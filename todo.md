@@ -152,3 +152,10 @@
 - [x] Implement update existing order functionality
 - [x] Show summary of duplicates found vs new orders
 - [x] Test with duplicate data
+
+## Schedule View Redesign
+- [x] Change layout to installer rows (left) and WO columns (top)
+- [x] Implement custom time slots: 9am, 10am, 11am, 11:30am, 1pm, 2:30pm, 3pm, 4pm, 6pm
+- [x] Add manual order creation dialog
+- [x] Update click-to-assign functionality (replaced drag-and-drop)
+- [x] Test new schedule view
