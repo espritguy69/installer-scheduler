@@ -17,6 +17,26 @@ import * as XLSX from "xlsx";
 import { Link } from "wouter";
 import { APP_TITLE } from "@/const";
 
+// Helper function to convert Excel time decimal to readable format
+function excelTimeToReadable(excelTime: any): string {
+  if (!excelTime && excelTime !== 0) return "";
+  
+  // If it's already a string, return it
+  if (typeof excelTime === 'string') return excelTime;
+  
+  // Convert Excel decimal time to hours and minutes
+  const totalMinutes = Math.round(excelTime * 24 * 60);
+  let hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  
+  // Convert to 12-hour format
+  const period = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12; // Convert 0 to 12 for midnight
+  
+  // Format as HH:MM AM/PM
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+}
+
 export default function Upload() {
   const [ordersFile, setOrdersFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -102,7 +122,7 @@ export default function Upload() {
             row["App Date"] || row["Appointment Date"] ||
             row.appointmentDate || row.AppointmentDate || ""
           ),
-          appointmentTime: String(
+          appointmentTime: excelTimeToReadable(
             row["App Time"] || row["Appointment Time"] ||
             row.appointmentTime || row.AppointmentTime || ""
           ),

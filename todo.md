@@ -301,3 +301,17 @@
 - [x] Test order creation with all new fields
 - [x] Verify fields are saved to database correctly
 - [x] Verify order cards display all Row 2 information (Service No., Time, Building)
+
+## Audit All Order-Related tRPC Procedures
+- [x] Check orders.update procedure for missing field validation
+- [x] Check orders.bulkCreate procedure (if exists) for field validation
+- [x] Verify upload procedure maps all Excel columns to database fields
+- [x] Test update operation with all fields
+- [x] Test bulk operations with all fields
+- [x] Document any other procedures that need fixing
+
+## Fix Excel Time Format Conversion
+- [x] Add excelTimeToReadable() helper function to convert Excel time decimals
+- [x] Update Upload.tsx to use time conversion for appointmentTime field
+- [x] Test Excel upload with time format conversion
+- [x] Verify order cards display readable time format (10:00 AM instead of 0.4166...)
