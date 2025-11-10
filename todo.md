@@ -63,3 +63,20 @@
 - [x] Map Service No., Customer Name, Contact No to database fields
 - [x] Support App Date, App Time, Building Name, SI Name columns
 - [x] Test with user's Excel format
+
+## Phase 10: Bug Fixes
+- [x] Fix nested anchor tag error in Home page navigation
+
+## Phase 11: Update Excel Format for User's Data
+- [x] Update order upload to recognize "Status" column as installer assignment
+- [x] Handle multiple installers in Status column (e.g., "AFIZ/AMAN")
+- [x] Update installer upload to support simple name list format
+- [x] Add "Service No." field to orders
+- [x] Test with user's actual Excel files
+
+## Phase 12: Update Status Workflow
+- [x] Update order status enum to include: pending, assigned, on_the_way, met_customer, completed, rescheduled, withdrawn
+- [x] Add reschedule reason field (customer_issue, building_issue, network_issue)
+- [x] Add rescheduled date and time fields
+- [x] Update status update UI with proper workflow
+- [x] Test new status workflow

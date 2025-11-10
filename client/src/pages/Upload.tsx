@@ -71,13 +71,16 @@ export default function Upload() {
           appointmentInfo = `Appointment: ${appDate} ${appTime}`.trim();
         }
 
-        // Combine building name and SI name into notes
+        // Handle Status column (contains installer names like "AFIZ/AMAN")
+        const statusValue = row["Status"] || row["SI Name"] || "";
+        
+        // Combine building name and installer assignment into notes
         let notesText = row.notes || row.Notes || "";
         if (row["Building Name"]) {
           notesText += (notesText ? " | " : "") + `Building: ${row["Building Name"]}`;
         }
-        if (row["SI Name"]) {
-          notesText += (notesText ? " | " : "") + `Assigned SI: ${row["SI Name"]}`;
+        if (statusValue) {
+          notesText += (notesText ? " | " : "") + `Assigned SI: ${statusValue}`;
         }
         if (appointmentInfo) {
           notesText += (notesText ? " | " : "") + appointmentInfo;
@@ -88,6 +91,10 @@ export default function Upload() {
             row["WO No."] || row["WO No"] || 
             row.orderNumber || row.OrderNumber || row.order_number || ""
           ),
+          serviceNumber: String(
+            row["Service No."] || row["Service No"] || 
+            row.serviceNumber || row.ServiceNumber || row.service_number || ""
+          ),
           customerName: String(
             row["Customer Name"] || 
             row.customerName || row.CustomerName || row.customer_name || ""
@@ -97,8 +104,11 @@ export default function Upload() {
             row.customerPhone || row.CustomerPhone || row.customer_phone || "",
           customerEmail: row.customerEmail || row.CustomerEmail || row.customer_email || "",
           serviceType: 
-            row["WO Type"] || row["Sales/Modi Type"] ||
+            row["WO Type"] ||
             row.serviceType || row.ServiceType || row.service_type || "",
+          salesModiType:
+            row["Sales/Modi Type"] ||
+            row.salesModiType || row.SalesModiType || "",
           address: 
             row["Building Name"] ||
             row.address || row.Address || "",
@@ -132,9 +142,9 @@ export default function Upload() {
     }
   };
 
-  const handleUploadInstallers = async () => {
+  const handleInstallersUpload = async () => {
     if (!installersFile) {
-      toast.error("Please select a file to upload");
+      toast.error("Please select a file");
       return;
     }
 
@@ -143,33 +153,38 @@ export default function Upload() {
       const rawData = await parseExcelFile(installersFile);
       
       // Map Excel columns to database fields
-      const installers = rawData.map((row: any) => ({
-        name: String(row.name || row.Name || ""),
-        email: row.email || row.Email || "",
-        phone: row.phone || row.Phone || "",
-        skills: row.skills || row.Skills || "",
-        isActive: row.isActive !== undefined ? Number(row.isActive) : (row.IsActive !== undefined ? Number(row.IsActive) : 1),
-      }));
+      // Support simple list format (just names) or detailed format
+      const installers = rawData.map((row: any) => {
+        // Handle simple list format where first column contains names
+        const firstColumnValue = Object.values(row)[0];
+        const nameValue = row.name || row.Name || row["SI LIST:"] || row["SI Name"] || firstColumnValue || "";
+        
+        return {
+          name: String(nameValue).trim(),
+          email: row.email || row.Email || "",
+          phone: row.phone || row.Phone || "",
+          skills: row.skills || row.Skills || "",
+          isActive: row.isActive !== undefined ? Number(row.isActive) : 1,
+        };
+      });
 
-      // Validate required fields
-      const invalidRows = installers.filter(i => !i.name);
-      if (invalidRows.length > 0) {
-        toast.error(`${invalidRows.length} rows are missing required field (name)`);
-        setIsProcessing(false);
+      // Filter out empty rows and validate
+      const validInstallers = installers.filter(i => i.name && i.name !== "SI LIST:");
+      
+      if (validInstallers.length === 0) {
+        toast.error("No valid installer names found in the file");
         return;
       }
 
-      await bulkCreateInstallers.mutateAsync(installers);
-      await utils.installers.list.invalidate();
+      // Upload to server
+      const result = await bulkCreateInstallers.mutateAsync(validInstallers);
       
-      toast.success(`Successfully imported ${installers.length} installers`);
+      await utils.installers.list.invalidate();
+      toast.success(`Successfully imported ${result.count} installers`);
       setInstallersFile(null);
-      // Reset file input
-      const fileInput = document.getElementById("installers-file-input") as HTMLInputElement;
-      if (fileInput) fileInput.value = "";
     } catch (error) {
       console.error("Error uploading installers:", error);
-      toast.error("Failed to upload installers. Please check the file format.");
+      toast.error("Failed to upload installers. Please check your file format.");
     } finally {
       setIsProcessing(false);
     }
@@ -316,7 +331,7 @@ export default function Upload() {
               </div>
             )}
             <Button
-              onClick={handleUploadInstallers}
+              onClick={handleInstallersUpload}
               disabled={!installersFile || isProcessing}
               className="w-full"
             >

@@ -15,6 +15,20 @@
       "when": 1762762505034,
       "tag": "0001_perfect_genesis",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1762763735130,
+      "tag": "0002_absurd_solo",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1762763909885,
+      "tag": "0003_green_the_order",
+      "breakpoints": true
     }
   ]
 }

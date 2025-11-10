@@ -104,9 +104,9 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="w-full">
-                <Link href="/upload">Go to Upload</Link>
-              </Button>
+              <Link href="/upload">
+                <Button className="w-full">Go to Upload</Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -121,9 +121,9 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="w-full">
-                <Link href="/schedule">Go to Schedule</Link>
-              </Button>
+              <Link href="/schedule">
+                <Button className="w-full">Go to Schedule</Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -138,9 +138,9 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="w-full" variant="outline">
-                <Link href="/schedule">View Schedule</Link>
-              </Button>
+              <Link href="/schedule">
+                <Button className="w-full" variant="outline">View Schedule</Button>
+              </Link>
             </CardContent>
           </Card>
         </div>

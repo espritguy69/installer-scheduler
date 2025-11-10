@@ -49,7 +49,10 @@ export const appRouter = router({
       address: z.string().optional(),
       estimatedDuration: z.number().optional(),
       priority: z.enum(["low", "medium", "high"]).optional(),
-      status: z.enum(["pending", "assigned", "in_progress", "completed", "cancelled"]).optional(),
+      status: z.enum(["pending", "assigned", "on_the_way", "met_customer", "completed", "rescheduled", "withdrawn"]).optional(),
+      rescheduleReason: z.enum(["customer_issue", "building_issue", "network_issue"]).optional(),
+      rescheduledDate: z.date().optional(),
+      rescheduledTime: z.string().optional(),
       notes: z.string().optional(),
     })).mutation(async ({ input }) => {
       const { id, ...data } = input;

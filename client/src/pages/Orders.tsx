@@ -35,6 +35,9 @@ export default function Orders() {
   const { user, logout } = useAuth();
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [newStatus, setNewStatus] = useState<string>("");
+  const [rescheduleReason, setRescheduleReason] = useState<string>("");
+  const [rescheduledDate, setRescheduledDate] = useState<string>("");
+  const [rescheduledTime, setRescheduledTime] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { data: orders = [], isLoading } = trpc.orders.list.useQuery();
@@ -48,11 +51,15 @@ export default function Orders() {
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
       case "assigned":
         return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
-      case "in_progress":
+      case "on_the_way":
+        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200";
+      case "met_customer":
         return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
       case "completed":
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-      case "cancelled":
+      case "rescheduled":
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+      case "withdrawn":
         return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
@@ -79,17 +86,36 @@ export default function Orders() {
   const handleStatusChange = (order: any) => {
     setSelectedOrder(order);
     setNewStatus(order.status);
+    setRescheduleReason("");
+    setRescheduledDate("");
+    setRescheduledTime("");
     setIsDialogOpen(true);
   };
 
   const handleUpdateStatus = async () => {
     if (!selectedOrder) return;
 
+    // Validate reschedule fields if status is rescheduled
+    if (newStatus === "rescheduled") {
+      if (!rescheduleReason || !rescheduledDate || !rescheduledTime) {
+        toast.error("Please provide reason, date and time for rescheduling");
+        return;
+      }
+    }
+
     try {
-      await updateOrder.mutateAsync({
+      const updateData: any = {
         id: selectedOrder.id,
         status: newStatus as any,
-      });
+      };
+
+      if (newStatus === "rescheduled") {
+        updateData.rescheduleReason = rescheduleReason as any;
+        updateData.rescheduledDate = new Date(rescheduledDate + "T" + rescheduledTime);
+        updateData.rescheduledTime = rescheduledTime;
+      }
+
+      await updateOrder.mutateAsync(updateData);
 
       await utils.orders.list.invalidate();
       toast.success("Order status updated successfully");
@@ -183,12 +209,12 @@ export default function Orders() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Order Number</TableHead>
+                    <TableHead>WO No.</TableHead>
+                    <TableHead>Service No.</TableHead>
                     <TableHead>Customer</TableHead>
-                    <TableHead>Service Type</TableHead>
+                    <TableHead>WO Type</TableHead>
                     <TableHead>Priority</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Duration</TableHead>
                     <TableHead>Assignment</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -206,13 +232,19 @@ export default function Orders() {
                       return (
                         <TableRow key={order.id}>
                           <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                          <TableCell className="text-xs">{order.serviceNumber || "-"}</TableCell>
                           <TableCell>
                             <div>{order.customerName}</div>
                             {order.customerPhone && (
                               <div className="text-xs text-muted-foreground">{order.customerPhone}</div>
                             )}
                           </TableCell>
-                          <TableCell>{order.serviceType || "-"}</TableCell>
+                          <TableCell>
+                            <div className="text-xs">{order.serviceType || "-"}</div>
+                            {order.salesModiType && (
+                              <div className="text-xs text-muted-foreground">{order.salesModiType}</div>
+                            )}
+                          </TableCell>
                           <TableCell>
                             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityBadgeColor(order.priority)}`}>
                               {order.priority}
@@ -223,7 +255,6 @@ export default function Orders() {
                               {order.status.replace("_", " ")}
                             </span>
                           </TableCell>
-                          <TableCell>{order.estimatedDuration} min</TableCell>
                           <TableCell>
                             {assignment ? (
                               <div className="text-sm">
@@ -267,20 +298,60 @@ export default function Orders() {
               Change the status of order: {selectedOrder?.orderNumber}
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <label className="text-sm font-medium mb-2 block">Select New Status</label>
-            <Select value={newStatus} onValueChange={setNewStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="assigned">Assigned</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Select New Status</label>
+              <Select value={newStatus} onValueChange={setNewStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="assigned">Assigned</SelectItem>
+                  <SelectItem value="on_the_way">On the Way</SelectItem>
+                  <SelectItem value="met_customer">Met the Customer</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="rescheduled">Reschedule</SelectItem>
+                  <SelectItem value="withdrawn">Withdrawn</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {newStatus === "rescheduled" && (
+              <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Reschedule Reason *</label>
+                  <Select value={rescheduleReason} onValueChange={setRescheduleReason}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select reason" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="customer_issue">Customer Issue</SelectItem>
+                      <SelectItem value="building_issue">Building Issue</SelectItem>
+                      <SelectItem value="network_issue">Network Issue</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">New Date *</label>
+                  <input
+                    type="date"
+                    value={rescheduledDate}
+                    onChange={(e) => setRescheduledDate(e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">New Time *</label>
+                  <input
+                    type="time"
+                    value={rescheduledTime}
+                    onChange={(e) => setRescheduledTime(e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
