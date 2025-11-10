@@ -118,18 +118,21 @@ export default function Upload() {
         };
       });
 
-      // Validate required fields
-      const invalidRows = orders.filter(o => !o.orderNumber || !o.customerName);
-      if (invalidRows.length > 0) {
-        toast.error(`${invalidRows.length} rows are missing required fields (orderNumber, customerName)`);
+      // Filter out completely empty rows (where all key fields are empty)
+      const validOrders = orders.filter(o => 
+        o.orderNumber || o.customerName || o.serviceNumber || o.serviceType
+      );
+
+      if (validOrders.length === 0) {
+        toast.error("No valid order data found in the file");
         setIsProcessing(false);
         return;
       }
 
-      await bulkCreateOrders.mutateAsync(orders);
+      await bulkCreateOrders.mutateAsync(validOrders);
       await utils.orders.list.invalidate();
       
-      toast.success(`Successfully imported ${orders.length} orders`);
+      toast.success(`Successfully imported ${validOrders.length} orders`);
       setOrdersFile(null);
       // Reset file input
       const fileInput = document.getElementById("orders-file-input") as HTMLInputElement;
@@ -253,7 +256,7 @@ export default function Upload() {
               <CardTitle>Upload Orders</CardTitle>
             </div>
             <CardDescription>
-              Upload an Excel file containing service orders. Required columns: orderNumber, customerName
+              Upload an Excel file containing service orders. Expected columns: WO No., WO Type, Sales/Modi Type, Service No., Customer Name, Contact No, App Date, App Time, Building Name, Status
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

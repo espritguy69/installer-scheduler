@@ -108,3 +108,7 @@
 ## Routing Issues
 - [x] Fix 404 error on /upload route
 - [x] Verify all routes are working correctly
+
+## Upload Validation Updates
+- [x] Remove strict validation for orderNumber and customerName
+- [x] Update validation to match user's Excel headers exactly
