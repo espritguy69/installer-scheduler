@@ -11,7 +11,9 @@ import {
   CheckCircle2,
   Clock,
   AlertCircle,
-  TrendingUp
+  TrendingUp,
+  StickyNote,
+  Filter
 } from "lucide-react";
 import { Link } from "wouter";
 import { useMemo } from "react";
@@ -20,6 +22,7 @@ export default function Dashboard() {
   const { data: orders = [] } = trpc.orders.list.useQuery();
   const { data: installers = [] } = trpc.installers.list.useQuery();
   const { data: assignments = [] } = trpc.assignments.list.useQuery();
+  const { data: allNotes = [] } = trpc.notes.list.useQuery();
 
   // Calculate metrics
   const metrics = useMemo(() => {
@@ -327,6 +330,102 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+        
+        {/* Recent Notes Section */}
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <StickyNote className="h-5 w-5" />
+                <CardTitle>Recent Notes & Remarks</CardTitle>
+              </div>
+              <Link href="/notes" className="text-sm text-primary hover:underline">
+                View All →
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {(() => {
+              // Filter notes from last 7 days
+              const sevenDaysAgo = new Date();
+              sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+              const recentNotes = allNotes.filter(note => {
+                const noteDate = new Date(note.date);
+                return noteDate >= sevenDaysAgo;
+              }).slice(0, 10); // Show max 10 notes
+              
+              // Count open incidents and pending follow-ups
+              const openIncidents = recentNotes.filter(n => n.noteType === "incident" && n.status === "open").length;
+              const pendingFollowUps = recentNotes.filter(n => n.noteType === "follow_up" && n.status === "open").length;
+              
+              return (
+                <>
+                  {/* Quick Stats */}
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-950 rounded-lg">
+                      <AlertCircle className="h-5 w-5 text-red-600" />
+                      <div>
+                        <div className="text-2xl font-bold text-red-600">{openIncidents}</div>
+                        <div className="text-sm text-red-700 dark:text-red-300">Open Incidents</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                      <Clock className="h-5 w-5 text-blue-600" />
+                      <div>
+                        <div className="text-2xl font-bold text-blue-600">{pendingFollowUps}</div>
+                        <div className="text-sm text-blue-700 dark:text-blue-300">Pending Follow-ups</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Notes List */}
+                  {recentNotes.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No recent notes in the last 7 days
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {recentNotes.map(note => (
+                        <div key={note.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <h4 className="font-medium">{note.title}</h4>
+                              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{note.content}</p>
+                            </div>
+                            <div className="flex gap-1 ml-2">
+                              <span className={`text-xs px-2 py-1 rounded-full ${
+                                note.noteType === "incident" ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" :
+                                note.noteType === "complaint" ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" :
+                                note.noteType === "follow_up" ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" :
+                                note.noteType === "reschedule" ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200" :
+                                "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                              }`}>
+                                {note.noteType}
+                              </span>
+                              <span className={`text-xs px-2 py-1 rounded-full ${
+                                note.status === "open" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200" :
+                                note.status === "in_progress" ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" :
+                                note.status === "resolved" ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" :
+                                "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                              }`}>
+                                {note.status}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span>📅 {note.date}</span>
+                            {note.serviceNumber && <span>🔧 {note.serviceNumber}</span>}
+                            {note.customerName && <span>👤 {note.customerName}</span>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </CardContent>
         </Card>
       </div>

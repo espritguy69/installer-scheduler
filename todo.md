@@ -240,3 +240,14 @@
 - [x] Add note types (reschedule, follow-up, incident, complaint)
 - [x] Implement service number search and linking
 - [x] Test notes persistence after clearing orders
+
+## Notes System Enhancements
+- [x] Add Excel export functionality for notes
+- [x] Implement date range filtering for export
+- [x] Create note templates for common scenarios (customer not home, wrong address, equipment issue)
+- [x] Add quick-add template buttons to note creation dialog
+- [x] Display recent notes (last 7 days) on Dashboard
+- [x] Add filters for open incidents and pending follow-ups on Dashboard
+- [x] Test Excel export with various filters
+- [x] Test template functionality
+- [x] Test dashboard notes integration

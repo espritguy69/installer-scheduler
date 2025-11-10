@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { APP_TITLE } from "@/const";
-import { BookOpen, Loader2, Plus, Search } from "lucide-react";
+import { BookOpen, Download, Loader2, Plus, Search } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
@@ -105,6 +105,94 @@ export default function Notes() {
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
+    }
+  };
+  
+  const handleExport = () => {
+    if (notes.length === 0) {
+      toast.error("No notes to export");
+      return;
+    }
+    
+    // Create CSV content
+    const headers = ["Date", "Note Type", "Priority", "Status", "Service No.", "Order No.", "Customer", "Title", "Content", "Created By", "Created At"];
+    const rows = notes.map(note => [
+      note.date,
+      note.noteType,
+      note.priority,
+      note.status,
+      note.serviceNumber || "",
+      note.orderNumber || "",
+      note.customerName || "",
+      note.title,
+      note.content.replace(/\n/g, " ").replace(/"/g, '""'), // Escape quotes and remove newlines
+      note.createdBy,
+      new Date(note.createdAt).toLocaleString()
+    ]);
+    
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
+    ].join("\n");
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `notes_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success(`Exported ${notes.length} notes to CSV`);
+  };
+  
+  const applyTemplate = (templateType: string) => {
+    const templates: Record<string, { noteType: typeof formData.noteType; priority: typeof formData.priority; title: string; content: string }> = {
+      customer_not_home: {
+        noteType: "reschedule",
+        priority: "medium",
+        title: "Customer not available at location",
+        content: "Arrived at customer location but customer was not home. Attempted to contact via phone but no answer. Need to reschedule appointment."
+      },
+      wrong_address: {
+        noteType: "incident",
+        priority: "high",
+        title: "Incorrect address provided",
+        content: "The address provided in the order does not match the actual location. Customer confirmed correct address. Need to update order details and reschedule."
+      },
+      equipment_issue: {
+        noteType: "incident",
+        priority: "high",
+        title: "Equipment malfunction or missing parts",
+        content: "Encountered equipment issue during installation. Missing required parts or equipment malfunction. Need to order replacement parts and reschedule completion."
+      },
+      reschedule_request: {
+        noteType: "reschedule",
+        priority: "medium",
+        title: "Customer requested reschedule",
+        content: "Customer contacted to request rescheduling of appointment. Reason: [Add customer's reason here]. Proposed new date: [Add date]."
+      },
+      service_complaint: {
+        noteType: "complaint",
+        priority: "high",
+        title: "Customer complaint received",
+        content: "Customer expressed dissatisfaction with service. Issue: [Describe the complaint]. Action taken: [Describe resolution steps]. Follow-up required."
+      }
+    };
+    
+    const template = templates[templateType];
+    if (template) {
+      setFormData(prev => ({
+        ...prev,
+        noteType: template.noteType,
+        priority: template.priority,
+        title: template.title,
+        content: template.content
+      }));
+      toast.success("Template applied");
     }
   };
   
@@ -265,10 +353,16 @@ export default function Notes() {
                   Total: {notes.length} notes
                 </CardDescription>
               </div>
-              <Button onClick={() => setIsCreateDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Note
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleExport}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+                <Button onClick={() => setIsCreateDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Note
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -387,6 +481,54 @@ export default function Notes() {
               Record a remark, incident, complaint, or follow-up task
             </DialogDescription>
           </DialogHeader>
+          
+          {/* Quick Templates */}
+          <div className="border-b pb-4 mb-4">
+            <label className="text-sm font-medium mb-2 block">Quick Templates</label>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => applyTemplate("customer_not_home")}
+              >
+                Customer Not Home
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => applyTemplate("wrong_address")}
+              >
+                Wrong Address
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => applyTemplate("equipment_issue")}
+              >
+                Equipment Issue
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => applyTemplate("reschedule_request")}
+              >
+                Reschedule Request
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => applyTemplate("service_complaint")}
+              >
+                Service Complaint
+              </Button>
+            </div>
+          </div>
+          
           <div className="grid grid-cols-2 gap-4 py-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Date *</label>
