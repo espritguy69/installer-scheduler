@@ -23,6 +23,7 @@ export default function Schedule() {
   const createAssignment = trpc.assignments.create.useMutation();
   const updateAssignment = trpc.assignments.update.useMutation();
   const deleteAssignment = trpc.assignments.delete.useMutation();
+  const updateOrder = trpc.orders.update.useMutation();
   const utils = trpc.useUtils();
 
   // Filter unassigned orders
@@ -98,6 +99,12 @@ export default function Schedule() {
         scheduledDate,
         scheduledStartTime: timeSlot,
         scheduledEndTime: `${endHour.toString().padStart(2, "0")}:${endMinute.toString().padStart(2, "0")}`,
+      });
+
+      // Update order status to 'assigned'
+      await updateOrder.mutateAsync({
+        id: draggedOrder.id,
+        status: "assigned",
       });
 
       await utils.assignments.list.invalidate();
@@ -206,6 +213,16 @@ export default function Schedule() {
               <Link href="/upload">
                 <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   Upload
+                </a>
+              </Link>
+              <Link href="/orders">
+                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Orders
+                </a>
+              </Link>
+              <Link href="/installers">
+                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Installers
                 </a>
               </Link>
               <Link href="/schedule">

@@ -61,17 +61,52 @@ export default function Upload() {
       const rawData = await parseExcelFile(ordersFile);
       
       // Map Excel columns to database fields
-      const orders = rawData.map((row: any) => ({
-        orderNumber: String(row.orderNumber || row.OrderNumber || row.order_number || ""),
-        customerName: String(row.customerName || row.CustomerName || row.customer_name || ""),
-        customerPhone: row.customerPhone || row.CustomerPhone || row.customer_phone || "",
-        customerEmail: row.customerEmail || row.CustomerEmail || row.customer_email || "",
-        serviceType: row.serviceType || row.ServiceType || row.service_type || "",
-        address: row.address || row.Address || "",
-        estimatedDuration: Number(row.estimatedDuration || row.EstimatedDuration || row.estimated_duration || 60),
-        priority: (row.priority || row.Priority || "medium").toLowerCase(),
-        notes: row.notes || row.Notes || "",
-      }));
+      // Support both generic format and user's specific format (WO No., Customer Name, etc.)
+      const orders = rawData.map((row: any) => {
+        // Handle appointment date and time
+        let appointmentInfo = "";
+        if (row["App Date"] || row["App Time"]) {
+          const appDate = row["App Date"] || "";
+          const appTime = row["App Time"] || "";
+          appointmentInfo = `Appointment: ${appDate} ${appTime}`.trim();
+        }
+
+        // Combine building name and SI name into notes
+        let notesText = row.notes || row.Notes || "";
+        if (row["Building Name"]) {
+          notesText += (notesText ? " | " : "") + `Building: ${row["Building Name"]}`;
+        }
+        if (row["SI Name"]) {
+          notesText += (notesText ? " | " : "") + `Assigned SI: ${row["SI Name"]}`;
+        }
+        if (appointmentInfo) {
+          notesText += (notesText ? " | " : "") + appointmentInfo;
+        }
+
+        return {
+          orderNumber: String(
+            row["WO No."] || row["WO No"] || 
+            row.orderNumber || row.OrderNumber || row.order_number || ""
+          ),
+          customerName: String(
+            row["Customer Name"] || 
+            row.customerName || row.CustomerName || row.customer_name || ""
+          ),
+          customerPhone: 
+            row["Contact No"] || row["Contact No."] ||
+            row.customerPhone || row.CustomerPhone || row.customer_phone || "",
+          customerEmail: row.customerEmail || row.CustomerEmail || row.customer_email || "",
+          serviceType: 
+            row["WO Type"] || row["Sales/Modi Type"] ||
+            row.serviceType || row.ServiceType || row.service_type || "",
+          address: 
+            row["Building Name"] ||
+            row.address || row.Address || "",
+          estimatedDuration: Number(row.estimatedDuration || row.EstimatedDuration || row.estimated_duration || 60),
+          priority: (row.priority || row.Priority || "medium").toLowerCase(),
+          notes: notesText,
+        };
+      });
 
       // Validate required fields
       const invalidRows = orders.filter(o => !o.orderNumber || !o.customerName);
@@ -160,6 +195,16 @@ export default function Upload() {
                   Upload
                 </a>
               </Link>
+              <Link href="/orders">
+                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Orders
+                </a>
+              </Link>
+              <Link href="/installers">
+                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Installers
+                </a>
+              </Link>
               <Link href="/schedule">
                 <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   Schedule
@@ -223,17 +268,19 @@ export default function Upload() {
               Upload Orders
             </Button>
             <div className="text-xs text-muted-foreground space-y-1">
-              <p className="font-semibold">Expected columns:</p>
-              <ul className="list-disc list-inside space-y-1">
+              <p className="font-semibold">Supported column formats:</p>
+              <p className="mt-2 font-medium">Standard format:</p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
                 <li>orderNumber (required)</li>
                 <li>customerName (required)</li>
-                <li>customerPhone</li>
-                <li>customerEmail</li>
-                <li>serviceType</li>
-                <li>address</li>
-                <li>estimatedDuration (in minutes, default: 60)</li>
-                <li>priority (low/medium/high, default: medium)</li>
-                <li>notes</li>
+                <li>customerPhone, serviceType, address, priority, notes</li>
+              </ul>
+              <p className="mt-2 font-medium">Work Order format:</p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li>WO No. (required)</li>
+                <li>Customer Name (required)</li>
+                <li>Contact No, WO Type, Sales/Modi Type</li>
+                <li>App Date, App Time, Building Name, SI Name</li>
               </ul>
             </div>
           </CardContent>

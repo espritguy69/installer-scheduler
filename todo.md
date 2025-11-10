@@ -36,10 +36,30 @@
 - [x] Test Excel export output
 - [x] Add loading states and error messages
 - [x] Improve UI/UX based on testing
-- [ ] Create checkpoint
+- [x] Create checkpoint
 
 ## Phase 6: Documentation
-- [ ] Create user guide for uploading orders
-- [ ] Create user guide for drag-and-drop assignment
-- [ ] Create user guide for Excel export
-- [ ] Document data format requirements
+- [x] Create user guide for uploading orders
+- [x] Create user guide for drag-and-drop assignment
+- [x] Create user guide for Excel export
+- [x] Document data format requirements
+
+## Phase 7: Order Status Tracking
+- [x] Add status update UI to schedule page
+- [x] Implement status change functionality in backend
+- [x] Update order status when assigned
+- [x] Add visual indicators for different statuses
+- [x] Test status updates
+
+## Phase 8: Installer Management
+- [x] Create Installers page with list view
+- [x] Add edit functionality for installers
+- [x] Add delete functionality for installers
+- [x] Add search/filter for installers
+- [x] Test installer management features
+
+## Phase 9: Custom Excel Format Support
+- [x] Update order upload to support WO No., WO Type, Sales/Modi Type columns
+- [x] Map Service No., Customer Name, Contact No to database fields
+- [x] Support App Date, App Time, Building Name, SI Name columns
+- [x] Test with user's Excel format

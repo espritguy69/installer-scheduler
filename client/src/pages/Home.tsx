@@ -57,6 +57,16 @@ export default function Home() {
                   Upload
                 </a>
               </Link>
+              <Link href="/orders">
+                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Orders
+                </a>
+              </Link>
+              <Link href="/installers">
+                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Installers
+                </a>
+              </Link>
               <Link href="/schedule">
                 <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   Schedule
