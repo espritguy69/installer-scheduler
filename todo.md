@@ -270,3 +270,9 @@
 ## Fix Nested Anchor Tag Error
 - [x] Fix Navigation component to remove nested `<a>` tags inside Link components
 - [x] Test all pages to verify error is resolved
+
+## Fix Schedule Order Card Display
+- [x] Investigate why Service No., App Time, Building Name not showing in order cards
+- [x] Fix order card component to always display Row 2 fields
+- [x] Add sample data with all fields populated for testing
+- [x] Verify order cards display correctly on Schedule page

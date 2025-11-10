@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO orders (orderNumber, serviceType, salesModiType, serviceNumber, customerName, customerPhone, appointmentDate, appointmentTime, buildingName, status, estimatedDuration, priority, createdAt, updatedAt) VALUES ('WO-DEMO-001', 'Installation', 'New', 'SVC-99999', 'Demo Customer', '012-3456789', '2025-11-10', '10:00 AM', 'Menara Demo Tower', 'pending', 120, 'normal', NOW(), NOW())",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute INSERT INTO orders (orderNumber, serviceType, salesModiType, serviceNumber, customerName, customerPhone, appointmentDate, appointmentTime, buildingName, status, estimatedDuration, priority, createdAt, updatedAt) VALUES ('WO-DEMO-001', 'Installation', 'New', 'SVC-99999', 'Demo Customer', '012-3456789', '2025-11-10', '10:00 AM', 'Menara Demo Tower', 'pending', 120, 'normal', NOW(), NOW())",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1265 (01000) at line 1: Data truncated for column 'priority' at row 1"
+  ]
+}
