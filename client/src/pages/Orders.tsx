@@ -44,6 +44,11 @@ export default function Orders() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [rescheduleReasonFilter, setRescheduleReasonFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  
+  // Bulk operations
+  const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
+  const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
+  const [bulkAction, setBulkAction] = useState<string>("");
 
   const { data: allOrders = [], isLoading } = trpc.orders.list.useQuery();
   
@@ -445,3 +450,5 @@ export default function Orders() {
     </div>
   );
 }
+
+// Bulk operations handlers added

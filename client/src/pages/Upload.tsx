@@ -1,6 +1,13 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
 import { Upload as UploadIcon, FileSpreadsheet } from "lucide-react";
 import { useState } from "react";
@@ -12,8 +19,12 @@ import { APP_TITLE } from "@/const";
 export default function Upload() {
   const [ordersFile, setOrdersFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [duplicates, setDuplicates] = useState<any[]>([]);
+  const [newOrders, setNewOrders] = useState<any[]>([]);
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
 
   const bulkCreateOrders = trpc.orders.bulkCreate.useMutation();
+  const { data: existingOrders = [] } = trpc.orders.list.useQuery();
   const utils = trpc.useUtils();
 
   const handleOrdersFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,10 +135,25 @@ export default function Upload() {
         return;
       }
 
-      await bulkCreateOrders.mutateAsync(validOrders);
+      // Check for duplicates
+      const existingOrderNumbers = new Set(existingOrders.map(o => o.orderNumber));
+      const duplicateOrders = validOrders.filter(o => existingOrderNumbers.has(o.orderNumber));
+      const uniqueOrders = validOrders.filter(o => !existingOrderNumbers.has(o.orderNumber));
+
+      if (duplicateOrders.length > 0) {
+        // Show duplicate dialog
+        setDuplicates(duplicateOrders);
+        setNewOrders(uniqueOrders);
+        setShowDuplicateDialog(true);
+        setIsProcessing(false);
+        return;
+      }
+
+      // No duplicates, proceed with import
+      await bulkCreateOrders.mutateAsync(uniqueOrders);
       await utils.orders.list.invalidate();
       
-      toast.success(`Successfully imported ${validOrders.length} orders`);
+      toast.success(`Successfully imported ${uniqueOrders.length} orders`);
       setOrdersFile(null);
       // Reset file input
       const fileInput = document.getElementById("orders-file-input") as HTMLInputElement;
@@ -243,6 +269,77 @@ export default function Upload() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Duplicate Warning Dialog */}
+      <Dialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Duplicate Orders Detected</DialogTitle>
+            <DialogDescription>
+              Found {duplicates.length} duplicate order(s) and {newOrders.length} new order(s)
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="max-h-60 overflow-y-auto border rounded-lg p-4">
+              <h4 className="font-semibold mb-2">Duplicate Orders:</h4>
+              <ul className="space-y-1 text-sm">
+                {duplicates.map((order, idx) => (
+                  <li key={idx} className="text-muted-foreground">
+                    {order.orderNumber} - {order.customerName}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  // Import only new orders (skip duplicates)
+                  if (newOrders.length > 0) {
+                    await bulkCreateOrders.mutateAsync(newOrders);
+                    await utils.orders.list.invalidate();
+                    toast.success(`Imported ${newOrders.length} new orders. Skipped ${duplicates.length} duplicates.`);
+                  } else {
+                    toast.info("No new orders to import.");
+                  }
+                  setShowDuplicateDialog(false);
+                  setOrdersFile(null);
+                  const fileInput = document.getElementById("orders-file-input") as HTMLInputElement;
+                  if (fileInput) fileInput.value = "";
+                }}
+              >
+                Skip Duplicates ({duplicates.length})
+              </Button>
+              <Button
+                onClick={async () => {
+                  // Import all orders (including duplicates as updates)
+                  const allOrders = [...newOrders, ...duplicates];
+                  await bulkCreateOrders.mutateAsync(allOrders);
+                  await utils.orders.list.invalidate();
+                  toast.success(`Imported ${newOrders.length} new orders and updated ${duplicates.length} existing orders.`);
+                  setShowDuplicateDialog(false);
+                  setOrdersFile(null);
+                  const fileInput = document.getElementById("orders-file-input") as HTMLInputElement;
+                  if (fileInput) fileInput.value = "";
+                }}
+              >
+                Update Existing ({duplicates.length})
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setShowDuplicateDialog(false);
+                  setOrdersFile(null);
+                  const fileInput = document.getElementById("orders-file-input") as HTMLInputElement;
+                  if (fileInput) fileInput.value = "";
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
     </div>
   );

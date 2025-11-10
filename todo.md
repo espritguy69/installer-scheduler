@@ -122,3 +122,33 @@
 - [x] Remove installer upload section from Upload page
 - [x] Create seed script to populate 16 predefined installers
 - [x] Keep Installers page for manual add/remove functionality
+
+## Performance Tracking Dashboard
+- [x] Create dashboard page with installer performance metrics
+- [x] Add completed jobs count per installer
+- [x] Calculate average completion time
+- [x] Show current workload (assigned vs completed)
+- [x] Add performance charts and visualizations
+
+## Smart Assignment Suggestions
+- [x] Create algorithm to suggest best installer for orders
+- [x] Factor in current workload
+- [x] Consider installer completion rate
+- [x] Add suggestion UI to schedule page
+- [x] Display suggested installer with workload info
+
+## Bulk Order Operations
+- [x] Add bulk operations state management
+- [x] Add bulk action handlers (export, delete)
+- [ ] Add checkboxes UI to Orders table
+- [ ] Add bulk operations toolbar
+- [ ] Test bulk operations
+
+## Duplicate Detection for Order Import
+- [x] Add duplicate detection logic to check existing WO numbers
+- [x] Add state management for duplicates and new orders
+- [x] Create duplicate warning dialog UI
+- [x] Implement skip duplicate functionality
+- [x] Implement update existing order functionality
+- [x] Show summary of duplicates found vs new orders
+- [x] Test with duplicate data

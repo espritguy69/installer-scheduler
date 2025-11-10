@@ -297,7 +297,28 @@ export default function Schedule() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {unassignedOrders.map(order => (
+              {unassignedOrders.map(order => {
+                // Calculate best installer suggestion
+                const installerWorkload = installers.map(installer => {
+                  const installerAssignments = filteredAssignments.filter(a => a.installerId === installer.id);
+                  const installerOrders = installerAssignments.map(a => orders.find(o => o.id === a.orderId)).filter(Boolean);
+                  const completedCount = installerOrders.filter(o => o?.status === "completed").length;
+                  const totalCount = installerOrders.length;
+                  const completionRate = totalCount > 0 ? completedCount / totalCount : 1;
+                  
+                  return {
+                    installer,
+                    workload: installerAssignments.length,
+                    completionRate,
+                    score: (1 - (installerAssignments.length / 10)) * 0.6 + completionRate * 0.4
+                  };
+                });
+                
+                const bestMatch = installerWorkload
+                  .filter(iw => iw.installer.isActive)
+                  .sort((a, b) => b.score - a.score)[0];
+                
+                return (
                 <div
                   key={order.id}
                   draggable
@@ -309,8 +330,15 @@ export default function Schedule() {
                   <div className="text-xs text-muted-foreground mt-1">
                     {order.estimatedDuration} min • {order.priority}
                   </div>
+                  {bestMatch && (
+                    <div className="mt-2 pt-2 border-t text-xs">
+                      <div className="text-muted-foreground">Suggested: <span className="font-medium text-foreground">{bestMatch.installer.name}</span></div>
+                      <div className="text-muted-foreground">Workload: {bestMatch.workload} tasks</div>
+                    </div>
+                  )}
                 </div>
-              ))}
+                );
+              })}
               {unassignedOrders.length === 0 && (
                 <div className="text-sm text-muted-foreground text-center py-4">
                   No unassigned orders

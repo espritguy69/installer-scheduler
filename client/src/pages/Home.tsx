@@ -47,7 +47,7 @@ export default function Home() {
           <div className="flex items-center gap-6">
             <h1 className="text-xl font-bold">{APP_TITLE}</h1>
             <nav className="flex gap-4">
-              <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/" className="text-sm font-medium text-foreground transition-colors">
                 Home
               </Link>
               <Link href="/upload" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -61,6 +61,9 @@ export default function Home() {
               </Link>
               <Link href="/schedule" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Schedule
+              </Link>
+              <Link href="/performance" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Performance
               </Link>
             </nav>
           </div>
