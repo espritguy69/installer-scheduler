@@ -117,3 +117,8 @@
 - [x] Remove email validation requirement from order schema
 - [x] Fix phone number type conversion from Excel
 - [x] Fix nested anchor tags in Upload page navigation
+
+## Installer Management Updates
+- [x] Remove installer upload section from Upload page
+- [x] Create seed script to populate 16 predefined installers
+- [x] Keep Installers page for manual add/remove functionality

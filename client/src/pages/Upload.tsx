@@ -2,7 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Upload as UploadIcon, FileSpreadsheet, Users } from "lucide-react";
+import { Upload as UploadIcon, FileSpreadsheet } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
@@ -11,11 +11,9 @@ import { APP_TITLE } from "@/const";
 
 export default function Upload() {
   const [ordersFile, setOrdersFile] = useState<File | null>(null);
-  const [installersFile, setInstallersFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const bulkCreateOrders = trpc.orders.bulkCreate.useMutation();
-  const bulkCreateInstallers = trpc.installers.bulkCreate.useMutation();
   const utils = trpc.useUtils();
 
   const handleOrdersFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,11 +22,7 @@ export default function Upload() {
     }
   };
 
-  const handleInstallersFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setInstallersFile(e.target.files[0]);
-    }
-  };
+
 
   const parseExcelFile = async (file: File): Promise<any[]> => {
     return new Promise((resolve, reject) => {
@@ -146,53 +140,7 @@ export default function Upload() {
     }
   };
 
-  const handleInstallersUpload = async () => {
-    if (!installersFile) {
-      toast.error("Please select a file");
-      return;
-    }
 
-    setIsProcessing(true);
-    try {
-      const rawData = await parseExcelFile(installersFile);
-      
-      // Map Excel columns to database fields
-      // Support simple list format (just names) or detailed format
-      const installers = rawData.map((row: any) => {
-        // Handle simple list format where first column contains names
-        const firstColumnValue = Object.values(row)[0];
-        const nameValue = row.name || row.Name || row["SI LIST:"] || row["SI Name"] || firstColumnValue || "";
-        
-        return {
-          name: String(nameValue).trim(),
-          email: row.email || row.Email || "",
-          phone: row.phone || row.Phone || "",
-          skills: row.skills || row.Skills || "",
-          isActive: row.isActive !== undefined ? Number(row.isActive) : 1,
-        };
-      });
-
-      // Filter out empty rows and validate
-      const validInstallers = installers.filter(i => i.name && i.name !== "SI LIST:");
-      
-      if (validInstallers.length === 0) {
-        toast.error("No valid installer names found in the file");
-        return;
-      }
-
-      // Upload to server
-      const result = await bulkCreateInstallers.mutateAsync(validInstallers);
-      
-      await utils.installers.list.invalidate();
-      toast.success(`Successfully imported ${result.count} installers`);
-      setInstallersFile(null);
-    } catch (error) {
-      console.error("Error uploading installers:", error);
-      toast.error("Failed to upload installers. Please check your file format.");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   const { user, logout } = useAuth();
 
@@ -290,56 +238,6 @@ export default function Upload() {
                 <li>Customer Name (required)</li>
                 <li>Contact No, WO Type, Sales/Modi Type</li>
                 <li>App Date, App Time, Building Name, SI Name</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Upload Installers */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              <CardTitle>Upload Installers</CardTitle>
-            </div>
-            <CardDescription>
-              Upload an Excel file containing installer information. Required column: name
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="installers-file-input" className="text-sm font-medium">
-                Select File
-              </label>
-              <input
-                id="installers-file-input"
-                type="file"
-                accept=".xlsx,.xls,.csv"
-                onChange={handleInstallersFileChange}
-                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-              />
-            </div>
-            {installersFile && (
-              <div className="text-sm text-muted-foreground">
-                Selected: {installersFile.name}
-              </div>
-            )}
-            <Button
-              onClick={handleInstallersUpload}
-              disabled={!installersFile || isProcessing}
-              className="w-full"
-            >
-              <UploadIcon className="mr-2 h-4 w-4" />
-              Upload Installers
-            </Button>
-            <div className="text-xs text-muted-foreground space-y-1">
-              <p className="font-semibold">Expected columns:</p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>name (required)</li>
-                <li>email</li>
-                <li>phone</li>
-                <li>skills</li>
-                <li>isActive (1 for active, 0 for inactive, default: 1)</li>
               </ul>
             </div>
           </CardContent>
