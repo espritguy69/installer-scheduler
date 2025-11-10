@@ -104,3 +104,7 @@
 
 ## Bug Fixes
 - [x] Fix nested anchor tag error on Home page
+
+## Routing Issues
+- [x] Fix 404 error on /upload route
+- [x] Verify all routes are working correctly
