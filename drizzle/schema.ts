@@ -115,3 +115,22 @@ export const notes = mysqlTable("notes", {
 
 export type Note = typeof notes.$inferSelect;
 export type InsertNote = typeof notes.$inferInsert;
+
+/**
+ * Order history table - audit log for tracking all changes made to orders
+ * Records who changed what, when, and the before/after values
+ */
+export const orderHistory = mysqlTable("orderHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  orderId: int("orderId").notNull(), // Reference to the order that was changed
+  userId: int("userId"), // User who made the change (can be null for system changes)
+  userName: varchar("userName", { length: 255 }), // User name at time of change
+  action: mysqlEnum("action", ["created", "updated", "status_changed"]).notNull(),
+  fieldName: varchar("fieldName", { length: 100 }), // Which field was changed (null for create action)
+  oldValue: text("oldValue"), // Previous value (null for create action)
+  newValue: text("newValue"), // New value
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type OrderHistory = typeof orderHistory.$inferSelect;
+export type InsertOrderHistory = typeof orderHistory.$inferInsert;

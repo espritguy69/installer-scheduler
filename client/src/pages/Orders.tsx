@@ -17,6 +17,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Table,
   TableBody,
   TableCell,
@@ -131,6 +137,20 @@ export default function Orders() {
     setRescheduledDate("");
     setRescheduledTime("");
     setIsDialogOpen(true);
+  };
+  
+  const handleQuickStatusUpdate = async (orderId: number, newStatus: string) => {
+    try {
+      await updateOrder.mutateAsync({
+        id: orderId,
+        status: newStatus as any,
+      });
+      await utils.orders.list.invalidate();
+      toast.success("Status updated successfully");
+    } catch (error) {
+      toast.error("Failed to update status");
+      console.error(error);
+    }
   };
   
   const handleEditOrder = (order: any) => {
@@ -362,9 +382,58 @@ export default function Orders() {
                             </span>
                           </TableCell>
                           <TableCell>
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(order.status)}`}>
-                              {order.status.replace("_", " ")}
-                            </span>
+                            <Select
+                              value={order.status}
+                              onValueChange={(value) => handleQuickStatusUpdate(order.id, value)}
+                            >
+                              <SelectTrigger className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border-0 w-auto h-auto gap-1 ${getStatusBadgeColor(order.status)}`}>
+                                <SelectValue>{order.status.replace("_", " ")}</SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="pending">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                    Pending
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="assigned">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                    Assigned
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="on_the_way">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                                    On the way
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="met_customer">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                    Met customer
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="completed">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                                    Completed
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="rescheduled">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+                                    Rescheduled
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="withdrawn">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                                    Withdrawn
+                                  </span>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                           <TableCell>
                             {assignment ? (

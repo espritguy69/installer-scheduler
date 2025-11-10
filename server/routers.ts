@@ -42,8 +42,21 @@ export const appRouter = router({
       estimatedDuration: z.number().default(60),
       priority: z.enum(["low", "medium", "high"]).default("medium"),
       notes: z.string().optional(),
-    })).mutation(async ({ input }) => {
-      return await db.createOrder(input);
+    })).mutation(async ({ input, ctx }) => {
+      const result = await db.createOrder(input);
+      
+      // Log order creation in audit log
+      const insertId = (result as any).insertId || (result as any)[0]?.insertId;
+      if (insertId) {
+        await db.logOrderCreation(
+          insertId,
+          ctx.user?.id || null,
+          ctx.user?.name || null,
+          input
+        );
+      }
+      
+      return result;
     }),
     update: protectedProcedure.input(z.object({
       id: z.number(),

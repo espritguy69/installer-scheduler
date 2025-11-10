@@ -1,6 +1,6 @@
 import { and, eq, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { assignments, InsertAssignment, InsertInstaller, InsertNote, InsertOrder, installers, InsertUser, notes, orders, users } from "../drizzle/schema";
+import { assignments, InsertAssignment, InsertInstaller, InsertNote, InsertOrder, InsertOrderHistory, installers, InsertUser, notes, orderHistory, orders, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -290,4 +290,60 @@ export async function deleteNote(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.delete(notes).where(eq(notes.id, id));
+}
+
+// Order History / Audit Log queries
+export async function getOrderHistory(orderId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(orderHistory)
+    .where(eq(orderHistory.orderId, orderId))
+    .orderBy(orderHistory.createdAt);
+}
+
+export async function logOrderHistory(entry: InsertOrderHistory) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(orderHistory).values(entry);
+}
+
+export async function logOrderCreation(orderId: number, userId: number | null, userName: string | null, orderData: any) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.insert(orderHistory).values({
+    orderId,
+    userId,
+    userName,
+    action: "created",
+    fieldName: null,
+    oldValue: null,
+    newValue: JSON.stringify(orderData),
+  });
+}
+
+export async function logOrderUpdate(orderId: number, userId: number | null, userName: string | null, changes: Record<string, { old: any, new: any }>) {
+  const db = await getDb();
+  if (!db) return;
+  
+  const entries: InsertOrderHistory[] = [];
+  
+  for (const [fieldName, { old: oldValue, new: newValue }] of Object.entries(changes)) {
+    // Skip if values are the same
+    if (oldValue === newValue) continue;
+    
+    entries.push({
+      orderId,
+      userId,
+      userName,
+      action: fieldName === "status" ? "status_changed" : "updated",
+      fieldName,
+      oldValue: oldValue != null ? String(oldValue) : null,
+      newValue: newValue != null ? String(newValue) : null,
+    });
+  }
+  
+  if (entries.length > 0) {
+    await db.insert(orderHistory).values(entries);
+  }
 }

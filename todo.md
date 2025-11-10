@@ -326,3 +326,26 @@
 - [x] Show success/error toast messages
 - [x] Refresh order list after successful update
 - [x] Test editing various order fields and verify changes persist
+
+## Implement Order History and Audit Log
+- [ ] Design orderHistory database table schema (orderId, userId, userName, action, fieldName, oldValue, newValue, timestamp)
+- [ ] Add orderHistory table to drizzle/schema.ts
+- [ ] Push database schema changes with pnpm db:push
+- [ ] Create database helper functions in server/db.ts for logging history
+- [ ] Implement audit logging in orders.create mutation
+- [ ] Implement audit logging in orders.update mutation
+- [ ] Create tRPC procedure to fetch order history by orderId
+- [ ] Build Order History component to display change log
+- [ ] Add Order History tab/section to Edit Order dialog
+- [ ] Display formatted history entries with user, timestamp, and changes
+- [ ] Test audit logging by creating and editing orders
+- [ ] Verify history entries are saved correctly in database
+
+## Implement Clickable Status Badge Dropdown
+- [x] Replace static status badge with clickable dropdown component
+- [x] Add Select component for status selection
+- [x] Implement handleQuickStatusUpdate function for inline status changes
+- [x] Show all available status options in dropdown menu
+- [x] Update status immediately on selection without opening dialog
+- [x] Keep "Update Status" button for complex changes (reschedule with reason/date)
+- [x] Test quick status updates and verify changes persist
