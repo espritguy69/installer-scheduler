@@ -1,6 +1,6 @@
 import { and, eq, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { assignments, InsertAssignment, InsertInstaller, InsertOrder, installers, InsertUser, orders, users } from "../drizzle/schema";
+import { assignments, InsertAssignment, InsertInstaller, InsertNote, InsertOrder, installers, InsertUser, notes, orders, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -233,4 +233,61 @@ export async function deleteAssignment(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.delete(assignments).where(eq(assignments.id, id));
+}
+
+
+// Notes queries
+export async function getAllNotes() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(notes).orderBy(notes.createdAt);
+}
+
+export async function getNoteById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(notes).where(eq(notes.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getNotesByDate(date: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(notes).where(eq(notes.date, date)).orderBy(notes.createdAt);
+}
+
+export async function getNotesByServiceNumber(serviceNumber: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(notes).where(eq(notes.serviceNumber, serviceNumber)).orderBy(notes.createdAt);
+}
+
+export async function getNotesByDateRange(startDate: string, endDate: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(notes).where(
+    and(
+      gte(notes.date, startDate),
+      lte(notes.date, endDate)
+    )
+  ).orderBy(notes.createdAt);
+}
+
+export async function createNote(note: InsertNote) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(notes).values(note);
+  return result;
+}
+
+export async function updateNote(id: number, note: Partial<InsertNote>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(notes).set(note).where(eq(notes.id, id));
+}
+
+export async function deleteNote(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(notes).where(eq(notes.id, id));
 }

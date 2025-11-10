@@ -36,6 +36,13 @@
       "when": 1762769234148,
       "tag": "0004_public_boomerang",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1762770326574,
+      "tag": "0005_clear_ma_gnuci",
+      "breakpoints": true
     }
   ]
 }

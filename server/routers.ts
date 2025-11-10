@@ -241,6 +241,65 @@ export const appRouter = router({
       return { success: true };
     }),
   }),
+
+  notes: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllNotes();
+    }),
+    getById: protectedProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+      return await db.getNoteById(input.id);
+    }),
+    getByDate: protectedProcedure.input(z.object({ date: z.string() })).query(async ({ input }) => {
+      return await db.getNotesByDate(input.date);
+    }),
+    getByServiceNumber: protectedProcedure.input(z.object({ serviceNumber: z.string() })).query(async ({ input }) => {
+      return await db.getNotesByServiceNumber(input.serviceNumber);
+    }),
+    getByDateRange: protectedProcedure.input(z.object({
+      startDate: z.string(),
+      endDate: z.string(),
+    })).query(async ({ input }) => {
+      return await db.getNotesByDateRange(input.startDate, input.endDate);
+    }),
+    create: protectedProcedure.input(z.object({
+      date: z.string(),
+      serviceNumber: z.string().optional(),
+      orderNumber: z.string().optional(),
+      customerName: z.string().optional(),
+      noteType: z.enum(["general", "reschedule", "follow_up", "incident", "complaint"]).default("general"),
+      title: z.string(),
+      content: z.string(),
+      priority: z.enum(["low", "medium", "high"]).default("medium"),
+      status: z.enum(["open", "in_progress", "resolved", "closed"]).default("open"),
+      createdBy: z.string().optional(),
+    })).mutation(async ({ input, ctx }) => {
+      const noteData = {
+        ...input,
+        createdBy: input.createdBy || ctx.user?.name || "Unknown",
+      };
+      return await db.createNote(noteData);
+    }),
+    update: protectedProcedure.input(z.object({
+      id: z.number(),
+      date: z.string().optional(),
+      serviceNumber: z.string().optional(),
+      orderNumber: z.string().optional(),
+      customerName: z.string().optional(),
+      noteType: z.enum(["general", "reschedule", "follow_up", "incident", "complaint"]).optional(),
+      title: z.string().optional(),
+      content: z.string().optional(),
+      priority: z.enum(["low", "medium", "high"]).optional(),
+      status: z.enum(["open", "in_progress", "resolved", "closed"]).optional(),
+    })).mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db.updateNote(id, data);
+      return { success: true };
+    }),
+    delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+      await db.deleteNote(input.id);
+      return { success: true };
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

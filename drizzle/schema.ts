@@ -92,3 +92,26 @@ export const assignments = mysqlTable("assignments", {
 
 export type Assignment = typeof assignments.$inferSelect;
 export type InsertAssignment = typeof assignments.$inferInsert;
+
+/**
+ * Daily notes table - stores remarks, incidents, complaints, and follow-ups
+ * Persists even after orders are cleared for historical tracking
+ */
+export const notes = mysqlTable("notes", {
+  id: int("id").autoincrement().primaryKey(),
+  date: varchar("date", { length: 10 }).notNull(), // YYYY-MM-DD format
+  serviceNumber: varchar("serviceNumber", { length: 100 }), // Reference to service number (persists after order deletion)
+  orderNumber: varchar("orderNumber", { length: 100 }), // Reference to order number
+  customerName: varchar("customerName", { length: 255 }),
+  noteType: mysqlEnum("noteType", ["general", "reschedule", "follow_up", "incident", "complaint"]).default("general").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  priority: mysqlEnum("priority", ["low", "medium", "high"]).default("medium").notNull(),
+  status: mysqlEnum("status", ["open", "in_progress", "resolved", "closed"]).default("open").notNull(),
+  createdBy: varchar("createdBy", { length: 255 }), // User who created the note
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Note = typeof notes.$inferSelect;
+export type InsertNote = typeof notes.$inferInsert;

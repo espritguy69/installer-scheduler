@@ -232,3 +232,11 @@
 - [x] Add "Clear All Orders" button to Orders page
 - [x] Implement confirmation dialog before clearing
 - [x] Test clear functionality
+
+## Notes/Remarks System
+- [x] Create notes database table with service number reference
+- [x] Add backend tRPC procedures for notes CRUD
+- [x] Create Notes page with date filtering
+- [x] Add note types (reschedule, follow-up, incident, complaint)
+- [x] Implement service number search and linking
+- [x] Test notes persistence after clearing orders

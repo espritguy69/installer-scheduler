@@ -12,6 +12,7 @@ import Schedule from "./pages/ScheduleV3";
 import Orders from "./pages/Orders";
 import Installers from "./pages/Installers";
 import Dashboard from "./pages/Dashboard";
+import Notes from "./pages/Notes";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -25,6 +26,7 @@ function Router() {
       <Route path={"/orders"} component={Orders} />
       <Route path={"/installers"} component={Installers} />
       <Route path={"/schedule"} component={Schedule} />
+      <Route path={"/notes"} component={Notes} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
