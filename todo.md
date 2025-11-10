@@ -349,3 +349,30 @@
 - [x] Update status immediately on selection without opening dialog
 - [x] Keep "Update Status" button for complex changes (reschedule with reason/date)
 - [x] Test quick status updates and verify changes persist
+
+## Add New Order Statuses (Docket Received & Docket Uploaded)
+- [ ] Update orders table schema to add docket_received and docket_uploaded to status enum
+- [ ] Push database schema changes
+- [ ] Update backend tRPC validation schemas for create/update/bulkCreate procedures
+- [ ] Add new statuses to Orders page status dropdown
+- [ ] Add new statuses to Schedule page status dropdown
+- [ ] Add new statuses to status filter dropdowns
+- [ ] Define badge colors for docket_received and docket_uploaded statuses
+- [ ] Test status changes with new statuses
+- [ ] Verify new statuses appear correctly in all views
+
+## Add New Order Statuses (Docket Received & Docket Uploaded)
+- [x] Update database schema to add docket_received and docket_uploaded enum values
+- [x] Push database schema changes with pnpm db:push
+- [x] Update orders.update tRPC procedure validation to accept new statuses
+- [x] Add new statuses to Orders page status filter dropdown
+- [x] Add new statuses to Orders page clickable status badge dropdown with colors
+- [x] Add new statuses to Orders page Update Status dialog
+- [x] Add new statuses to InstallerView page dropdown
+- [x] Add status badge colors for new statuses in InstallerView
+- [x] Add status colors for new statuses in ScheduleV3 getStatusColor function
+- [x] Add status labels for new statuses in ScheduleV3 getStatusLabel function
+- [x] Add status badge colors for new statuses in Orders getStatusBadgeColor function
+- [x] Test docket_received status with teal badge color
+- [x] Test docket_uploaded status with cyan badge color
+- [x] Verify new statuses appear in all status dropdowns and filters

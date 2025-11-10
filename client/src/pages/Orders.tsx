@@ -104,6 +104,10 @@ export default function Orders() {
         return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
       case "completed":
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      case "docket_received":
+        return "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200";
+      case "docket_uploaded":
+        return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200";
       case "rescheduled":
         return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
       case "withdrawn":
@@ -310,6 +314,8 @@ export default function Orders() {
                     <SelectItem value="on_the_way">On the Way</SelectItem>
                     <SelectItem value="met_customer">Met Customer</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="docket_received">Docket Received</SelectItem>
+                    <SelectItem value="docket_uploaded">Docket Uploaded</SelectItem>
                     <SelectItem value="rescheduled">Rescheduled</SelectItem>
                     <SelectItem value="withdrawn">Withdrawn</SelectItem>
                   </SelectContent>
@@ -420,6 +426,18 @@ export default function Orders() {
                                     Completed
                                   </span>
                                 </SelectItem>
+                                <SelectItem value="docket_received">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-teal-500"></span>
+                                    Docket Received
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="docket_uploaded">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
+                                    Docket Uploaded
+                                  </span>
+                                </SelectItem>
                                 <SelectItem value="rescheduled">
                                   <span className="inline-flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-orange-500"></span>
@@ -500,6 +518,8 @@ export default function Orders() {
                   <SelectItem value="on_the_way">On the Way</SelectItem>
                   <SelectItem value="met_customer">Met the Customer</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="docket_received">Docket Received</SelectItem>
+                  <SelectItem value="docket_uploaded">Docket Uploaded</SelectItem>
                   <SelectItem value="rescheduled">Reschedule</SelectItem>
                   <SelectItem value="withdrawn">Withdrawn</SelectItem>
                 </SelectContent>

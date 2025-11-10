@@ -38,6 +38,10 @@ const getStatusColor = (status: string) => {
   switch (status) {
     case "completed":
       return "bg-green-100 border-green-300 text-green-800";
+    case "docket_received":
+      return "bg-teal-100 border-teal-300 text-teal-800";
+    case "docket_uploaded":
+      return "bg-cyan-100 border-cyan-300 text-cyan-800";
     case "on_the_way":
     case "met_customer":
       return "bg-yellow-100 border-yellow-300 text-yellow-800";
@@ -60,6 +64,10 @@ const getStatusLabel = (status: string) => {
       return "On the way";
     case "met_customer":
       return "Met customer";
+    case "docket_received":
+      return "Docket received";
+    case "docket_uploaded":
+      return "Docket uploaded";
     default:
       return status.charAt(0).toUpperCase() + status.slice(1);
   }
