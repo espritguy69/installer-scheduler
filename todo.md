@@ -219,3 +219,10 @@
 - [x] Format fields in a readable row layout
 - [x] Ensure appropriate text sizing for readability
 - [x] Test with sample data
+
+## Database Schema Optimization
+- [x] Audit current schema against Excel columns
+- [x] Ensure all Excel columns map to dedicated database fields
+- [x] Remove data duplication (no storing in notes what should be in proper fields)
+- [x] Update upload logic to use proper field mapping
+- [x] Test with fresh Excel upload

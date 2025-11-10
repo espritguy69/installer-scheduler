@@ -68,14 +68,8 @@ export default function Upload() {
       // Map Excel columns to database fields
       // Support both generic format and user's specific format (WO No., Customer Name, etc.)
       const orders = rawData.map((row: any) => {
-        // Handle Status column (contains installer names like "AFIZ/AMAN")
-        const statusValue = row["Status"] || row["SI Name"] || "";
-        
-        // Build notes with installer assignment if present
-        let notesText = row.notes || row.Notes || "";
-        if (statusValue) {
-          notesText += (notesText ? " | " : "") + `Assigned SI: ${statusValue}`;
-        }
+        // Notes field for additional information only
+        const notesText = row.notes || row.Notes || "";
 
         return {
           orderNumber: String(
