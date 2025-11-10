@@ -8,7 +8,7 @@ import Home from "./pages/Home";
 import Performance from "./pages/Performance";
 import InstallerView from "./pages/InstallerView";
 import Upload from "./pages/Upload";
-import Schedule from "./pages/ScheduleNew";
+import Schedule from "./pages/ScheduleV3";
 import Orders from "./pages/Orders";
 import Installers from "./pages/Installers";
 

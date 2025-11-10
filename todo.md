@@ -166,3 +166,10 @@
 - [x] Add date range navigation for weekly view
 - [x] Display installer workload summary (assigned order count)
 - [x] Test all enhancements
+
+## Schedule Layout Redesign
+- [x] Move orders to top as draggable cards
+- [x] Add time slots (9am, 10am, 11am, 11:30am, 1pm, 2:30pm, 3pm, 4pm, 6pm) in rows with installer names
+- [x] Implement drag-and-drop from orders to time slot cells
+- [x] Show assigned orders in time slot cells
+- [x] Test drag-and-drop functionality
