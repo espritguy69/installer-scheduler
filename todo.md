@@ -112,3 +112,8 @@
 ## Upload Validation Updates
 - [x] Remove strict validation for orderNumber and customerName
 - [x] Update validation to match user's Excel headers exactly
+
+## Validation Fixes
+- [x] Remove email validation requirement from order schema
+- [x] Fix phone number type conversion from Excel
+- [x] Fix nested anchor tags in Upload page navigation

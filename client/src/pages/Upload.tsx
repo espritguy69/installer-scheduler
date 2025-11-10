@@ -99,9 +99,10 @@ export default function Upload() {
             row["Customer Name"] || 
             row.customerName || row.CustomerName || row.customer_name || ""
           ),
-          customerPhone: 
+          customerPhone: String(
             row["Contact No"] || row["Contact No."] ||
-            row.customerPhone || row.CustomerPhone || row.customer_phone || "",
+            row.customerPhone || row.CustomerPhone || row.customer_phone || ""
+          ),
           customerEmail: row.customerEmail || row.CustomerEmail || row.customer_email || "",
           serviceType: 
             row["WO Type"] ||
@@ -203,30 +204,20 @@ export default function Upload() {
           <div className="flex items-center gap-6">
             <h1 className="text-xl font-bold">{APP_TITLE}</h1>
             <nav className="flex gap-4">
-              <Link href="/">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Home
-                </a>
+              <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Home
               </Link>
-              <Link href="/upload">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Upload
-                </a>
+              <Link href="/upload" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Upload
               </Link>
-              <Link href="/orders">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Orders
-                </a>
+              <Link href="/orders" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Orders
               </Link>
-              <Link href="/installers">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Installers
-                </a>
+              <Link href="/installers" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Installers
               </Link>
-              <Link href="/schedule">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Schedule
-                </a>
+              <Link href="/schedule" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Schedule
               </Link>
             </nav>
           </div>
