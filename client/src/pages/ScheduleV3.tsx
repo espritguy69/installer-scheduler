@@ -87,11 +87,34 @@ const DraggableOrder = ({ order }: DraggableOrderProps) => {
       className={`p-3 border-2 rounded-lg cursor-move ${statusColor} ${
         isDragging ? "opacity-50" : ""
       }`}
-      style={{ minWidth: "150px" }}
+      style={{ minWidth: "200px", maxWidth: "250px" }}
     >
-      <div className="font-semibold text-sm">{order.orderNumber}</div>
-      <div className="text-xs mt-1">{order.customerName}</div>
-      <div className="flex justify-between items-center mt-1">
+      <div className="flex items-center gap-2 mb-2">
+        <div className="font-semibold text-sm">{order.orderNumber}</div>
+        <div className="h-4 w-px bg-border"></div>
+        <div className="text-sm text-muted-foreground truncate flex-1">{order.customerName}</div>
+      </div>
+      <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+        {order.serviceNumber && (
+          <div className="flex items-center gap-1">
+            <span className="font-medium">Service No:</span>
+            <span>{order.serviceNumber}</span>
+          </div>
+        )}
+        {order.appointmentTime && (
+          <div className="flex items-center gap-1">
+            <span className="font-medium">Time:</span>
+            <span>{order.appointmentTime}</span>
+          </div>
+        )}
+        {order.buildingName && (
+          <div className="flex items-center gap-1">
+            <span className="font-medium">Building:</span>
+            <span className="truncate">{order.buildingName}</span>
+          </div>
+        )}
+      </div>
+      <div className="flex justify-between items-center mt-2">
         <span className="text-xs text-muted-foreground">{getStatusLabel(order.status)}</span>
         <span className="text-xs font-medium bg-white/50 px-1.5 py-0.5 rounded">{estimatedDuration}</span>
       </div>

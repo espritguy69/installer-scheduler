@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO orders (orderNumber, serviceNumber, customerName, customerPhone, serviceType, salesModiType, address, appointmentDate, appointmentTime, buildingName, estimatedDuration, priority, status, notes) VALUES ('WO-TEST-001', 'SVC-12345', 'John Doe', '555-1234', 'Installation', 'New', '123 Main Street', '2025-11-15', '10:00 AM', 'Sunshine Towers', 120, 'high', 'pending', 'Test order to verify card layout')",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute INSERT INTO orders (orderNumber, serviceNumber, customerName, customerPhone, serviceType, salesModiType, address, appointmentDate, appointmentTime, buildingName, estimatedDuration, priority, status, notes) VALUES ('WO-TEST-001', 'SVC-12345', 'John Doe', '555-1234', 'Installation', 'New', '123 Main Street', '2025-11-15', '10:00 AM', 'Sunshine Towers', 120, 'high', 'pending', 'Test order to verify card layout')",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 59
+}

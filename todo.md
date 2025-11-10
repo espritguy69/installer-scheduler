@@ -213,3 +213,9 @@
 - [x] Clear all orders from database
 - [x] Verify system works correctly with zero data
 - [ ] Test fresh order upload after cleanup
+
+## Order Card Layout Enhancement
+- [x] Update unassigned order cards to display Service No., Customer Name, App Time, and Building Name
+- [x] Format fields in a readable row layout
+- [x] Ensure appropriate text sizing for readability
+- [x] Test with sample data

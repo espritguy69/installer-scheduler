@@ -68,27 +68,13 @@ export default function Upload() {
       // Map Excel columns to database fields
       // Support both generic format and user's specific format (WO No., Customer Name, etc.)
       const orders = rawData.map((row: any) => {
-        // Handle appointment date and time
-        let appointmentInfo = "";
-        if (row["App Date"] || row["App Time"]) {
-          const appDate = row["App Date"] || "";
-          const appTime = row["App Time"] || "";
-          appointmentInfo = `Appointment: ${appDate} ${appTime}`.trim();
-        }
-
         // Handle Status column (contains installer names like "AFIZ/AMAN")
         const statusValue = row["Status"] || row["SI Name"] || "";
         
-        // Combine building name and installer assignment into notes
+        // Build notes with installer assignment if present
         let notesText = row.notes || row.Notes || "";
-        if (row["Building Name"]) {
-          notesText += (notesText ? " | " : "") + `Building: ${row["Building Name"]}`;
-        }
         if (statusValue) {
           notesText += (notesText ? " | " : "") + `Assigned SI: ${statusValue}`;
-        }
-        if (appointmentInfo) {
-          notesText += (notesText ? " | " : "") + appointmentInfo;
         }
 
         return {
@@ -116,9 +102,20 @@ export default function Upload() {
             row["Sales/Modi Type"] ||
             row.salesModiType || row.SalesModiType || "",
           address: 
-            row["Building Name"] ||
             row.address || row.Address || "",
-          estimatedDuration: Number(row.estimatedDuration || row.EstimatedDuration || row.estimated_duration || 60),
+          appointmentDate: String(
+            row["App Date"] || row["Appointment Date"] ||
+            row.appointmentDate || row.AppointmentDate || ""
+          ),
+          appointmentTime: String(
+            row["App Time"] || row["Appointment Time"] ||
+            row.appointmentTime || row.AppointmentTime || ""
+          ),
+          buildingName: String(
+            row["Building Name"] ||
+            row.buildingName || row.BuildingName || ""
+          ),
+          estimatedDuration: Number(row.estimatedDuration || row.EstimatedDuration || row.estimated_duration || 120),
           priority: (row.priority || row.Priority || "medium").toLowerCase(),
           notes: notesText,
         };

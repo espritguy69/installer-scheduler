@@ -325,10 +325,39 @@ export default function Schedule() {
                   onDragStart={(e) => handleDragStart(e, order)}
                   className="p-3 border rounded-lg cursor-move hover:bg-accent hover:border-primary transition-colors"
                 >
-                  <div className="font-semibold text-sm">{order.orderNumber}</div>
-                  <div className="text-xs text-muted-foreground">{order.customerName}</div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {order.estimatedDuration} min • {order.priority}
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="font-semibold text-sm">{order.orderNumber}</div>
+                    <div className="h-4 w-px bg-border"></div>
+                    <div className="text-sm text-muted-foreground truncate flex-1">{order.customerName}</div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                    {order.serviceNumber && (
+                      <>
+                        <span className="font-medium">Service No:</span>
+                        <span>{order.serviceNumber}</span>
+                        <div className="h-3 w-px bg-border"></div>
+                      </>
+                    )}
+                    {order.appointmentTime && (
+                      <>
+                        <span className="font-medium">Time:</span>
+                        <span>{order.appointmentTime}</span>
+                        <div className="h-3 w-px bg-border"></div>
+                      </>
+                    )}
+                    {order.buildingName && (
+                      <>
+                        <span className="font-medium">Building:</span>
+                        <span className="truncate max-w-[200px]">{order.buildingName}</span>
+                      </>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    <span className="inline-flex items-center gap-1">
+                      <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">{order.status}</span>
+                      <span className="mx-1">•</span>
+                      <span>2h duration</span>
+                    </span>
                   </div>
                   {bestMatch && (
                     <div className="mt-2 pt-2 border-t text-xs">
