@@ -77,6 +77,8 @@ const DraggableOrder = ({ order }: DraggableOrderProps) => {
   }));
 
   const statusColor = getStatusColor(order.status);
+  // Default duration: 2 hours for most jobs
+  const estimatedDuration = "2h";
 
   return (
     <div
@@ -88,7 +90,10 @@ const DraggableOrder = ({ order }: DraggableOrderProps) => {
     >
       <div className="font-semibold text-sm">{order.orderNumber}</div>
       <div className="text-xs mt-1">{order.customerName}</div>
-      <div className="text-xs text-muted-foreground mt-1">{getStatusLabel(order.status)}</div>
+      <div className="flex justify-between items-center mt-1">
+        <span className="text-xs text-muted-foreground">{getStatusLabel(order.status)}</span>
+        <span className="text-xs font-medium bg-white/50 px-1.5 py-0.5 rounded">{estimatedDuration}</span>
+      </div>
     </div>
   );
 };
@@ -99,16 +104,42 @@ interface TimeSlotCellProps {
   assignment: any;
   onDrop: (orderId: number, installerId: number, timeSlot: string) => void;
   onRemove: (assignmentId: number) => void;
+  onReassign: (assignmentId: number, newInstallerId: number, newTimeSlot: string) => void;
 }
 
-const TimeSlotCell = ({ installerId, timeSlot, assignment, onDrop, onRemove }: TimeSlotCellProps) => {
+const TimeSlotCell = ({ installerId, timeSlot, assignment, onDrop, onRemove, onReassign }: TimeSlotCellProps) => {
   const [{ isOver }, drop] = useDrop(() => ({
-    accept: "ORDER",
-    drop: (item: { orderId: number }) => {
-      onDrop(item.orderId, installerId, timeSlot);
+    accept: ["ORDER", "ASSIGNED_ORDER"],
+    drop: (item: { orderId?: number; assignmentId?: number }) => {
+      // Handle reassignment from another slot
+      if (item.assignmentId) {
+        if (assignment) {
+          toast.error("This time slot is already occupied. Please choose another slot.");
+          return;
+        }
+        onReassign(item.assignmentId, installerId, timeSlot);
+        return;
+      }
+      // Handle new assignment
+      if (item.orderId) {
+        if (assignment) {
+          toast.error("This time slot is already occupied. Please choose another slot or remove the existing assignment.");
+          return;
+        }
+        onDrop(item.orderId, installerId, timeSlot);
+      }
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
+    }),
+  }));
+
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "ASSIGNED_ORDER",
+    item: assignment ? { assignmentId: assignment.id } : null,
+    canDrag: !!assignment,
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
     }),
   }));
 
@@ -117,10 +148,12 @@ const TimeSlotCell = ({ installerId, timeSlot, assignment, onDrop, onRemove }: T
       ref={drop as any}
       className={`border p-2 min-w-[120px] h-16 ${
         isOver ? "bg-primary/20" : ""
-      } ${assignment && assignment.order ? getStatusColor(assignment.order.status) : ""}`}
+      } ${assignment && assignment.order ? getStatusColor(assignment.order.status) : ""} ${
+        isDragging ? "opacity-50" : ""
+      }`}
     >
       {assignment && assignment.order && (
-        <div className="text-center relative group">
+        <div ref={drag as any} className="text-center relative group cursor-move">
           <div className="text-xs font-semibold">{assignment.order.orderNumber}</div>
           <div className="text-xs">{assignment.order.customerName}</div>
           <button
@@ -258,6 +291,29 @@ export default function ScheduleV3() {
     }
   };
 
+  const handleReassign = async (assignmentId: number, newInstallerId: number, newTimeSlot: string) => {
+    try {
+      const assignment = assignments.find(a => a.id === assignmentId);
+      if (assignment) {
+        // Delete old assignment
+        await deleteAssignment.mutateAsync({ id: assignmentId });
+        // Create new assignment with new installer and time slot
+        await createAssignment.mutateAsync({
+          orderId: assignment.orderId,
+          installerId: newInstallerId,
+          scheduledDate: currentDate,
+          scheduledStartTime: newTimeSlot,
+          scheduledEndTime: "18:00",
+        });
+        await utils.assignments.list.invalidate();
+        await utils.orders.list.invalidate();
+        toast.success("Order reassigned successfully");
+      }
+    } catch (error) {
+      toast.error("Failed to reassign order");
+    }
+  };
+
   const handleExport = () => {
     const exportData = assignmentsWithOrders.map(assignment => {
       const installer = installers.find(i => i.id === assignment.installerId);
@@ -281,6 +337,10 @@ export default function ScheduleV3() {
     toast.success("Schedule exported");
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (ordersLoading || installersLoading || assignmentsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -291,6 +351,19 @@ export default function ScheduleV3() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          .print-area, .print-area * { visibility: visible; }
+          .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+          .print:hidden { display: none !important; }
+          header, nav, button { display: none !important; }
+          .draggable-orders { display: none !important; }
+          table { page-break-inside: auto; }
+          tr { page-break-inside: avoid; page-break-after: auto; }
+          @page { margin: 1cm; }
+        }
+      `}</style>
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="border-b bg-background sticky top-0 z-50">
@@ -362,6 +435,12 @@ export default function ScheduleV3() {
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
+            <Button variant="outline" onClick={handlePrint} className="print:hidden">
+              <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              Print
+            </Button>
           </div>
 
           {/* Date Navigation and View Toggle */}
@@ -402,7 +481,7 @@ export default function ScheduleV3() {
           </div>
 
           {/* Unassigned Orders */}
-          <Card className="mb-6">
+          <Card className="mb-6 draggable-orders">
             <CardHeader>
               <CardTitle>Unassigned Orders ({unassignedOrders.length})</CardTitle>
             </CardHeader>
@@ -420,7 +499,7 @@ export default function ScheduleV3() {
           </Card>
 
           {/* Schedule Grid */}
-          <Card>
+          <Card className="print-area">
             <CardHeader>
               <CardTitle>Daily Schedule - {assignmentsWithOrders.length} Assignments</CardTitle>
             </CardHeader>
@@ -460,6 +539,7 @@ export default function ScheduleV3() {
                               assignment={getAssignmentForSlot(installer.id, slot)}
                               onDrop={handleDrop}
                               onRemove={handleRemoveAssignment}
+                              onReassign={handleReassign}
                             />
                           ))}
                         </tr>

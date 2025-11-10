@@ -173,3 +173,12 @@
 - [x] Implement drag-and-drop from orders to time slot cells
 - [x] Show assigned orders in time slot cells
 - [x] Test drag-and-drop functionality
+
+## Schedule Enhancements - Duration & Reassignment
+- [x] Display estimated duration on order cards
+- [x] Implement overlap detection for time slot assignments
+- [x] Prevent double-booking of installers
+- [x] Create print-friendly CSS for schedule view
+- [x] Add print button with optimized layout
+- [x] Enable drag-and-drop reassignment between installers
+- [x] Test all new features
