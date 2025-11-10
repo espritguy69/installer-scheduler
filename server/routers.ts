@@ -115,6 +115,7 @@ export const appRouter = router({
       customerPhone: z.string().optional(),
       customerEmail: z.string().optional(),
       serviceType: z.string().optional(),
+      salesModiType: z.string().optional(),
       address: z.string().optional(),
       estimatedDuration: z.number().default(60),
       priority: z.enum(["low", "medium", "high"]).default("medium"),
@@ -122,6 +123,10 @@ export const appRouter = router({
     }))).mutation(async ({ input }) => {
       await db.bulkCreateOrders(input);
       return { success: true, count: input.length };
+    }),
+    clearAll: protectedProcedure.mutation(async () => {
+      await db.clearAllOrders();
+      return { success: true };
     }),
   }),
 

@@ -122,6 +122,15 @@ export async function deleteOrder(id: number) {
   await db.delete(orders).where(eq(orders.id, id));
 }
 
+export async function clearAllOrders() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  // Delete all assignments first (foreign key constraint)
+  await db.delete(assignments);
+  // Then delete all orders
+  await db.delete(orders);
+}
+
 export async function bulkCreateOrders(orderList: InsertOrder[]) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

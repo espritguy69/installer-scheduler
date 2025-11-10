@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO orders (orderNumber, serviceNumber, customerName, customerPhone, serviceType, salesModiType, address, appointmentDate, appointmentTime, buildingName, estimatedDuration, priority, status) VALUES ('TEST-001', 'SVC-001', 'Test Customer', '555-0001', 'Installation', 'New', '123 Test St', '2025-11-15', '10:00 AM', 'Test Building', 120, 'high', 'pending'), ('TEST-002', 'SVC-002', 'Another Customer', '555-0002', 'Repair', 'Modification', '456 Test Ave', '2025-11-16', '2:00 PM', 'Another Building', 90, 'medium', 'pending')",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute INSERT INTO orders (orderNumber, serviceNumber, customerName, customerPhone, serviceType, salesModiType, address, appointmentDate, appointmentTime, buildingName, estimatedDuration, priority, status) VALUES ('TEST-001', 'SVC-001', 'Test Customer', '555-0001', 'Installation', 'New', '123 Test St', '2025-11-15', '10:00 AM', 'Test Building', 120, 'high', 'pending'), ('TEST-002', 'SVC-002', 'Another Customer', '555-0002', 'Repair', 'Modification', '456 Test Ave', '2025-11-16', '2:00 PM', 'Another Building', 90, 'medium', 'pending')",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 52
+}

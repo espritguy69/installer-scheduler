@@ -1,0 +1,19 @@
+{
+  "query": "SELECT COUNT(*) as order_count FROM orders; SELECT COUNT(*) as assignment_count FROM assignments;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT COUNT(*) as order_count FROM orders; SELECT COUNT(*) as assignment_count FROM assignments;",
+  "rows": [
+    {
+      "order_count": "0"
+    },
+    {
+      "order_count": "assignment_count"
+    },
+    {
+      "order_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "order_count\n0\nassignment_count\n0\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

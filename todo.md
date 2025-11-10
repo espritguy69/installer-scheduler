@@ -226,3 +226,9 @@
 - [x] Remove data duplication (no storing in notes what should be in proper fields)
 - [x] Update upload logic to use proper field mapping
 - [x] Test with fresh Excel upload
+
+## Clear All Orders Feature
+- [x] Add backend tRPC procedure to clear all orders and assignments
+- [x] Add "Clear All Orders" button to Orders page
+- [x] Implement confirmation dialog before clearing
+- [x] Test clear functionality

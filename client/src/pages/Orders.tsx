@@ -49,6 +49,9 @@ export default function Orders() {
   const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
   const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
   const [bulkAction, setBulkAction] = useState<string>("");
+  
+  // Clear all orders
+  const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
 
   const { data: allOrders = [], isLoading } = trpc.orders.list.useQuery();
   
@@ -75,6 +78,7 @@ export default function Orders() {
   });
   const { data: assignments = [] } = trpc.assignments.list.useQuery();
   const updateOrder = trpc.orders.update.useMutation();
+  const clearAllOrders = trpc.orders.clearAll.useMutation();
   const utils = trpc.useUtils();
 
   const getStatusBadgeColor = (status: string) => {
@@ -122,6 +126,19 @@ export default function Orders() {
     setRescheduledDate("");
     setRescheduledTime("");
     setIsDialogOpen(true);
+  };
+
+  const handleClearAll = async () => {
+    try {
+      await clearAllOrders.mutateAsync();
+      await utils.orders.list.invalidate();
+      await utils.assignments.list.invalidate();
+      toast.success("All orders and assignments cleared successfully");
+      setIsClearDialogOpen(false);
+    } catch (error) {
+      toast.error("Failed to clear orders");
+      console.error(error);
+    }
   };
 
   const handleUpdateStatus = async () => {
@@ -234,6 +251,13 @@ export default function Orders() {
                   Total: {orders.length} orders
                 </CardDescription>
               </div>
+              <Button 
+                variant="destructive" 
+                onClick={() => setIsClearDialogOpen(true)}
+                disabled={orders.length === 0}
+              >
+                Clear All Orders
+              </Button>
             </div>
           </CardHeader>
           <CardContent>
@@ -443,6 +467,30 @@ export default function Orders() {
             </Button>
             <Button onClick={handleUpdateStatus} disabled={!newStatus || newStatus === selectedOrder?.status}>
               Update Status
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Clear All Orders Confirmation Dialog */}
+      <Dialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clear All Orders?</DialogTitle>
+            <DialogDescription>
+              This will permanently delete all {orders.length} orders and their assignments. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsClearDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleClearAll}
+              disabled={clearAllOrders.isPending}
+            >
+              {clearAllOrders.isPending ? "Clearing..." : "Clear All Orders"}
             </Button>
           </DialogFooter>
         </DialogContent>
