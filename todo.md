@@ -251,3 +251,11 @@
 - [x] Test Excel export with various filters
 - [x] Test template functionality
 - [x] Test dashboard notes integration
+
+## Schedule Page Fixes
+- [x] Fix order card layout to show Service No., App Time, Building Name properly
+- [x] Format order cards with proper row structure and dividers
+- [x] Make unassigned orders section sticky/fixed
+- [x] Make installer names list scrollable independently
+- [x] Test order card display with sample data
+- [x] Test scrolling behavior

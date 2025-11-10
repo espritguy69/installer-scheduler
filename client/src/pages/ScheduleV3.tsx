@@ -529,10 +529,11 @@ export default function ScheduleV3() {
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
+                <div className="max-h-[600px] overflow-y-auto">
+                  <table className="w-full border-collapse">
+                  <thead className="sticky top-0 z-20">
                     <tr>
-                      <th className="border p-2 bg-muted sticky left-0 z-10">Installer</th>
+                      <th className="border p-2 bg-muted sticky left-0 z-30">Installer</th>
                       {TIME_SLOTS.map(slot => (
                         <th key={slot} className="border p-2 bg-muted min-w-[120px]">
                           {slot}
@@ -588,7 +589,8 @@ export default function ScheduleV3() {
                       );
                     })}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               </div>
             </CardContent>
           </Card>
