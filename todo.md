@@ -159,3 +159,10 @@
 - [x] Add manual order creation dialog
 - [x] Update click-to-assign functionality (replaced drag-and-drop)
 - [x] Test new schedule view
+
+## Schedule View Enhancements
+- [x] Add color-coded status indicators in schedule grid cells
+- [x] Implement weekly view toggle button
+- [x] Add date range navigation for weekly view
+- [x] Display installer workload summary (assigned order count)
+- [x] Test all enhancements

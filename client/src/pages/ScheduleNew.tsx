@@ -29,9 +29,42 @@ import { Link } from "wouter";
 // Custom time slots as specified
 const TIME_SLOTS = ["09:00", "10:00", "11:00", "11:30", "13:00", "14:30", "15:00", "16:00", "18:00"];
 
+// Helper function to get status color
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "completed":
+      return "bg-green-100 border-green-300 text-green-800";
+    case "on_the_way":
+    case "met_customer":
+      return "bg-yellow-100 border-yellow-300 text-yellow-800";
+    case "rescheduled":
+      return "bg-red-100 border-red-300 text-red-800";
+    case "assigned":
+      return "bg-blue-100 border-blue-300 text-blue-800";
+    case "pending":
+      return "bg-gray-100 border-gray-300 text-gray-800";
+    case "withdrawn":
+      return "bg-purple-100 border-purple-300 text-purple-800";
+    default:
+      return "bg-gray-100 border-gray-300 text-gray-800";
+  }
+};
+
+const getStatusLabel = (status: string) => {
+  switch (status) {
+    case "on_the_way":
+      return "On the way";
+    case "met_customer":
+      return "Met customer";
+    default:
+      return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+};
+
 export default function ScheduleNew() {
   const { user, logout } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState<"daily" | "weekly">("daily");
   const [showAddOrderDialog, setShowAddOrderDialog] = useState(false);
   const [newOrder, setNewOrder] = useState({
     orderNumber: "",
@@ -81,7 +114,8 @@ export default function ScheduleNew() {
 
   const navigateDate = (direction: "prev" | "next") => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + (direction === "next" ? 1 : -1));
+    const daysToMove = viewMode === "weekly" ? 7 : 1;
+    newDate.setDate(currentDate.getDate() + (direction === "next" ? daysToMove : -daysToMove));
     setCurrentDate(newDate);
   };
 
@@ -253,16 +287,37 @@ export default function ScheduleNew() {
           </div>
         </div>
 
-        {/* Date Navigation */}
+        {/* Date Navigation and View Toggle */}
         <div className="mb-6 flex items-center justify-between">
           <Button variant="outline" size="icon" onClick={() => navigateDate("prev")}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            <span className="text-lg font-semibold">
-              {currentDate.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-            </span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              <span className="text-lg font-semibold">
+                {viewMode === "daily" 
+                  ? currentDate.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+                  : `Week of ${currentDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                }
+              </span>
+            </div>
+            <div className="flex gap-1 border rounded-md p-1">
+              <Button 
+                variant={viewMode === "daily" ? "default" : "ghost"} 
+                size="sm"
+                onClick={() => setViewMode("daily")}
+              >
+                Daily
+              </Button>
+              <Button 
+                variant={viewMode === "weekly" ? "default" : "ghost"} 
+                size="sm"
+                onClick={() => setViewMode("weekly")}
+              >
+                Weekly
+              </Button>
+            </div>
           </div>
           <Button variant="outline" size="icon" onClick={() => navigateDate("next")}>
             <ChevronRight className="h-4 w-4" />
@@ -291,33 +346,45 @@ export default function ScheduleNew() {
                   </tr>
                 </thead>
                 <tbody>
-                  {installers.filter(i => i.isActive).map(installer => (
+                  {installers.filter(i => i.isActive).map(installer => {
+                    const installerAssignments = todaysAssignments.filter(a => a.installerId === installer.id);
+                    const workloadCount = installerAssignments.length;
+                    
+                    return (
                     <tr key={installer.id}>
                       <td className="border p-2 font-medium sticky left-0 z-10 bg-background">
-                        {installer.name}
+                        <div className="flex items-center justify-between">
+                          <span>{installer.name}</span>
+                          <span className="ml-2 px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
+                            {workloadCount}
+                          </span>
+                        </div>
                       </td>
                       {todaysOrders.map(order => {
                         const assignment = getAssignment(installer.id, order.id);
                         const isAssigned = !!assignment;
+                        const statusColor = getStatusColor(order.status);
                         
                         return (
                           <td
                             key={order.id}
                             className={`border p-2 cursor-pointer hover:bg-accent transition-colors ${
-                              isAssigned ? "bg-primary/20" : ""
+                              isAssigned ? statusColor : ""
                             }`}
                             onClick={() => handleCellClick(installer.id, order.id)}
                           >
                             {isAssigned && (
                               <div className="text-center">
-                                <div className="text-xs font-medium">✓ Assigned</div>
+                                <div className="text-xs font-semibold">✓ Assigned</div>
+                                <div className="text-xs mt-1">{getStatusLabel(order.status)}</div>
                               </div>
                             )}
                           </td>
                         );
                       })}
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
