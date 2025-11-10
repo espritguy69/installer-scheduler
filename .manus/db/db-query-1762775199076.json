@@ -1,0 +1,21 @@
+{
+  "query": "SELECT orderNumber, serviceNumber, customerName, appointmentDate, appointmentTime, buildingName, serviceType, salesModiType, address FROM orders WHERE orderNumber = 'WO-FINAL-TEST'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT orderNumber, serviceNumber, customerName, appointmentDate, appointmentTime, buildingName, serviceType, salesModiType, address FROM orders WHERE orderNumber = 'WO-FINAL-TEST'",
+  "rows": [
+    {
+      "orderNumber": "WO-FINAL-TEST",
+      "serviceNumber": "SVC-FINAL-999",
+      "customerName": "Final Test Customer",
+      "appointmentDate": "2025-11-15",
+      "appointmentTime": "",
+      "buildingName": "Menara Final Test Tower",
+      "serviceType": "ACTIVATION",
+      "salesModiType": "New Sales",
+      "address": "999 Final Test Street"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNumber\tserviceNumber\tcustomerName\tappointmentDate\tappointmentTime\tbuildingName\tserviceType\tsalesModiType\taddress\nWO-FINAL-TEST\tSVC-FINAL-999\tFinal Test Customer\t2025-11-15\t\tMenara Final Test Tower\tACTIVATION\tNew Sales\t999 Final Test Street\n",
+  "stderr": "",
+  "execution_time_ms": 48
+}

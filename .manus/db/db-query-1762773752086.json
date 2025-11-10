@@ -1,0 +1,50 @@
+{
+  "query": "SELECT orderNumber, serviceNumber, customerName, appointmentTime, buildingName, status FROM orders LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT orderNumber, serviceNumber, customerName, appointmentTime, buildingName, status FROM orders LIMIT 5",
+  "rows": [
+    {
+      "orderNumber": "A1775621",
+      "serviceNumber": "NULL",
+      "customerName": "AMIRUL IDDLAN BIN MD ZAINAL",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "status": "pending"
+    },
+    {
+      "orderNumber": "A1785662",
+      "serviceNumber": "NULL",
+      "customerName": "Nurul Affiq Afifie Bin Abdul Rahim",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "status": "pending"
+    },
+    {
+      "orderNumber": "M1786442",
+      "serviceNumber": "NULL",
+      "customerName": "Hee Wai Hong",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "status": "pending"
+    },
+    {
+      "orderNumber": "A1786084",
+      "serviceNumber": "NULL",
+      "customerName": "AMEERA BINTI KHAIRULIZAM",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "status": "pending"
+    },
+    {
+      "orderNumber": "M1787117",
+      "serviceNumber": "NULL",
+      "customerName": "Shavin Dhavindar",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "status": "pending"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNumber\tserviceNumber\tcustomerName\tappointmentTime\tbuildingName\tstatus\nA1775621\tNULL\tAMIRUL IDDLAN BIN MD ZAINAL\tNULL\tNULL\tpending\nA1785662\tNULL\tNurul Affiq Afifie Bin Abdul Rahim\tNULL\tNULL\tpending\nM1786442\tNULL\tHee Wai Hong\tNULL\tNULL\tpending\nA1786084\tNULL\tAMEERA BINTI KHAIRULIZAM\tNULL\tNULL\tpending\nM1787117\tNULL\tShavin Dhavindar\tNULL\tNULL\tpending\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}

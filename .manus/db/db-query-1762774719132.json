@@ -1,0 +1,24 @@
+{
+  "query": "SELECT orderNumber, serviceNumber, customerName, customerPhone, serviceType, salesModiType, address, appointmentDate, appointmentTime, buildingName, priority, status FROM orders WHERE orderNumber = 'WO-TEST-2025'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT orderNumber, serviceNumber, customerName, customerPhone, serviceType, salesModiType, address, appointmentDate, appointmentTime, buildingName, priority, status FROM orders WHERE orderNumber = 'WO-TEST-2025'",
+  "rows": [
+    {
+      "orderNumber": "WO-TEST-2025",
+      "serviceNumber": "NULL",
+      "customerName": "Test Customer",
+      "customerPhone": "0123456789",
+      "serviceType": "ACTIVATION",
+      "salesModiType": "NULL",
+      "address": "123 Test Street",
+      "appointmentDate": "NULL",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "priority": "medium",
+      "status": "pending"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNumber\tserviceNumber\tcustomerName\tcustomerPhone\tserviceType\tsalesModiType\taddress\tappointmentDate\tappointmentTime\tbuildingName\tpriority\tstatus\nWO-TEST-2025\tNULL\tTest Customer\t0123456789\tACTIVATION\tNULL\t123 Test Street\tNULL\tNULL\tNULL\tmedium\tpending\n",
+  "stderr": "",
+  "execution_time_ms": 46
+}

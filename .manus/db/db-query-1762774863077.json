@@ -1,0 +1,33 @@
+{
+  "query": "SELECT * FROM orders WHERE orderNumber = 'WO-TEST-2025'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT * FROM orders WHERE orderNumber = 'WO-TEST-2025'",
+  "rows": [
+    {
+      "id": "60002",
+      "orderNumber": "WO-TEST-2025",
+      "customerName": "Test Customer",
+      "customerPhone": "0123456789",
+      "customerEmail": "NULL",
+      "serviceType": "ACTIVATION",
+      "address": "123 Test Street",
+      "estimatedDuration": "60",
+      "priority": "medium",
+      "status": "pending",
+      "notes": "NULL",
+      "createdAt": "2025-11-10 11:38:03",
+      "updatedAt": "2025-11-10 11:38:03",
+      "serviceNumber": "NULL",
+      "salesModiType": "NULL",
+      "rescheduleReason": "NULL",
+      "rescheduledDate": "NULL",
+      "rescheduledTime": "NULL",
+      "appointmentDate": "NULL",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\tcustomerName\tcustomerPhone\tcustomerEmail\tserviceType\taddress\testimatedDuration\tpriority\tstatus\tnotes\tcreatedAt\tupdatedAt\tserviceNumber\tsalesModiType\trescheduleReason\trescheduledDate\trescheduledTime\tappointmentDate\tappointmentTime\tbuildingName\n60002\tWO-TEST-2025\tTest Customer\t0123456789\tNULL\tACTIVATION\t123 Test Street\t60\tmedium\tpending\tNULL\t2025-11-10 11:38:03\t2025-11-10 11:38:03\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 48
+}

@@ -276,3 +276,28 @@
 - [x] Fix order card component to always display Row 2 fields
 - [x] Add sample data with all fields populated for testing
 - [x] Verify order cards display correctly on Schedule page
+
+## Verify Excel Upload Mapping
+- [ ] Check Upload.tsx column name matching (case sensitivity, spaces, special characters)
+- [ ] Verify all Excel columns are being read correctly
+- [ ] Test upload with user's actual Excel file
+- [ ] Confirm data appears in order cards with Row 2 visible
+
+## Fix Add New Order Dialog
+- [x] Add Service Number field to Add Order dialog
+- [x] Add WO Type field to Add Order dialog
+- [x] Add Sales/Modi Type field to Add Order dialog
+- [x] Add Appointment Date field to Add Order dialog
+- [x] Add Appointment Time field to Add Order dialog
+- [x] Add Building Name field to Add Order dialog
+- [x] Test manual order creation with all fields populated
+
+## Fix Backend Order Creation Schema
+- [x] Update orders.create tRPC procedure to accept serviceNumber field
+- [x] Update orders.create tRPC procedure to accept salesModiType field
+- [x] Update orders.create tRPC procedure to accept appointmentDate field
+- [x] Update orders.create tRPC procedure to accept appointmentTime field
+- [x] Update orders.create tRPC procedure to accept buildingName field
+- [x] Test order creation with all new fields
+- [x] Verify fields are saved to database correctly
+- [x] Verify order cards display all Row 2 information (Service No., Time, Building)

@@ -200,10 +200,15 @@ export default function ScheduleV3() {
   const [showAddOrderDialog, setShowAddOrderDialog] = useState(false);
   const [newOrder, setNewOrder] = useState({
     orderNumber: "",
+    serviceNumber: "",
     customerName: "",
     customerPhone: "",
     serviceType: "",
+    salesModiType: "",
     address: "",
+    appointmentDate: "",
+    appointmentTime: "",
+    buildingName: "",
     priority: "medium" as "low" | "medium" | "high",
     estimatedDuration: 60,
   });
@@ -268,10 +273,15 @@ export default function ScheduleV3() {
       setShowAddOrderDialog(false);
       setNewOrder({
         orderNumber: "",
+        serviceNumber: "",
         customerName: "",
         customerPhone: "",
         serviceType: "",
+        salesModiType: "",
         address: "",
+        appointmentDate: "",
+        appointmentTime: "",
+        buildingName: "",
         priority: "medium",
         estimatedDuration: 60,
       });
@@ -563,6 +573,14 @@ export default function ScheduleV3() {
                 />
               </div>
               <div className="grid gap-2">
+                <Label htmlFor="serviceNumber">Service Number</Label>
+                <Input
+                  id="serviceNumber"
+                  value={newOrder.serviceNumber}
+                  onChange={(e) => setNewOrder({ ...newOrder, serviceNumber: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="customerName">Customer Name *</Label>
                 <Input
                   id="customerName"
@@ -579,11 +597,21 @@ export default function ScheduleV3() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="serviceType">Service Type</Label>
+                <Label htmlFor="serviceType">Service Type (WO Type)</Label>
                 <Input
                   id="serviceType"
                   value={newOrder.serviceType}
                   onChange={(e) => setNewOrder({ ...newOrder, serviceType: e.target.value })}
+                  placeholder="e.g., ACTIVATION, MODIFICATION"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="salesModiType">Sales/Modi Type</Label>
+                <Input
+                  id="salesModiType"
+                  value={newOrder.salesModiType}
+                  onChange={(e) => setNewOrder({ ...newOrder, salesModiType: e.target.value })}
+                  placeholder="e.g., New Sales, Outdoor relocation"
                 />
               </div>
               <div className="grid gap-2">
@@ -592,6 +620,33 @@ export default function ScheduleV3() {
                   id="address"
                   value={newOrder.address}
                   onChange={(e) => setNewOrder({ ...newOrder, address: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="appointmentDate">Appointment Date</Label>
+                <Input
+                  id="appointmentDate"
+                  type="date"
+                  value={newOrder.appointmentDate}
+                  onChange={(e) => setNewOrder({ ...newOrder, appointmentDate: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="appointmentTime">Appointment Time</Label>
+                <Input
+                  id="appointmentTime"
+                  type="time"
+                  value={newOrder.appointmentTime}
+                  onChange={(e) => setNewOrder({ ...newOrder, appointmentTime: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="buildingName">Building Name</Label>
+                <Input
+                  id="buildingName"
+                  value={newOrder.buildingName}
+                  onChange={(e) => setNewOrder({ ...newOrder, buildingName: e.target.value })}
+                  placeholder="e.g., Menara ABC Tower"
                 />
               </div>
               <div className="grid gap-2">
