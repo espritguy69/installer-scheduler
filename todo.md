@@ -266,3 +266,7 @@
 - [ ] Standardize navigation component usage
 - [ ] Ensure consistent active state indicators
 - [ ] Test navigation on all pages (Home, Upload, Orders, Installers, Schedule, Dashboard, Performance, Notes)
+
+## Fix Nested Anchor Tag Error
+- [x] Fix Navigation component to remove nested `<a>` tags inside Link components
+- [x] Test all pages to verify error is resolved
