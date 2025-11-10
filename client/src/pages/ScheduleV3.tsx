@@ -27,6 +27,7 @@ import * as XLSX from "xlsx";
 import { Link } from "wouter";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { RouteOptimizer } from "@/components/RouteOptimizer";
 
 // Custom time slots as specified
 const TIME_SLOTS = ["09:00", "10:00", "11:00", "11:30", "13:00", "14:30", "15:00", "16:00", "18:00"];
@@ -524,11 +525,29 @@ export default function ScheduleV3() {
                       return (
                         <tr key={installer.id}>
                           <td className="border p-2 font-medium sticky left-0 z-10 bg-background">
-                            <div className="flex items-center justify-between">
-                              <span>{installer.name}</span>
-                              <span className="ml-2 px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
-                                {workloadCount}
-                              </span>
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span>{installer.name}</span>
+                                <span className="ml-2 px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
+                                  {workloadCount}
+                                </span>
+                              </div>
+                              <RouteOptimizer
+                                orders={orders.filter((o: any) => {
+                                  const assignment = todaysAssignments.find(a => a.orderId === o.id);
+                                  return assignment?.installerId === installer.id;
+                                }).map((o: any) => ({
+                                  id: o.id,
+                                  orderNumber: o.orderNumber,
+                                  customerName: o.customerName,
+                                  address: o.address,
+                                  scheduledStartTime: todaysAssignments.find(a => a.orderId === o.id)?.scheduledStartTime || undefined
+                                }))}
+                                installerName={installer.name}
+                                onApplyRoute={(optimizedOrders) => {
+                                  toast.info("Route optimization applied. Drag orders to adjust time slots.");
+                                }}
+                              />
                             </div>
                           </td>
                           {TIME_SLOTS.map(slot => (

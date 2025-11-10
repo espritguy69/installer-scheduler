@@ -11,12 +11,15 @@ import Upload from "./pages/Upload";
 import Schedule from "./pages/ScheduleV3";
 import Orders from "./pages/Orders";
 import Installers from "./pages/Installers";
+import Dashboard from "./pages/Dashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/upload"} component={Upload} />
+      <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/performance"} component={Performance} />
       <Route path="/installer" component={InstallerView} />
       <Route path={"/orders"} component={Orders} />

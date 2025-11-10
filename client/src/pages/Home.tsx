@@ -62,6 +62,9 @@ export default function Home() {
               <Link href="/schedule" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Schedule
               </Link>
+              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Dashboard
+              </Link>
               <Link href="/performance" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Performance
               </Link>
