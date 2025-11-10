@@ -1,0 +1,15 @@
+{
+  "query": "SELECT orderNumber, customerName, customerPhone FROM orders WHERE orderNumber = 'A1775621'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT orderNumber, customerName, customerPhone FROM orders WHERE orderNumber = 'A1775621'",
+  "rows": [
+    {
+      "orderNumber": "A1775621",
+      "customerName": "AMIRUL IDDLAN BIN MD ZAINAL",
+      "customerPhone": "011-99999999"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNumber\tcustomerName\tcustomerPhone\nA1775621\tAMIRUL IDDLAN BIN MD ZAINAL\t011-99999999\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

@@ -315,3 +315,14 @@
 - [x] Update Upload.tsx to use time conversion for appointmentTime field
 - [x] Test Excel upload with time format conversion
 - [x] Verify order cards display readable time format (10:00 AM instead of 0.4166...)
+
+## Implement Edit Order Dialog
+- [x] Design Edit Order dialog UI with all fields (matching Add Order dialog)
+- [x] Add Edit button to each row in the Orders table
+- [x] Implement edit functionality using orders.update tRPC mutation
+- [x] Pre-fill dialog with existing order data when editing
+- [x] Support editing all fields: orderNumber, serviceNumber, customerName, customerPhone, serviceType, salesModiType, address, appointmentDate, appointmentTime, buildingName, priority, notes
+- [x] Add form validation for required fields
+- [x] Show success/error toast messages
+- [x] Refresh order list after successful update
+- [x] Test editing various order fields and verify changes persist

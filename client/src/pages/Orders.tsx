@@ -53,6 +53,10 @@ export default function Orders() {
   
   // Clear all orders
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
+  
+  // Edit order dialog
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editOrder, setEditOrder] = useState<any>(null);
 
   const { data: allOrders = [], isLoading } = trpc.orders.list.useQuery();
   
@@ -127,6 +131,43 @@ export default function Orders() {
     setRescheduledDate("");
     setRescheduledTime("");
     setIsDialogOpen(true);
+  };
+  
+  const handleEditOrder = (order: any) => {
+    setEditOrder({
+      id: order.id,
+      orderNumber: order.orderNumber || "",
+      serviceNumber: order.serviceNumber || "",
+      customerName: order.customerName || "",
+      customerPhone: order.customerPhone || "",
+      serviceType: order.serviceType || "",
+      salesModiType: order.salesModiType || "",
+      address: order.address || "",
+      appointmentDate: order.appointmentDate || "",
+      appointmentTime: order.appointmentTime || "",
+      buildingName: order.buildingName || "",
+      priority: order.priority || "medium",
+      notes: order.notes || "",
+    });
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleSaveEdit = async () => {
+    if (!editOrder || !editOrder.orderNumber || !editOrder.customerName) {
+      toast.error("Order number and customer name are required");
+      return;
+    }
+    
+    try {
+      await updateOrder.mutateAsync(editOrder);
+      await utils.orders.list.invalidate();
+      toast.success("Order updated successfully");
+      setIsEditDialogOpen(false);
+      setEditOrder(null);
+    } catch (error) {
+      toast.error("Failed to update order");
+      console.error(error);
+    }
   };
 
   const handleClearAll = async () => {
@@ -340,13 +381,22 @@ export default function Orders() {
                             )}
                           </TableCell>
                           <TableCell>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleStatusChange(order)}
-                            >
-                              Update Status
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditOrder(order)}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleStatusChange(order)}
+                              >
+                                Update Status
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
@@ -429,6 +479,152 @@ export default function Orders() {
             </Button>
             <Button onClick={handleUpdateStatus} disabled={!newStatus || newStatus === selectedOrder?.status}>
               Update Status
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Order Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Order</DialogTitle>
+            <DialogDescription>
+              Update order details for: {editOrder?.orderNumber}
+            </DialogDescription>
+          </DialogHeader>
+          {editOrder && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Order Number *</label>
+                <input
+                  type="text"
+                  value={editOrder.orderNumber}
+                  onChange={(e) => setEditOrder({ ...editOrder, orderNumber: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  placeholder="e.g., WO-2025-001"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Service Number</label>
+                <input
+                  type="text"
+                  value={editOrder.serviceNumber}
+                  onChange={(e) => setEditOrder({ ...editOrder, serviceNumber: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  placeholder="e.g., TBBNB029186G"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Customer Name *</label>
+                <input
+                  type="text"
+                  value={editOrder.customerName}
+                  onChange={(e) => setEditOrder({ ...editOrder, customerName: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Customer Phone</label>
+                <input
+                  type="text"
+                  value={editOrder.customerPhone}
+                  onChange={(e) => setEditOrder({ ...editOrder, customerPhone: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">WO Type</label>
+                <input
+                  type="text"
+                  value={editOrder.serviceType}
+                  onChange={(e) => setEditOrder({ ...editOrder, serviceType: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  placeholder="e.g., ACTIVATION, MODIFICATION"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Sales/Modi Type</label>
+                <input
+                  type="text"
+                  value={editOrder.salesModiType}
+                  onChange={(e) => setEditOrder({ ...editOrder, salesModiType: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  placeholder="e.g., New Sales, Outdoor relocation"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Address</label>
+                <input
+                  type="text"
+                  value={editOrder.address}
+                  onChange={(e) => setEditOrder({ ...editOrder, address: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Appointment Date</label>
+                <input
+                  type="date"
+                  value={editOrder.appointmentDate}
+                  onChange={(e) => setEditOrder({ ...editOrder, appointmentDate: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Appointment Time</label>
+                <input
+                  type="time"
+                  value={editOrder.appointmentTime}
+                  onChange={(e) => setEditOrder({ ...editOrder, appointmentTime: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Building Name</label>
+                <input
+                  type="text"
+                  value={editOrder.buildingName}
+                  onChange={(e) => setEditOrder({ ...editOrder, buildingName: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  placeholder="e.g., Menara ABC Tower"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Priority</label>
+                <Select
+                  value={editOrder.priority}
+                  onValueChange={(value: "low" | "medium" | "high") =>
+                    setEditOrder({ ...editOrder, priority: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Notes</label>
+                <textarea
+                  value={editOrder.notes}
+                  onChange={(e) => setEditOrder({ ...editOrder, notes: e.target.value })}
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  placeholder="Additional notes..."
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveEdit} disabled={updateOrder.isPending}>
+              {updateOrder.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </DialogContent>
