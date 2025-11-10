@@ -193,17 +193,19 @@ export async function getAssignmentsByDateRange(startDate: Date, endDate: Date) 
     ));
 }
 
+export async function getAssignmentsByOrder(orderId: number) {
+  const database = await getDb();
+  if (!database) return [];
+  return await database.select().from(assignments).where(eq(assignments.orderId, orderId));
+}
+
 export async function getAssignmentsByInstaller(installerId: number) {
   const db = await getDb();
   if (!db) return [];
   return await db.select().from(assignments).where(eq(assignments.installerId, installerId));
 }
 
-export async function getAssignmentsByOrder(orderId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(assignments).where(eq(assignments.orderId, orderId));
-}
+
 
 export async function createAssignment(assignment: InsertAssignment) {
   const db = await getDb();

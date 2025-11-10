@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Upload as UploadIcon, FileSpreadsheet } from "lucide-react";
+import { Calendar, Upload as UploadIcon, FileSpreadsheet, User } from "lucide-react";
 import { APP_TITLE, getLoginUrl } from "@/const";
 import { Link } from "wouter";
 
@@ -140,6 +140,23 @@ export default function Home() {
             <CardContent>
               <Link href="/schedule">
                 <Button className="w-full" variant="outline">View Schedule</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <User className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle>Installer View</CardTitle>
+              <CardDescription>
+                Mobile-friendly view for installers to manage their daily tasks and update order status
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/installer">
+                <Button className="w-full">Open Installer Dashboard</Button>
               </Link>
             </CardContent>
           </Card>

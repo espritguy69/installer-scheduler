@@ -39,8 +39,35 @@ export default function Orders() {
   const [rescheduledDate, setRescheduledDate] = useState<string>("");
   const [rescheduledTime, setRescheduledTime] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // Filter states
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [rescheduleReasonFilter, setRescheduleReasonFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const { data: orders = [], isLoading } = trpc.orders.list.useQuery();
+  const { data: allOrders = [], isLoading } = trpc.orders.list.useQuery();
+  
+  // Apply filters
+  const orders = allOrders.filter(order => {
+    // Status filter
+    if (statusFilter !== "all" && order.status !== statusFilter) return false;
+    
+    // Reschedule reason filter
+    if (rescheduleReasonFilter !== "all" && order.rescheduleReason !== rescheduleReasonFilter) return false;
+    
+    // Search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        order.orderNumber.toLowerCase().includes(query) ||
+        order.customerName.toLowerCase().includes(query) ||
+        (order.serviceNumber && order.serviceNumber.toLowerCase().includes(query)) ||
+        (order.customerPhone && order.customerPhone.toLowerCase().includes(query))
+      );
+    }
+    
+    return true;
+  });
   const { data: assignments = [] } = trpc.assignments.list.useQuery();
   const updateOrder = trpc.orders.update.useMutation();
   const utils = trpc.useUtils();
@@ -205,6 +232,58 @@ export default function Orders() {
             </div>
           </CardHeader>
           <CardContent>
+            {/* Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Search</label>
+                <input
+                  type="text"
+                  placeholder="Search by WO No., Customer, Service No..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">Status</label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="assigned">Assigned</SelectItem>
+                    <SelectItem value="on_the_way">On the Way</SelectItem>
+                    <SelectItem value="met_customer">Met Customer</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="rescheduled">Rescheduled</SelectItem>
+                    <SelectItem value="withdrawn">Withdrawn</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">Reschedule Reason</label>
+                <Select value={rescheduleReasonFilter} onValueChange={setRescheduleReasonFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All reasons" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Reasons</SelectItem>
+                    <SelectItem value="customer_issue">Customer Issue</SelectItem>
+                    <SelectItem value="building_issue">Building Issue</SelectItem>
+                    <SelectItem value="network_issue">Network Issue</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="text-sm text-muted-foreground mb-4">
+              Showing {orders.length} of {allOrders.length} orders
+            </div>
+            
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>

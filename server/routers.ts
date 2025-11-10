@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { notifyOrderAssigned, notifyOrderCompleted, notifyOrderRescheduled, notifyOrderWithdrawn } from "./notifications";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -56,7 +57,52 @@ export const appRouter = router({
       notes: z.string().optional(),
     })).mutation(async ({ input }) => {
       const { id, ...data } = input;
+      
+      // Get order and assignment info before update for notifications
+      const order = await db.getOrderById(id);
+      const oldStatus = order?.status;
+      
       await db.updateOrder(id, data);
+      
+      // Send notifications based on status change
+      if (data.status && data.status !== oldStatus) {
+        try {
+          // Get assignment to find installer name
+          const assignments = await db.getAssignmentsByOrder(id);
+          const assignment = assignments[0];
+          let installerName = "Unknown";
+          
+          if (assignment) {
+            const installer = await db.getInstallerById(assignment.installerId);
+            installerName = installer?.name || "Unknown";
+          }
+          
+          if (data.status === "completed" && order) {
+            await notifyOrderCompleted({
+              orderNumber: order.orderNumber,
+              installerName,
+              customerName: order.customerName,
+            });
+          } else if (data.status === "rescheduled" && order && data.rescheduleReason && data.rescheduledDate && data.rescheduledTime) {
+            await notifyOrderRescheduled({
+              orderNumber: order.orderNumber,
+              installerName,
+              customerName: order.customerName,
+              reason: data.rescheduleReason,
+              newDate: new Date(data.rescheduledDate).toLocaleDateString(),
+              newTime: data.rescheduledTime,
+            });
+          } else if (data.status === "withdrawn" && order) {
+            await notifyOrderWithdrawn({
+              orderNumber: order.orderNumber,
+              customerName: order.customerName,
+            });
+          }
+        } catch (error) {
+          console.error("Failed to send status change notification:", error);
+        }
+      }
+      
       return { success: true };
     }),
     delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
@@ -150,7 +196,26 @@ export const appRouter = router({
       scheduledEndTime: z.string().regex(/^\d{2}:\d{2}$/),
       notes: z.string().optional(),
     })).mutation(async ({ input }) => {
-      return await db.createAssignment(input);
+      const result = await db.createAssignment(input);
+      
+      // Send notification
+      try {
+        const order = await db.getOrderById(input.orderId);
+        const installer = await db.getInstallerById(input.installerId);
+        if (order && installer) {
+          await notifyOrderAssigned({
+            orderNumber: order.orderNumber,
+            installerName: installer.name,
+            customerName: order.customerName,
+            scheduledDate: input.scheduledDate.toLocaleDateString(),
+            scheduledTime: `${input.scheduledStartTime} - ${input.scheduledEndTime}`,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to send assignment notification:", error);
+      }
+      
+      return result;
     }),
     update: protectedProcedure.input(z.object({
       id: z.number(),

@@ -80,3 +80,24 @@
 - [x] Add rescheduled date and time fields
 - [x] Update status update UI with proper workflow
 - [x] Test new status workflow
+
+## Phase 13: Status Filtering on Orders Page
+- [x] Add status filter dropdown
+- [x] Add reschedule reason filter
+- [x] Add search filter
+- [x] Implement filter logic
+- [x] Test filtering functionality
+
+## Phase 14: Installer Mobile View
+- [x] Create mobile-friendly installer dashboard
+- [x] Show assigned tasks for current day
+- [x] Add quick status update buttons
+- [x] Implement real-time status updates
+- [x] Test on mobile devices
+
+## Phase 15: Automatic Notifications
+- [x] Set up notification system for order assignments
+- [x] Add notifications for order completions
+- [x] Add notifications for reschedules
+- [x] Add notifications for withdrawn orders
+- [x] Test notification delivery
