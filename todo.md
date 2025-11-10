@@ -259,3 +259,10 @@
 - [x] Make installer names list scrollable independently
 - [x] Test order card display with sample data
 - [x] Test scrolling behavior
+
+## Navigation Bar Uniformity
+- [x] Audit navigation implementation across all pages
+- [x] Check for inconsistent layouts or styling
+- [ ] Standardize navigation component usage
+- [ ] Ensure consistent active state indicators
+- [ ] Test navigation on all pages (Home, Upload, Orders, Installers, Schedule, Dashboard, Performance, Notes)

@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { APP_TITLE } from "@/const";
 import { BookOpen, Download, Loader2, Plus, Search } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
@@ -289,48 +290,7 @@ export default function Notes() {
   
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="font-semibold text-xl">
-              {APP_TITLE}
-            </Link>
-            <nav className="hidden md:flex gap-6">
-              <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
-                Home
-              </Link>
-              <Link href="/upload" className="text-sm font-medium transition-colors hover:text-primary">
-                Upload
-              </Link>
-              <Link href="/orders" className="text-sm font-medium transition-colors hover:text-primary">
-                Orders
-              </Link>
-              <Link href="/installers" className="text-sm font-medium transition-colors hover:text-primary">
-                Installers
-              </Link>
-              <Link href="/schedule" className="text-sm font-medium transition-colors hover:text-primary">
-                Schedule
-              </Link>
-              <Link href="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
-                Dashboard
-              </Link>
-              <Link href="/performance" className="text-sm font-medium transition-colors hover:text-primary">
-                Performance
-              </Link>
-              <Link href="/notes" className="text-sm font-medium transition-colors hover:text-primary text-primary">
-                Notes
-              </Link>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4">
-            {user && <span className="text-sm text-muted-foreground">{user.name}</span>}
-            <Button variant="outline" onClick={logout}>
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Main Content */}
       <div className="container py-8">

@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, orderNumber, serviceNumber, appointmentTime, buildingName, notes FROM orders LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, orderNumber, serviceNumber, appointmentTime, buildingName, notes FROM orders LIMIT 5",
+  "rows": [
+    {
+      "id": "30048",
+      "orderNumber": "A1775621",
+      "serviceNumber": "NULL",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "notes": ""
+    },
+    {
+      "id": "30049",
+      "orderNumber": "A1785662",
+      "serviceNumber": "NULL",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "notes": ""
+    },
+    {
+      "id": "30050",
+      "orderNumber": "M1786442",
+      "serviceNumber": "NULL",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "notes": ""
+    },
+    {
+      "id": "30051",
+      "orderNumber": "A1786084",
+      "serviceNumber": "NULL",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "notes": ""
+    },
+    {
+      "id": "30052",
+      "orderNumber": "M1787117",
+      "serviceNumber": "NULL",
+      "appointmentTime": "NULL",
+      "buildingName": "NULL",
+      "notes": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\tserviceNumber\tappointmentTime\tbuildingName\tnotes\n30048\tA1775621\tNULL\tNULL\tNULL\t\n30049\tA1785662\tNULL\tNULL\tNULL\t\n30050\tM1786442\tNULL\tNULL\tNULL\t\n30051\tA1786084\tNULL\tNULL\tNULL\t\n30052\tM1787117\tNULL\tNULL\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

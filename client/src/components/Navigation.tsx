@@ -1,0 +1,66 @@
+import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { APP_TITLE } from "@/const";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { Home, Upload, FileText, Users, Calendar, BarChart3, StickyNote } from "lucide-react";
+
+export function Navigation() {
+  const [location] = useLocation();
+  const { user, logout } = useAuth();
+
+  const navItems = [
+    { href: "/", label: "Home", icon: Home },
+    { href: "/upload", label: "Upload", icon: Upload },
+    { href: "/orders", label: "Orders", icon: FileText },
+    { href: "/installers", label: "Installers", icon: Users },
+    { href: "/schedule", label: "Schedule", icon: Calendar },
+    { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
+    { href: "/performance", label: "Performance", icon: BarChart3 },
+    { href: "/notes", label: "Notes", icon: StickyNote },
+  ];
+
+  const isActive = (href: string) => {
+    if (href === "/") return location === "/";
+    return location.startsWith(href);
+  };
+
+  return (
+    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-8">
+          <Link href="/">
+            <a className="text-xl font-bold hover:text-primary transition-colors">
+              {APP_TITLE}
+            </a>
+          </Link>
+          <div className="hidden md:flex gap-1">
+            {navItems.map(({ href, label, icon: Icon }) => (
+              <Link key={href} href={href}>
+                <Button
+                  variant={isActive(href) ? "default" : "ghost"}
+                  size="sm"
+                  className="gap-2"
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </Button>
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          {user && (
+            <>
+              <span className="text-sm text-muted-foreground hidden sm:inline">
+                {user.name}
+              </span>
+              <Button variant="outline" size="sm" onClick={() => logout()}>
+                Sign Out
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}

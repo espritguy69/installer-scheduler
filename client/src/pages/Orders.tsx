@@ -27,6 +27,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { APP_TITLE } from "@/const";
 import { FileText, Loader2 } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
@@ -190,46 +191,7 @@ export default function Orders() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-6">
-            <h1 className="text-xl font-bold">{APP_TITLE}</h1>
-            <nav className="flex gap-4">
-              <Link href="/">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Home
-                </a>
-              </Link>
-              <Link href="/upload">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Upload
-                </a>
-              </Link>
-              <Link href="/orders">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Orders
-                </a>
-              </Link>
-              <Link href="/installers">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Installers
-                </a>
-              </Link>
-              <Link href="/schedule">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Schedule
-                </a>
-              </Link>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user?.name}</span>
-            <Button variant="outline" size="sm" onClick={() => logout()}>
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       <div className="container py-8">
         <div className="mb-8">

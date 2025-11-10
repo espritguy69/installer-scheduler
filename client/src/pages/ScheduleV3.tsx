@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { APP_TITLE } from "@/const";
-import { Calendar, ChevronLeft, ChevronRight, Download, Plus, Home as HomeIcon, Upload as UploadIcon, FileText, Users, BarChart3 } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Download, Plus } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
@@ -389,58 +390,7 @@ export default function ScheduleV3() {
         }
       `}</style>
       <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b bg-background sticky top-0 z-50">
-          <div className="container mx-auto flex items-center justify-between py-4">
-            <div className="flex items-center gap-8">
-              <h1 className="text-2xl font-bold">{APP_TITLE}</h1>
-              <nav className="flex gap-1">
-                <Link href="/">
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <HomeIcon className="h-4 w-4" />
-                    Home
-                  </Button>
-                </Link>
-                <Link href="/upload">
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <UploadIcon className="h-4 w-4" />
-                    Upload
-                  </Button>
-                </Link>
-                <Link href="/orders">
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <FileText className="h-4 w-4" />
-                    Orders
-                  </Button>
-                </Link>
-                <Link href="/installers">
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <Users className="h-4 w-4" />
-                    Installers
-                  </Button>
-                </Link>
-                <Link href="/schedule">
-                  <Button variant="default" size="sm" className="gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Schedule
-                  </Button>
-                </Link>
-                <Link href="/performance">
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    Performance
-                  </Button>
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">{user?.name}</span>
-              <Button variant="outline" size="sm" onClick={() => logout()}>
-                Sign Out
-              </Button>
-            </div>
-          </div>
-        </header>
+        <Navigation />
 
         {/* Main Content */}
         <main className="container mx-auto py-8">

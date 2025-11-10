@@ -2,19 +2,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { APP_TITLE } from "@/const";
 import { 
-  Home as HomeIcon, 
-  Upload as UploadIcon, 
-  FileText, 
-  Users, 
-  Calendar,
-  BarChart3,
   CheckCircle2,
   Clock,
   AlertCircle,
   TrendingUp,
   StickyNote,
-  Filter
+  Filter,
+  FileText
 } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 import { Link } from "wouter";
 import { useMemo } from "react";
 
@@ -81,46 +77,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="font-bold text-xl">
-              {APP_TITLE}
-            </Link>
-            <div className="hidden md:flex gap-4">
-              <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
-                <HomeIcon className="inline h-4 w-4 mr-1" />
-                Home
-              </Link>
-              <Link href="/upload" className="text-sm font-medium hover:text-primary transition-colors">
-                <UploadIcon className="inline h-4 w-4 mr-1" />
-                Upload
-              </Link>
-              <Link href="/orders" className="text-sm font-medium hover:text-primary transition-colors">
-                <FileText className="inline h-4 w-4 mr-1" />
-                Orders
-              </Link>
-              <Link href="/installers" className="text-sm font-medium hover:text-primary transition-colors">
-                <Users className="inline h-4 w-4 mr-1" />
-                Installers
-              </Link>
-              <Link href="/schedule" className="text-sm font-medium hover:text-primary transition-colors">
-                <Calendar className="inline h-4 w-4 mr-1" />
-                Schedule
-              </Link>
-              <Link href="/performance" className="text-sm font-medium hover:text-primary transition-colors">
-                <BarChart3 className="inline h-4 w-4 mr-1" />
-                Performance
-              </Link>
-              <Link href="/dashboard" className="text-sm font-medium text-primary">
-                <TrendingUp className="inline h-4 w-4 mr-1" />
-                Dashboard
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
