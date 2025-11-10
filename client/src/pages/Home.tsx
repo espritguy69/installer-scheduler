@@ -47,30 +47,20 @@ export default function Home() {
           <div className="flex items-center gap-6">
             <h1 className="text-xl font-bold">{APP_TITLE}</h1>
             <nav className="flex gap-4">
-              <Link href="/">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Home
-                </a>
+              <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Home
               </Link>
-              <Link href="/upload">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Upload
-                </a>
+              <Link href="/upload" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Upload
               </Link>
-              <Link href="/orders">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Orders
-                </a>
+              <Link href="/orders" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Orders
               </Link>
-              <Link href="/installers">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Installers
-                </a>
+              <Link href="/installers" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Installers
               </Link>
-              <Link href="/schedule">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Schedule
-                </a>
+              <Link href="/schedule" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Schedule
               </Link>
             </nav>
           </div>
@@ -104,9 +94,9 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/upload">
-                <Button className="w-full">Go to Upload</Button>
-              </Link>
+              <Button asChild className="w-full">
+                <Link href="/upload">Go to Upload</Link>
+              </Button>
             </CardContent>
           </Card>
 
@@ -121,9 +111,9 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/schedule">
-                <Button className="w-full">Go to Schedule</Button>
-              </Link>
+              <Button asChild className="w-full">
+                <Link href="/schedule">Go to Schedule</Link>
+              </Button>
             </CardContent>
           </Card>
 
@@ -138,9 +128,9 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/schedule">
-                <Button className="w-full" variant="outline">View Schedule</Button>
-              </Link>
+              <Button asChild className="w-full" variant="outline">
+                <Link href="/schedule">View Schedule</Link>
+              </Button>
             </CardContent>
           </Card>
 
@@ -155,9 +145,9 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/installer">
-                <Button className="w-full">Open Installer Dashboard</Button>
-              </Link>
+              <Button asChild className="w-full">
+                <Link href="/installer">Open Installer Dashboard</Link>
+              </Button>
             </CardContent>
           </Card>
         </div>

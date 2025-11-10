@@ -101,3 +101,6 @@
 - [x] Add notifications for reschedules
 - [x] Add notifications for withdrawn orders
 - [x] Test notification delivery
+
+## Bug Fixes
+- [x] Fix nested anchor tag error on Home page
