@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { assignments, InsertAssignment, InsertInstaller, InsertOrder, installers, InsertUser, orders, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,137 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Orders queries
+export async function getAllOrders() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(orders);
+}
+
+export async function getOrderById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createOrder(order: InsertOrder) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(orders).values(order);
+  return result;
+}
+
+export async function updateOrder(id: number, order: Partial<InsertOrder>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(orders).set(order).where(eq(orders.id, id));
+}
+
+export async function deleteOrder(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(orders).where(eq(orders.id, id));
+}
+
+export async function bulkCreateOrders(orderList: InsertOrder[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  if (orderList.length === 0) return;
+  await db.insert(orders).values(orderList);
+}
+
+// Installers queries
+export async function getAllInstallers() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(installers);
+}
+
+export async function getInstallerById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(installers).where(eq(installers.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createInstaller(installer: InsertInstaller) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(installers).values(installer);
+  return result;
+}
+
+export async function updateInstaller(id: number, installer: Partial<InsertInstaller>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(installers).set(installer).where(eq(installers.id, id));
+}
+
+export async function deleteInstaller(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(installers).where(eq(installers.id, id));
+}
+
+export async function bulkCreateInstallers(installerList: InsertInstaller[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  if (installerList.length === 0) return;
+  await db.insert(installers).values(installerList);
+}
+
+// Assignments queries
+export async function getAllAssignments() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(assignments);
+}
+
+export async function getAssignmentById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(assignments).where(eq(assignments.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAssignmentsByDateRange(startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(assignments)
+    .where(and(
+      gte(assignments.scheduledDate, startDate),
+      lte(assignments.scheduledDate, endDate)
+    ));
+}
+
+export async function getAssignmentsByInstaller(installerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(assignments).where(eq(assignments.installerId, installerId));
+}
+
+export async function getAssignmentsByOrder(orderId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(assignments).where(eq(assignments.orderId, orderId));
+}
+
+export async function createAssignment(assignment: InsertAssignment) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(assignments).values(assignment);
+  return result;
+}
+
+export async function updateAssignment(id: number, assignment: Partial<InsertAssignment>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(assignments).set(assignment).where(eq(assignments.id, id));
+}
+
+export async function deleteAssignment(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(assignments).where(eq(assignments.id, id));
+}

@@ -1,7 +1,9 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { z } from "zod";
+import * as db from "./db";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -17,12 +19,155 @@ export const appRouter = router({
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  orders: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllOrders();
+    }),
+    getById: protectedProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+      return await db.getOrderById(input.id);
+    }),
+    create: protectedProcedure.input(z.object({
+      orderNumber: z.string(),
+      customerName: z.string(),
+      customerPhone: z.string().optional(),
+      customerEmail: z.string().email().optional(),
+      serviceType: z.string().optional(),
+      address: z.string().optional(),
+      estimatedDuration: z.number().default(60),
+      priority: z.enum(["low", "medium", "high"]).default("medium"),
+      notes: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      return await db.createOrder(input);
+    }),
+    update: protectedProcedure.input(z.object({
+      id: z.number(),
+      orderNumber: z.string().optional(),
+      customerName: z.string().optional(),
+      customerPhone: z.string().optional(),
+      customerEmail: z.string().email().optional(),
+      serviceType: z.string().optional(),
+      address: z.string().optional(),
+      estimatedDuration: z.number().optional(),
+      priority: z.enum(["low", "medium", "high"]).optional(),
+      status: z.enum(["pending", "assigned", "in_progress", "completed", "cancelled"]).optional(),
+      notes: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db.updateOrder(id, data);
+      return { success: true };
+    }),
+    delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+      await db.deleteOrder(input.id);
+      return { success: true };
+    }),
+    bulkCreate: protectedProcedure.input(z.array(z.object({
+      orderNumber: z.string(),
+      customerName: z.string(),
+      customerPhone: z.string().optional(),
+      customerEmail: z.string().email().optional(),
+      serviceType: z.string().optional(),
+      address: z.string().optional(),
+      estimatedDuration: z.number().default(60),
+      priority: z.enum(["low", "medium", "high"]).default("medium"),
+      notes: z.string().optional(),
+    }))).mutation(async ({ input }) => {
+      await db.bulkCreateOrders(input);
+      return { success: true, count: input.length };
+    }),
+  }),
+
+  installers: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllInstallers();
+    }),
+    getById: protectedProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+      return await db.getInstallerById(input.id);
+    }),
+    create: protectedProcedure.input(z.object({
+      name: z.string(),
+      email: z.string().email().optional(),
+      phone: z.string().optional(),
+      skills: z.string().optional(),
+      isActive: z.number().default(1),
+    })).mutation(async ({ input }) => {
+      return await db.createInstaller(input);
+    }),
+    update: protectedProcedure.input(z.object({
+      id: z.number(),
+      name: z.string().optional(),
+      email: z.string().email().optional(),
+      phone: z.string().optional(),
+      skills: z.string().optional(),
+      isActive: z.number().optional(),
+    })).mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db.updateInstaller(id, data);
+      return { success: true };
+    }),
+    delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+      await db.deleteInstaller(input.id);
+      return { success: true };
+    }),
+    bulkCreate: protectedProcedure.input(z.array(z.object({
+      name: z.string(),
+      email: z.string().email().optional(),
+      phone: z.string().optional(),
+      skills: z.string().optional(),
+      isActive: z.number().default(1),
+    }))).mutation(async ({ input }) => {
+      await db.bulkCreateInstallers(input);
+      return { success: true, count: input.length };
+    }),
+  }),
+
+  assignments: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllAssignments();
+    }),
+    getById: protectedProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+      return await db.getAssignmentById(input.id);
+    }),
+    getByDateRange: protectedProcedure.input(z.object({
+      startDate: z.date(),
+      endDate: z.date(),
+    })).query(async ({ input }) => {
+      return await db.getAssignmentsByDateRange(input.startDate, input.endDate);
+    }),
+    getByInstaller: protectedProcedure.input(z.object({ installerId: z.number() })).query(async ({ input }) => {
+      return await db.getAssignmentsByInstaller(input.installerId);
+    }),
+    getByOrder: protectedProcedure.input(z.object({ orderId: z.number() })).query(async ({ input }) => {
+      return await db.getAssignmentsByOrder(input.orderId);
+    }),
+    create: protectedProcedure.input(z.object({
+      orderId: z.number(),
+      installerId: z.number(),
+      scheduledDate: z.date(),
+      scheduledStartTime: z.string().regex(/^\d{2}:\d{2}$/),
+      scheduledEndTime: z.string().regex(/^\d{2}:\d{2}$/),
+      notes: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      return await db.createAssignment(input);
+    }),
+    update: protectedProcedure.input(z.object({
+      id: z.number(),
+      orderId: z.number().optional(),
+      installerId: z.number().optional(),
+      scheduledDate: z.date().optional(),
+      scheduledStartTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+      scheduledEndTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+      status: z.enum(["scheduled", "in_progress", "completed", "cancelled"]).optional(),
+      notes: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db.updateAssignment(id, data);
+      return { success: true };
+    }),
+    delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+      await db.deleteAssignment(input.id);
+      return { success: true };
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
