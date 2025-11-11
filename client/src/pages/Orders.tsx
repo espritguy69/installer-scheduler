@@ -403,13 +403,24 @@ export default function Orders() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div>
                 <label className="text-sm font-medium mb-2 block">Search</label>
-                <input
-                  type="text"
-                  placeholder="Search by WO No., Ticket No., Customer, Service No..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search by WO No., Ticket No., Customer, Service No..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                      title="Clear search"
+                    >
+                      <X className="h-4 w-4 text-gray-500" />
+                    </button>
+                  )}
+                </div>
               </div>
               
               <div>
