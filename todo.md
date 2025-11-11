@@ -513,3 +513,16 @@
 - [x] Implement date filtering to show only orders for selected date
 - [x] Test date navigation (previous/next day buttons)
 - [x] Verify empty state shows when no orders exist for selected date
+
+## Schedule Visibility Bug Fix
+- [ ] Verify orders are successfully uploaded to database
+- [ ] Check appointment date formats for standard vs assurance format orders
+- [ ] Debug why date filtering excludes uploaded orders
+- [ ] Fix date parsing to handle all possible date formats from Excel uploads
+- [ ] Test schedule page displays both standard and assurance format orders
+- [ ] Verify date navigation works correctly with mixed format orders
+
+## Auto-Refresh Calendar After Upload
+- [x] Invalidate orders query after successful Excel upload
+- [x] Add success notification with "View Schedule" button
+- [ ] Test that Schedule page automatically shows new orders after upload

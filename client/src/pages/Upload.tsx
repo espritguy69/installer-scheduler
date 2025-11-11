@@ -17,6 +17,24 @@ import * as XLSX from "xlsx";
 import { Link } from "wouter";
 import { APP_TITLE } from "@/const";
 
+// Helper function to convert Excel date serial number to readable format
+function excelDateToReadable(excelDate: any): string {
+  if (!excelDate && excelDate !== 0) return "";
+  
+  // If it's already a string, return it
+  if (typeof excelDate === 'string') return excelDate;
+  
+  // Convert Excel serial date to JavaScript Date
+  // Excel dates are days since 1900-01-01 (with 1900-01-01 being day 1)
+  // But Excel incorrectly treats 1900 as a leap year, so we need to adjust
+  const excelEpoch = new Date(1899, 11, 30); // December 30, 1899
+  const jsDate = new Date(excelEpoch.getTime() + excelDate * 24 * 60 * 60 * 1000);
+  
+  // Format as "MMM DD, YYYY" to match Assurance format
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${months[jsDate.getMonth()]} ${jsDate.getDate()}, ${jsDate.getFullYear()}`;
+}
+
 // Helper function to convert Excel time decimal to readable format
 function excelTimeToReadable(excelTime: any): string {
   if (!excelTime && excelTime !== 0) return "";
@@ -167,7 +185,7 @@ export default function Upload() {
               row.salesModiType || row.SalesModiType || "",
             address: 
               row.address || row.Address || "",
-            appointmentDate: String(
+            appointmentDate: excelDateToReadable(
               row["App Date"] || row["Appointment Date"] ||
               row.appointmentDate || row.AppointmentDate || ""
             ),
@@ -220,7 +238,12 @@ export default function Upload() {
       await bulkCreateOrders.mutateAsync(uniqueOrders);
       await utils.orders.list.invalidate();
       
-      toast.success(`Successfully imported ${uniqueOrders.length} orders`);
+      toast.success(`Successfully imported ${uniqueOrders.length} orders`, {
+        action: {
+          label: "View Schedule",
+          onClick: () => window.location.href = "/schedule"
+        }
+      });
       setOrdersFile(null);
       // Reset file input
       const fileInput = document.getElementById("orders-file-input") as HTMLInputElement;
@@ -336,7 +359,12 @@ export default function Upload() {
                   if (newOrders.length > 0) {
                     await bulkCreateOrders.mutateAsync(newOrders);
                     await utils.orders.list.invalidate();
-                    toast.success(`Imported ${newOrders.length} new orders. Skipped ${duplicates.length} duplicates.`);
+                    toast.success(`Imported ${newOrders.length} new orders. Skipped ${duplicates.length} duplicates.`, {
+                      action: {
+                        label: "View Schedule",
+                        onClick: () => window.location.href = "/schedule"
+                      }
+                    });
                   } else {
                     toast.info("No new orders to import.");
                   }
@@ -354,7 +382,12 @@ export default function Upload() {
                   const allOrders = [...newOrders, ...duplicates];
                   await bulkCreateOrders.mutateAsync(allOrders);
                   await utils.orders.list.invalidate();
-                  toast.success(`Imported ${newOrders.length} new orders and updated ${duplicates.length} existing orders.`);
+                  toast.success(`Imported ${newOrders.length} new orders and updated ${duplicates.length} existing orders.`, {
+                    action: {
+                      label: "View Schedule",
+                      onClick: () => window.location.href = "/schedule"
+                    }
+                  });
                   setShowDuplicateDialog(false);
                   setOrdersFile(null);
                   const fileInput = document.getElementById("orders-file-input") as HTMLInputElement;
