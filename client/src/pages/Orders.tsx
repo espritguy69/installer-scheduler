@@ -1,5 +1,8 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -63,6 +66,25 @@ export default function Orders() {
   // Clear all orders
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
   
+  // Add order dialog
+  const [isAddOrderDialogOpen, setIsAddOrderDialogOpen] = useState(false);
+  const [newOrderData, setNewOrderData] = useState({
+    orderNumber: "",
+    customerName: "",
+    serviceNumber: "",
+    ticketNumber: "",
+    customerPhone: "",
+    customerEmail: "",
+    address: "",
+    buildingName: "",
+    appointmentDate: "",
+    appointmentTime: "",
+    serviceType: "",
+    salesModiType: "",
+    priority: "medium" as "low" | "medium" | "high",
+    notes: "",
+  });
+  
   // Edit order dialog
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editOrder, setEditOrder] = useState<any>(null);
@@ -94,6 +116,7 @@ export default function Orders() {
   const updateOrder = trpc.orders.update.useMutation();
   const uploadDocketFile = trpc.orders.uploadDocketFile.useMutation();
   const clearAllOrders = trpc.orders.clearAll.useMutation();
+  const createOrder = trpc.orders.create.useMutation();
   const utils = trpc.useUtils();
 
   const getStatusBadgeColor = (status: string) => {
@@ -220,6 +243,40 @@ export default function Orders() {
       console.error(error);
     }
   };
+  
+  const handleAddOrder = async () => {
+    if (!newOrderData.orderNumber || !newOrderData.customerName) {
+      toast.error("Order number and customer name are required");
+      return;
+    }
+    
+    try {
+      await createOrder.mutateAsync(newOrderData);
+      await utils.orders.list.invalidate();
+      toast.success("Order created successfully");
+      setIsAddOrderDialogOpen(false);
+      // Reset form
+      setNewOrderData({
+        orderNumber: "",
+        customerName: "",
+        serviceNumber: "",
+        ticketNumber: "",
+        customerPhone: "",
+        customerEmail: "",
+        address: "",
+        buildingName: "",
+        appointmentDate: "",
+        appointmentTime: "",
+        serviceType: "",
+        salesModiType: "",
+        priority: "medium",
+        notes: "",
+      });
+    } catch (error) {
+      toast.error("Failed to create order");
+      console.error(error);
+    }
+  };
 
   const handleUpdateStatus = async () => {
     if (!selectedOrder) return;
@@ -292,13 +349,21 @@ export default function Orders() {
                   Total: {orders.length} orders
                 </CardDescription>
               </div>
-              <Button 
-                variant="destructive" 
-                onClick={() => setIsClearDialogOpen(true)}
-                disabled={orders.length === 0}
-              >
-                Clear All Orders
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="default" 
+                  onClick={() => setIsAddOrderDialogOpen(true)}
+                >
+                  Add Order
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={() => setIsClearDialogOpen(true)}
+                  disabled={orders.length === 0}
+                >
+                  Clear All Orders
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -855,6 +920,170 @@ export default function Orders() {
               disabled={!docketFile || uploadDocketFile.isPending}
             >
               {uploadDocketFile.isPending ? "Uploading..." : "Upload & Update Status"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Order Dialog */}
+      <Dialog open={isAddOrderDialogOpen} onOpenChange={setIsAddOrderDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Order</DialogTitle>
+            <DialogDescription>
+              Create a new service order manually
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="orderNumber">Order Number *</Label>
+                <Input
+                  id="orderNumber"
+                  value={newOrderData.orderNumber}
+                  onChange={(e) => setNewOrderData({...newOrderData, orderNumber: e.target.value})}
+                  placeholder="A1234567"
+                />
+              </div>
+              <div>
+                <Label htmlFor="customerName">Customer Name *</Label>
+                <Input
+                  id="customerName"
+                  value={newOrderData.customerName}
+                  onChange={(e) => setNewOrderData({...newOrderData, customerName: e.target.value})}
+                  placeholder="John Doe"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="serviceNumber">Service Number</Label>
+                <Input
+                  id="serviceNumber"
+                  value={newOrderData.serviceNumber}
+                  onChange={(e) => setNewOrderData({...newOrderData, serviceNumber: e.target.value})}
+                  placeholder="TBBN123456G"
+                />
+              </div>
+              <div>
+                <Label htmlFor="ticketNumber">Ticket Number</Label>
+                <Input
+                  id="ticketNumber"
+                  value={newOrderData.ticketNumber}
+                  onChange={(e) => setNewOrderData({...newOrderData, ticketNumber: e.target.value})}
+                  placeholder="TKT-12345"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="customerPhone">Phone</Label>
+                <Input
+                  id="customerPhone"
+                  value={newOrderData.customerPhone}
+                  onChange={(e) => setNewOrderData({...newOrderData, customerPhone: e.target.value})}
+                  placeholder="012-3456789"
+                />
+              </div>
+              <div>
+                <Label htmlFor="customerEmail">Email</Label>
+                <Input
+                  id="customerEmail"
+                  type="email"
+                  value={newOrderData.customerEmail}
+                  onChange={(e) => setNewOrderData({...newOrderData, customerEmail: e.target.value})}
+                  placeholder="customer@example.com"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="address">Address</Label>
+              <Input
+                id="address"
+                value={newOrderData.address}
+                onChange={(e) => setNewOrderData({...newOrderData, address: e.target.value})}
+                placeholder="123 Main Street"
+              />
+            </div>
+            <div>
+              <Label htmlFor="buildingName">Building Name</Label>
+              <Input
+                id="buildingName"
+                value={newOrderData.buildingName}
+                onChange={(e) => setNewOrderData({...newOrderData, buildingName: e.target.value})}
+                placeholder="Tower A"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="appointmentDate">Appointment Date</Label>
+                <Input
+                  id="appointmentDate"
+                  type="date"
+                  value={newOrderData.appointmentDate}
+                  onChange={(e) => setNewOrderData({...newOrderData, appointmentDate: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="appointmentTime">Appointment Time</Label>
+                <Input
+                  id="appointmentTime"
+                  type="time"
+                  value={newOrderData.appointmentTime}
+                  onChange={(e) => setNewOrderData({...newOrderData, appointmentTime: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="serviceType">Service Type</Label>
+                <Input
+                  id="serviceType"
+                  value={newOrderData.serviceType}
+                  onChange={(e) => setNewOrderData({...newOrderData, serviceType: e.target.value})}
+                  placeholder="ACTIVATION"
+                />
+              </div>
+              <div>
+                <Label htmlFor="salesModiType">Sales/Modi Type</Label>
+                <Input
+                  id="salesModiType"
+                  value={newOrderData.salesModiType}
+                  onChange={(e) => setNewOrderData({...newOrderData, salesModiType: e.target.value})}
+                  placeholder="New Sales"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="priority">Priority</Label>
+              <Select value={newOrderData.priority} onValueChange={(value: "low" | "medium" | "high") => setNewOrderData({...newOrderData, priority: value})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                value={newOrderData.notes}
+                onChange={(e) => setNewOrderData({...newOrderData, notes: e.target.value})}
+                placeholder="Additional notes..."
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddOrderDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddOrder} disabled={createOrder.isPending}>
+              {createOrder.isPending ? "Creating..." : "Create Order"}
             </Button>
           </DialogFooter>
         </DialogContent>

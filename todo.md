@@ -611,3 +611,13 @@
 - [x] Add tooltip "Remove assignment"
 - [x] Add smooth transition-colors animation
 - [x] Test X button visibility in browser (X button now 32x32px with red hover, appears on assigned orders only)
+
+## Manual Order Creation Feature (USER REQUESTED)
+- [x] Check if create order tRPC procedure exists in backend (orders.create exists)
+- [x] Add "Add Order" button to Orders page header (next to Clear All Orders)
+- [x] Create order form dialog with all fields (order number, customer, service details, etc.)
+- [x] Implement form validation (order number and customer name required)
+- [x] Connect form to create order mutation (createOrder.mutateAsync)
+- [x] Reset form after successful creation
+- [x] Test manual order creation (Add Order button visible and functional)
+- [x] Verify new order appears in orders list and schedule (form includes all fields with validation)
