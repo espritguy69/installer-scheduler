@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { APP_TITLE } from "@/const";
-import { FileText, Loader2, Upload, X } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, FileText, Loader2, Upload, X } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -58,6 +58,10 @@ export default function Orders() {
   const [rescheduleReasonFilter, setRescheduleReasonFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [dateFilter, setDateFilter] = useState<string>("");
+  
+  // Sorting states
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   
   // Bulk operations
   const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
@@ -97,7 +101,7 @@ export default function Orders() {
   const { data: allOrders = [], isLoading } = trpc.orders.list.useQuery();
   
   // Apply filters
-  const orders = allOrders.filter(order => {
+  const filteredOrders = allOrders.filter(order => {
     // Status filter
     if (statusFilter !== "all" && order.status !== statusFilter) return false;
     
@@ -125,6 +129,39 @@ export default function Orders() {
     }
     
     return true;
+  });
+  
+  // Apply sorting
+  const orders = [...filteredOrders].sort((a, b) => {
+    if (!sortColumn) return 0;
+    
+    let aValue: any;
+    let bValue: any;
+    
+    switch (sortColumn) {
+      case "orderNumber":
+        aValue = a.orderNumber.toLowerCase();
+        bValue = b.orderNumber.toLowerCase();
+        break;
+      case "customerName":
+        aValue = a.customerName.toLowerCase();
+        bValue = b.customerName.toLowerCase();
+        break;
+      case "appointmentDate":
+        aValue = a.appointmentDate ? new Date(a.appointmentDate).getTime() : 0;
+        bValue = b.appointmentDate ? new Date(b.appointmentDate).getTime() : 0;
+        break;
+      case "status":
+        aValue = a.status.toLowerCase();
+        bValue = b.status.toLowerCase();
+        break;
+      default:
+        return 0;
+    }
+    
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+    return 0;
   });
   const { data: assignments = [] } = trpc.assignments.list.useQuery();
   const updateOrder = trpc.orders.update.useMutation();
@@ -183,6 +220,17 @@ export default function Orders() {
     setRescheduledDate("");
     setRescheduledTime("");
     setIsDialogOpen(true);
+  };
+  
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      // Toggle direction if clicking the same column
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new column and default to ascending
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
   };
   
   const handleQuickStatusUpdate = async (orderId: number, newStatus: string) => {
@@ -490,14 +538,62 @@ export default function Orders() {
               <Table className="table-fixed w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[120px]">WO No.</TableHead>
+                    <TableHead className="w-[120px]">
+                      <button
+                        onClick={() => handleSort("orderNumber")}
+                        className="flex items-center gap-1 hover:text-foreground transition-colors font-medium"
+                      >
+                        WO No.
+                        {sortColumn === "orderNumber" ? (
+                          sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                        )}
+                      </button>
+                    </TableHead>
                     <TableHead className="w-[140px]">Ticket No.</TableHead>
                     <TableHead className="w-[120px]">Service No.</TableHead>
-                    <TableHead className="w-[180px]">Customer</TableHead>
+                    <TableHead className="w-[180px]">
+                      <button
+                        onClick={() => handleSort("customerName")}
+                        className="flex items-center gap-1 hover:text-foreground transition-colors font-medium"
+                      >
+                        Customer
+                        {sortColumn === "customerName" ? (
+                          sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                        )}
+                      </button>
+                    </TableHead>
                     <TableHead className="w-[140px]">WO Type</TableHead>
                     <TableHead className="w-[90px]">Priority</TableHead>
-                    <TableHead className="w-[140px]">Status</TableHead>
-                    <TableHead className="w-[120px]">Assignment</TableHead>
+                    <TableHead className="w-[140px]">
+                      <button
+                        onClick={() => handleSort("status")}
+                        className="flex items-center gap-1 hover:text-foreground transition-colors font-medium"
+                      >
+                        Status
+                        {sortColumn === "status" ? (
+                          sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                        )}
+                      </button>
+                    </TableHead>
+                    <TableHead className="w-[120px]">
+                      <button
+                        onClick={() => handleSort("appointmentDate")}
+                        className="flex items-center gap-1 hover:text-foreground transition-colors font-medium"
+                      >
+                        Assignment
+                        {sortColumn === "appointmentDate" ? (
+                          sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                        )}
+                      </button>
+                    </TableHead>
                     <TableHead className="w-[100px]">Docket</TableHead>
                     <TableHead className="w-[80px]">Actions</TableHead>
                   </TableRow>

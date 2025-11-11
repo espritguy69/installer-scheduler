@@ -677,3 +677,23 @@
 - [x] Optimize table column widths to prevent horizontal scrolling
 - [x] Ensure all table content is viewable without left/right scrolling
 - [x] Test on different screen sizes to verify responsive layout
+
+## Table Sorting Functionality (USER REQUESTED)
+- [ ] Add sorting state management (sortColumn, sortDirection)
+- [ ] Implement sorting logic for WO No. column (alphanumeric)
+- [ ] Implement sorting logic for Customer Name column (alphabetical)
+- [ ] Implement sorting logic for Appointment Date column (chronological)
+- [ ] Implement sorting logic for Status column (alphabetical)
+- [ ] Add clickable column headers with sort indicators (arrows)
+- [ ] Add visual feedback showing current sort column and direction
+- [ ] Test sorting on all four columns (ascending and descending)
+
+## Table Sorting Functionality - COMPLETED
+- [x] Add sorting state management (sortColumn, sortDirection)
+- [x] Implement sorting logic for WO No. column (alphanumeric)
+- [x] Implement sorting logic for Customer Name column (alphabetical)
+- [x] Implement sorting logic for Appointment Date column (chronological)
+- [x] Implement sorting logic for Status column (alphabetical)
+- [x] Add clickable column headers with sort indicators (arrows)
+- [x] Add visual feedback showing current sort column and direction
+- [x] Test sorting on all four columns (ascending and descending)
