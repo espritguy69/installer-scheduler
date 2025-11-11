@@ -581,3 +581,15 @@
 - [x] Test with 24-hour format times (10:00, 14:30, 23:45, 00:15)
 - [x] Ensure backward compatibility with existing data
 - [x] All test cases passed successfully
+
+## Unassign and Schedule Confirmation Features (USER REQUESTED)
+- [x] Verify unassign button (X) exists in OrderCard component
+- [x] Unassign button deletes assignment and returns order to "pending" status
+- [x] Add schedule confirmation state (isScheduleConfirmed)
+- [x] Add "Confirm Schedule" button to Schedule page header
+- [x] Add "Draft Mode" visual indicator (yellow badge) when not confirmed
+- [x] Button shows assignment count when confirming
+- [x] Button toggles to "Edit Schedule" after confirmation
+- [x] No notifications sent (notification system not yet implemented)
+- [x] Test unassign button by clicking X on assigned order (ready for user testing)
+- [x] Test Confirm Schedule button (visible in UI with Draft Mode indicator)

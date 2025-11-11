@@ -166,6 +166,7 @@ export default function ScheduleV4() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [, navigate] = useLocation();
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [isScheduleConfirmed, setIsScheduleConfirmed] = useState(false);
   const [timeChangeDialog, setTimeChangeDialog] = useState<{
     open: boolean;
     orderId: number | null;
@@ -421,10 +422,49 @@ export default function ScheduleV4() {
         <Navigation />
         <div className="container mx-auto p-4">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold">Calendar Schedule</h1>
-            <p className="text-muted-foreground">
-              Drag installers onto orders to assign them
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold">Calendar Schedule</h1>
+                <p className="text-muted-foreground">
+                  Drag installers onto orders to assign them
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                {!isScheduleConfirmed && (
+                  <div className="flex items-center gap-2 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-md text-sm">
+                    <span className="font-medium">Draft Mode</span>
+                    <span className="text-xs">No notifications sent</span>
+                  </div>
+                )}
+                <Button
+                  size="lg"
+                  variant={isScheduleConfirmed ? "outline" : "default"}
+                  onClick={() => {
+                    if (isScheduleConfirmed) {
+                      setIsScheduleConfirmed(false);
+                      toast.info("Schedule returned to draft mode");
+                    } else {
+                      // Count assigned orders
+                      const assignedCount = assignments.filter(a => 
+                        orders.some(o => o.id === a.orderId && o.appointmentDate &&
+                          new Date(o.appointmentDate).toDateString() === selectedDate.toDateString())
+                      ).length;
+                      
+                      if (assignedCount === 0) {
+                        toast.error("No assignments to confirm");
+                        return;
+                      }
+                      
+                      setIsScheduleConfirmed(true);
+                      toast.success(`Schedule confirmed! ${assignedCount} assignments ready for notification.`);
+                    }
+                  }}
+                  className={isScheduleConfirmed ? "" : "bg-green-600 hover:bg-green-700"}
+                >
+                  {isScheduleConfirmed ? "Edit Schedule" : "Confirm Schedule"}
+                </Button>
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-6">
