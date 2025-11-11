@@ -301,21 +301,49 @@ export default function ScheduleV4() {
       });
 
       // Create assignment
-      // Parse appointment date from MM/DD/YYYY format
-      const dateParts = order.appointmentDate.split("/");
-      const scheduledDate = new Date(
-        parseInt(dateParts[2]), // year
-        parseInt(dateParts[0]) - 1, // month (0-indexed)
-        parseInt(dateParts[1]) // day
-      );
+      // Parse appointment date from "Nov 1, 2025" format
+      const scheduledDate = new Date(order.appointmentDate);
       
       // Parse appointment time and calculate end time
-      const timeParts = order.appointmentTime.replace(/\s*(AM|PM|am|pm)\s*/g, "").split(":");
-      const hours = timeParts[0];
-      const minutes = timeParts[1] || "00";
-      const scheduledStartTime = `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
-      const endHour = (parseInt(hours) + 2).toString().padStart(2, "0");
-      const scheduledEndTime = `${endHour}:${minutes.padStart(2, "0")}`;
+      // Support both 12-hour format ("10:00 AM", "02:30 PM") and 24-hour format ("10:00", "14:30")
+      let hours: number;
+      let minutes: string;
+      
+      // Try 12-hour format first
+      const time12Match = order.appointmentTime.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+      if (time12Match) {
+        // 12-hour format
+        hours = parseInt(time12Match[1]);
+        minutes = time12Match[2];
+        const period = time12Match[3].toUpperCase();
+        
+        // Convert to 24-hour format
+        if (period === "PM" && hours !== 12) {
+          hours += 12;
+        } else if (period === "AM" && hours === 12) {
+          hours = 0;
+        }
+      } else {
+        // Try 24-hour format
+        const time24Match = order.appointmentTime.match(/(\d{1,2}):(\d{2})/);
+        if (time24Match) {
+          hours = parseInt(time24Match[1]);
+          minutes = time24Match[2];
+          
+          // Validate 24-hour format
+          if (hours < 0 || hours > 23) {
+            toast.error("Invalid time format (hours must be 0-23)");
+            return;
+          }
+        } else {
+          toast.error("Invalid time format. Use 12-hour (10:00 AM) or 24-hour (14:30) format");
+          return;
+        }
+      }
+      
+      const scheduledStartTime = `${hours.toString().padStart(2, "0")}:${minutes}`;
+      const endHour = (hours + 2) % 24;
+      const scheduledEndTime = `${endHour.toString().padStart(2, "0")}:${minutes}`;
 
       await createAssignmentMutation.mutateAsync({
         orderId,
