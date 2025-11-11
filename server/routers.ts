@@ -29,6 +29,7 @@ export const appRouter = router({
     }),
     create: protectedProcedure.input(z.object({
       orderNumber: z.string(),
+      ticketNumber: z.string().optional(),
       serviceNumber: z.string().optional(),
       customerName: z.string(),
       customerPhone: z.string().optional(),
@@ -134,6 +135,7 @@ export const appRouter = router({
     }),
     bulkCreate: protectedProcedure.input(z.array(z.object({
       orderNumber: z.string(),
+      ticketNumber: z.string().optional(),
       serviceNumber: z.string().optional(),
       customerName: z.string(),
       customerPhone: z.string().optional(),

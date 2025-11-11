@@ -1,0 +1,9 @@
+{
+  "query": "SELECT orderNumber, ticketNumber, serviceNumber, customerName, customerPhone, buildingName, appointmentDate, appointmentTime, status FROM orders WHERE ticketNumber LIKE '%CELCOM%' LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT orderNumber, ticketNumber, serviceNumber, customerName, customerPhone, buildingName, appointmentDate, appointmentTime, status FROM orders WHERE ticketNumber LIKE '%CELCOM%' LIMIT 5",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 46
+}

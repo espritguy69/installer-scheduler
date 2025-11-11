@@ -104,6 +104,12 @@ const DraggableOrder = ({ order }: DraggableOrderProps) => {
         <div className="text-sm text-muted-foreground truncate flex-1">{order.customerName}</div>
       </div>
       <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+        {order.ticketNumber && (
+          <div className="flex items-center gap-1">
+            <span className="font-medium">Ticket:</span>
+            <span className="truncate">{order.ticketNumber}</span>
+          </div>
+        )}
         {order.serviceNumber && (
           <div className="flex items-center gap-1">
             <span className="font-medium">Service No:</span>
@@ -208,6 +214,7 @@ export default function ScheduleV3() {
   const [showAddOrderDialog, setShowAddOrderDialog] = useState(false);
   const [newOrder, setNewOrder] = useState({
     orderNumber: "",
+    ticketNumber: "",
     serviceNumber: "",
     customerName: "",
     customerPhone: "",
@@ -281,6 +288,7 @@ export default function ScheduleV3() {
       setShowAddOrderDialog(false);
       setNewOrder({
         orderNumber: "",
+        ticketNumber: "",
         serviceNumber: "",
         customerName: "",
         customerPhone: "",
@@ -578,6 +586,15 @@ export default function ScheduleV3() {
                   id="orderNumber"
                   value={newOrder.orderNumber}
                   onChange={(e) => setNewOrder({ ...newOrder, orderNumber: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="ticketNumber">Ticket Number</Label>
+                <Input
+                  id="ticketNumber"
+                  value={newOrder.ticketNumber}
+                  onChange={(e) => setNewOrder({ ...newOrder, ticketNumber: e.target.value })}
+                  placeholder="e.g., TTKT202511108600806"
                 />
               </div>
               <div className="grid gap-2">

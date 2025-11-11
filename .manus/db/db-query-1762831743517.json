@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, orderNumber, ticketNumber, serviceNumber, customerName FROM orders WHERE ticketNumber IS NOT NULL AND ticketNumber != '' LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, orderNumber, ticketNumber, serviceNumber, customerName FROM orders WHERE ticketNumber IS NOT NULL AND ticketNumber != '' LIMIT 10",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 52
+}

@@ -57,6 +57,13 @@
       "when": 1762777622229,
       "tag": "0007_many_onslaught",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1762831238135,
+      "tag": "0008_lucky_rattler",
+      "breakpoints": true
     }
   ]
 }

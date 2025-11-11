@@ -347,6 +347,7 @@ export default function Orders() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>WO No.</TableHead>
+                    <TableHead>Ticket No.</TableHead>
                     <TableHead>Service No.</TableHead>
                     <TableHead>Customer</TableHead>
                     <TableHead>WO Type</TableHead>
@@ -359,7 +360,7 @@ export default function Orders() {
                 <TableBody>
                   {orders.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                         No orders found. Upload orders to get started.
                       </TableCell>
                     </TableRow>
@@ -369,6 +370,7 @@ export default function Orders() {
                       return (
                         <TableRow key={order.id}>
                           <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                          <TableCell className="text-xs">{order.ticketNumber || "-"}</TableCell>
                           <TableCell className="text-xs">{order.serviceNumber || "-"}</TableCell>
                           <TableCell>
                             <div>{order.customerName}</div>
@@ -592,6 +594,16 @@ export default function Orders() {
                   onChange={(e) => setEditOrder({ ...editOrder, orderNumber: e.target.value })}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   placeholder="e.g., WO-2025-001"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Ticket Number</label>
+                <input
+                  type="text"
+                  value={editOrder.ticketNumber || ""}
+                  onChange={(e) => setEditOrder({ ...editOrder, ticketNumber: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  placeholder="e.g., TTKT202511108600806"
                 />
               </div>
               <div className="grid gap-2">

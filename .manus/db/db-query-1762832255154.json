@@ -1,0 +1,21 @@
+{
+  "query": "SELECT orderNumber, ticketNumber, serviceNumber, customerName, customerPhone, buildingName, appointmentDate, appointmentTime, notes FROM orders WHERE orderNumber = 'AWO437166'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT orderNumber, ticketNumber, serviceNumber, customerName, customerPhone, buildingName, appointmentDate, appointmentTime, notes FROM orders WHERE orderNumber = 'AWO437166'",
+  "rows": [
+    {
+      "orderNumber": "AWO437166",
+      "ticketNumber": "TTKT202511108600806",
+      "serviceNumber": "TBBN417003G",
+      "customerName": "NGOO YEE TING",
+      "customerPhone": "0102310314",
+      "buildingName": "PANTAI HILL PARK",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "1:00 PM",
+      "notes": "Test order 1"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNumber\tticketNumber\tserviceNumber\tcustomerName\tcustomerPhone\tbuildingName\tappointmentDate\tappointmentTime\tnotes\nAWO437166\tTTKT202511108600806\tTBBN417003G\tNGOO YEE TING\t0102310314\tPANTAI HILL PARK\tNov 11, 2025\t1:00 PM\tTest order 1\n",
+  "stderr": "",
+  "execution_time_ms": 198
+}

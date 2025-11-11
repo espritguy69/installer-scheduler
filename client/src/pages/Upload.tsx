@@ -76,6 +76,22 @@ export default function Upload() {
     });
   };
 
+  // Helper function to parse date-time string like "Nov 11, 2025 1:00 PM"
+  const parseAppointmentDateTime = (dateTimeStr: string): { date: string, time: string } => {
+    if (!dateTimeStr) return { date: "", time: "" };
+    
+    try {
+      // Parse "Nov 11, 2025 1:00 PM" format
+      const match = dateTimeStr.match(/(\w+ \d+, \d{4}) (\d{1,2}:\d{2} [AP]M)/);
+      if (match) {
+        return { date: match[1], time: match[2] };
+      }
+      return { date: dateTimeStr, time: "" };
+    } catch {
+      return { date: dateTimeStr, time: "" };
+    }
+  };
+
   const handleUploadOrders = async () => {
     if (!ordersFile) {
       toast.error("Please select a file to upload");
@@ -86,60 +102,99 @@ export default function Upload() {
     try {
       const rawData = await parseExcelFile(ordersFile);
       
-      // Map Excel columns to database fields
-      // Support both generic format and user's specific format (WO No., Customer Name, etc.)
+      // Detect file format by checking headers
+      const firstRow = rawData[0] || {};
+      const isAssuranceFormat = 'TBBN NO.' in firstRow || 'Ticket Number' in firstRow || 'AWO NO.' in firstRow;
+      
+      console.log('Detected format:', isAssuranceFormat ? 'Assurance' : 'Standard');
+      console.log('First row data:', firstRow);
+      console.log('Raw data length:', rawData.length);
+      
+      // Map Excel columns to database fields based on detected format
       const orders = rawData.map((row: any) => {
-        // Notes field for additional information only
-        const notesText = row.notes || row.Notes || "";
-
-        return {
-          orderNumber: String(
-            row["WO No."] || row["WO No"] || 
-            row.orderNumber || row.OrderNumber || row.order_number || ""
-          ),
-          serviceNumber: String(
-            row["Service No."] || row["Service No"] || 
-            row.serviceNumber || row.ServiceNumber || row.service_number || ""
-          ),
-          customerName: String(
-            row["Customer Name"] || 
-            row.customerName || row.CustomerName || row.customer_name || ""
-          ),
-          customerPhone: String(
-            row["Contact No"] || row["Contact No."] ||
-            row.customerPhone || row.CustomerPhone || row.customer_phone || ""
-          ),
-          customerEmail: row.customerEmail || row.CustomerEmail || row.customer_email || "",
-          serviceType: 
-            row["WO Type"] ||
-            row.serviceType || row.ServiceType || row.service_type || "",
-          salesModiType:
-            row["Sales/Modi Type"] ||
-            row.salesModiType || row.SalesModiType || "",
-          address: 
-            row.address || row.Address || "",
-          appointmentDate: String(
-            row["App Date"] || row["Appointment Date"] ||
-            row.appointmentDate || row.AppointmentDate || ""
-          ),
-          appointmentTime: excelTimeToReadable(
-            row["App Time"] || row["Appointment Time"] ||
-            row.appointmentTime || row.AppointmentTime || ""
-          ),
-          buildingName: String(
-            row["Building Name"] ||
-            row.buildingName || row.BuildingName || ""
-          ),
-          estimatedDuration: Number(row.estimatedDuration || row.EstimatedDuration || row.estimated_duration || 120),
-          priority: (row.priority || row.Priority || "medium").toLowerCase(),
-          notes: notesText,
-        };
+        if (isAssuranceFormat) {
+          // Assurance format mapping
+          const appointmentDateTime = parseAppointmentDateTime(row["Appointment Date"] || "");
+          
+          return {
+            orderNumber: String(row["AWO NO."] || ""),
+            ticketNumber: String(row["Ticket Number"] || ""),
+            serviceNumber: String(row["TBBN NO."] || ""),
+            customerName: String(row["Name"] || ""),
+            customerPhone: String(row["Contact No"] || ""),
+            customerEmail: "",
+            serviceType: "",
+            salesModiType: "",
+            address: "",
+            appointmentDate: appointmentDateTime.date,
+            appointmentTime: appointmentDateTime.time,
+            buildingName: String(row["Building"] || ""),
+            estimatedDuration: 120,
+            priority: "medium" as "low" | "medium" | "high",
+            notes: String(row["Remarks"] || ""),
+          };
+        } else {
+          // Standard format mapping
+          const notesText = row.notes || row.Notes || "";
+          
+          return {
+            orderNumber: String(
+              row["WO No."] || row["WO No"] || 
+              row.orderNumber || row.OrderNumber || row.order_number || ""
+            ),
+            ticketNumber: String(
+              row["Ticket Number"] || row["Ticket No"] ||
+              row.ticketNumber || row.TicketNumber || ""
+            ),
+            serviceNumber: String(
+              row["Service No."] || row["Service No"] || 
+              row.serviceNumber || row.ServiceNumber || row.service_number || ""
+            ),
+            customerName: String(
+              row["Customer Name"] || 
+              row.customerName || row.CustomerName || row.customer_name || ""
+            ),
+            customerPhone: String(
+              row["Contact No"] || row["Contact No."] ||
+              row.customerPhone || row.CustomerPhone || row.customer_phone || ""
+            ),
+            customerEmail: row.customerEmail || row.CustomerEmail || row.customer_email || "",
+            serviceType: 
+              row["WO Type"] ||
+              row.serviceType || row.ServiceType || row.service_type || "",
+            salesModiType:
+              row["Sales/Modi Type"] ||
+              row.salesModiType || row.SalesModiType || "",
+            address: 
+              row.address || row.Address || "",
+            appointmentDate: String(
+              row["App Date"] || row["Appointment Date"] ||
+              row.appointmentDate || row.AppointmentDate || ""
+            ),
+            appointmentTime: excelTimeToReadable(
+              row["App Time"] || row["Appointment Time"] ||
+              row.appointmentTime || row.AppointmentTime || ""
+            ),
+            buildingName: String(
+              row["Building Name"] ||
+              row.buildingName || row.BuildingName || ""
+            ),
+            estimatedDuration: Number(row.estimatedDuration || row.EstimatedDuration || row.estimated_duration || 120),
+            priority: (row.priority || row.Priority || "medium").toLowerCase(),
+            notes: notesText,
+          };
+        }
       });
 
+      console.log('First mapped order:', orders[0]);
+      console.log('Total mapped orders:', orders.length);
+      
       // Filter out completely empty rows (where all key fields are empty)
       const validOrders = orders.filter(o => 
         o.orderNumber || o.customerName || o.serviceNumber || o.serviceType
       );
+      
+      console.log('Valid orders after filter:', validOrders.length);
 
       if (validOrders.length === 0) {
         toast.error("No valid order data found in the file");

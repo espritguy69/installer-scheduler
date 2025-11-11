@@ -376,3 +376,25 @@
 - [x] Test docket_received status with teal badge color
 - [x] Test docket_uploaded status with cyan badge color
 - [x] Verify new statuses appear in all status dropdowns and filters
+
+## Add Assurance Excel File Upload Support
+- [x] Add ticketNumber field to orders table schema
+- [ ] Push database schema changes with pnpm db:push
+- [x] Update orders.create tRPC procedure to accept ticketNumber
+- [x] Update orders.update tRPC procedure to accept ticketNumber
+- [x] Update orders.bulkCreate tRPC procedure to accept ticketNumber
+- [x] Create assurance file upload handler with header mapping logic
+- [x] Map "TBBN NO." to serviceNumber
+- [x] Map "Ticket Number" to ticketNumber (new field)
+- [x] Map "AWO NO." to orderNumber
+- [ ] Map "Name" to customerName
+- [ ] Map "Contact No" to customerPhone
+- [ ] Map "Service Installer" to installer assignment
+- [ ] Map "Building" to buildingName
+- [ ] Map "Status" to status (convert NOT_COMPLETED to pending)
+- [ ] Map "Remarks" to notes field
+- [ ] Parse "Appointment Date" to separate appointmentDate and appointmentTime
+- [x] Add ticketNumber display to Orders table
+- [x] Add ticketNumber display to Schedule page order cards
+- [x] Add ticketNumber field to Add/Edit Order dialogs
+- [x] Test assurance file upload and verify all fields populate correctly

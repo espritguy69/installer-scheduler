@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as total_orders FROM orders",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT COUNT(*) as total_orders FROM orders",
+  "rows": [
+    {
+      "total_orders": "22"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_orders\n22\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
