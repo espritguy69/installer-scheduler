@@ -115,6 +115,7 @@ export default function Orders() {
         order.orderNumber.toLowerCase().includes(query) ||
         order.customerName.toLowerCase().includes(query) ||
         (order.serviceNumber && order.serviceNumber.toLowerCase().includes(query)) ||
+        (order.ticketNumber && order.ticketNumber.toLowerCase().includes(query)) ||
         (order.customerPhone && order.customerPhone.toLowerCase().includes(query))
       );
     }
@@ -382,7 +383,7 @@ export default function Orders() {
                 <label className="text-sm font-medium mb-2 block">Search</label>
                 <input
                   type="text"
-                  placeholder="Search by WO No., Customer, Service No..."
+                  placeholder="Search by WO No., Ticket No., Customer, Service No..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"

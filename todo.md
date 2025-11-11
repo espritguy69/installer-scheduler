@@ -634,3 +634,8 @@
 - [x] Keep only appointment date and time for cleaner look
 - [x] Update Orders.tsx Assignment column display logic
 - [x] Test with assigned orders to verify clean display (2-hour timestamp removed, shows only date and time)
+
+## Ticket Number Search Enhancement (USER REQUESTED)
+- [x] Add ticketNumber field to search filter logic in Orders page
+- [x] Update search placeholder to indicate ticket number is searchable
+- [x] Test search with ticket number (placeholder updated, search functionality working)
