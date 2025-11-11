@@ -508,13 +508,7 @@ export default function Orders() {
                               >
                                 Edit
                               </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleStatusChange(order)}
-                              >
-                                Update Status
-                              </Button>
+
                             </div>
                           </TableCell>
                         </TableRow>

@@ -526,3 +526,8 @@
 - [x] Invalidate orders query after successful Excel upload
 - [x] Add success notification with "View Schedule" button
 - [ ] Test that Schedule page automatically shows new orders after upload
+
+## Priority Bug Fixes
+- [x] Remove duplicate "Update" button from Orders page (already replaced with status dropdown)
+- [x] Standardize navigation bar across all pages for consistency
+- [x] Fix App Date and App Time parsing in Excel upload (excelDateToReadable and excelTimeToReadable functions working correctly)

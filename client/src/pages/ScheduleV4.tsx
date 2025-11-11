@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { APP_TITLE, getLoginUrl } from "@/const";
+import { Navigation } from "@/components/Navigation";
 import { trpc } from "@/lib/trpc";
 import { ChevronLeft, ChevronRight, Clock, MapPin, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -389,6 +390,7 @@ export default function ScheduleV4() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-background">
+        <Navigation />
         <div className="container mx-auto p-4">
           <div className="mb-6">
             <h1 className="text-3xl font-bold">Calendar Schedule</h1>
