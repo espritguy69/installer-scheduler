@@ -481,3 +481,20 @@
 - [x] Test history logging for bulk assignments
 - [x] Test history logging for reassignments
 - [x] Test history logging for deletions
+
+## Calendar-Centric Schedule Redesign
+- [x] Design calendar layout showing orders at their appointment date/time slots
+- [x] Display unassigned orders in calendar cells at appointment times
+- [x] Create draggable installer badges/cards
+- [x] Implement drag installer onto order to assign functionality
+- [x] Add visual indicators for assigned vs unassigned orders (colors, borders, icons)
+- [x] Show assigned installer name on order cards in calendar
+- [x] Add unassign button to remove installer from order
+- [x] Implement click-to-reassign functionality (change installer)
+- [x] Add time adjustment dialog for modifying appointment time
+- [x] Update backend to support time changes
+- [x] Test drag-and-drop installer assignment
+- [ ] Test unassign and reassign workflows
+- [ ] Test time adjustment feature
+- [ ] Verify calendar updates in real-time after changes
+- [ ] Fix date filtering to properly show orders for selected date only

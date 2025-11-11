@@ -8,7 +8,7 @@ import Home from "./pages/Home";
 import Performance from "./pages/Performance";
 import InstallerView from "./pages/InstallerView";
 import Upload from "./pages/Upload";
-import Schedule from "./pages/ScheduleV3";
+import Schedule from "./pages/ScheduleV4";
 import Orders from "./pages/Orders";
 import Installers from "./pages/Installers";
 import Dashboard from "./pages/Dashboard";
@@ -25,8 +25,7 @@ function Router() {
       <Route path={"/performance"} component={Performance} />
       <Route path="/installer" component={InstallerView} />
       <Route path={"/orders"} component={Orders} />
-      <Route path={"/installers"} component={Installers} />
-      <Route path={"/schedule"} component={Schedule} />
+      <Route path={"/installers"} component={Installers} />      <Route path={"/schedule"} component={Schedule} />
       <Route path={"/notes"} component={Notes} />
       <Route path={"/history"} component={AssignmentHistory} />
       <Route path={"/404"} component={NotFound} />

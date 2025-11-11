@@ -1,0 +1,35 @@
+{
+  "query": "SELECT orderNumber, appointmentDate, appointmentTime FROM orders LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT orderNumber, appointmentDate, appointmentTime FROM orders LIMIT 5",
+  "rows": [
+    {
+      "orderNumber": "A1775621",
+      "appointmentDate": "45962",
+      "appointmentTime": "10:00 AM"
+    },
+    {
+      "orderNumber": "A1785662",
+      "appointmentDate": "45962",
+      "appointmentTime": "10:00 AM"
+    },
+    {
+      "orderNumber": "M1786442",
+      "appointmentDate": "45962",
+      "appointmentTime": "10:00 AM"
+    },
+    {
+      "orderNumber": "A1786084",
+      "appointmentDate": "45962",
+      "appointmentTime": "10:00 AM"
+    },
+    {
+      "orderNumber": "M1787117",
+      "appointmentDate": "45962",
+      "appointmentTime": "10:00 AM"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNumber\tappointmentDate\tappointmentTime\nA1775621\t45962\t10:00 AM\nA1785662\t45962\t10:00 AM\nM1786442\t45962\t10:00 AM\nA1786084\t45962\t10:00 AM\nM1787117\t45962\t10:00 AM\n",
+  "stderr": "",
+  "execution_time_ms": 1187
+}
