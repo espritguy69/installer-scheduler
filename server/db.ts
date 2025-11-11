@@ -1,6 +1,6 @@
 import { and, eq, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { assignments, InsertAssignment, InsertInstaller, InsertNote, InsertOrder, InsertOrderHistory, installers, InsertUser, notes, orderHistory, orders, users } from "../drizzle/schema";
+import { assignmentHistory, assignments, InsertAssignment, InsertAssignmentHistory, InsertInstaller, InsertNote, InsertOrder, InsertOrderHistory, installers, InsertUser, notes, orderHistory, orders, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -346,4 +346,52 @@ export async function logOrderUpdate(orderId: number, userId: number | null, use
   if (entries.length > 0) {
     await db.insert(orderHistory).values(entries);
   }
+}
+
+// ============= Assignment History Functions =============
+
+export async function logAssignmentHistory(entry: InsertAssignmentHistory) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(assignmentHistory).values(entry);
+}
+
+export async function getAssignmentHistory(filters?: {
+  startDate?: string;
+  endDate?: string;
+  installerId?: number;
+  orderId?: number;
+  action?: "created" | "updated" | "deleted" | "reassigned";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const conditions = [];
+  
+  if (filters?.startDate) {
+    conditions.push(gte(assignmentHistory.scheduledDate, filters.startDate));
+  }
+  if (filters?.endDate) {
+    conditions.push(lte(assignmentHistory.scheduledDate, filters.endDate));
+  }
+  if (filters?.installerId) {
+    conditions.push(eq(assignmentHistory.installerId, filters.installerId));
+  }
+  if (filters?.orderId) {
+    conditions.push(eq(assignmentHistory.orderId, filters.orderId));
+  }
+  if (filters?.action) {
+    conditions.push(eq(assignmentHistory.action, filters.action));
+  }
+
+  const query = db
+    .select()
+    .from(assignmentHistory)
+    .$dynamic();
+
+  if (conditions.length > 0) {
+    return await query.where(and(...conditions)).orderBy(assignmentHistory.createdAt);
+  }
+
+  return await query.orderBy(assignmentHistory.createdAt);
 }

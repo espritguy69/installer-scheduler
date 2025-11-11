@@ -462,3 +462,22 @@
 - [x] Create backend logic for bulk assignment creation
 - [x] Test bulk assignment with multiple orders
 - [x] Verify assignments appear correctly in schedule grid
+
+## Assignment History Tracking
+- [x] Create assignment_history database table with audit fields
+- [x] Add fields: assignmentId, orderId, installerId, timeSlot, assignedBy, assignedAt, action (create/update/delete)
+- [x] Create tRPC procedures for logging history entries
+- [x] Create tRPC procedures for retrieving history with filters
+- [x] Update createAssignment mutation to log history
+- [x] Update updateAssignment mutation to log history
+- [x] Update deleteAssignment mutation to log history
+- [x] Create Assignment History page component
+- [x] Add date range filter for history
+- [x] Add installer filter for history
+- [x] Add order search for history
+- [x] Add action type filter (create/update/delete)
+- [x] Implement Excel export for history logs
+- [x] Test history logging for single assignments
+- [x] Test history logging for bulk assignments
+- [x] Test history logging for reassignments
+- [x] Test history logging for deletions

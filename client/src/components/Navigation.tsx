@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { APP_TITLE } from "@/const";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Home, Upload, FileText, Users, Calendar, BarChart3, StickyNote } from "lucide-react";
+import { Home, Upload, FileText, Users, Calendar, BarChart3, StickyNote, History } from "lucide-react";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -17,6 +17,7 @@ export function Navigation() {
     { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { href: "/performance", label: "Performance", icon: BarChart3 },
     { href: "/notes", label: "Notes", icon: StickyNote },
+    { href: "/history", label: "History", icon: History },
   ];
 
   const isActive = (href: string) => {

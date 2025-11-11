@@ -137,3 +137,27 @@ export const orderHistory = mysqlTable("orderHistory", {
 
 export type OrderHistory = typeof orderHistory.$inferSelect;
 export type InsertOrderHistory = typeof orderHistory.$inferInsert;
+
+/**
+ * Assignment history table - audit log for tracking all assignment actions
+ * Records who assigned orders to installers, when, and what changed
+ */
+export const assignmentHistory = mysqlTable("assignmentHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  assignmentId: int("assignmentId"), // Reference to assignment (null if deleted)
+  orderId: int("orderId").notNull(), // Order that was assigned
+  orderNumber: varchar("orderNumber", { length: 100 }), // Order number for reference
+  installerId: int("installerId").notNull(), // Installer assigned to
+  installerName: varchar("installerName", { length: 255 }), // Installer name at time of action
+  scheduledDate: varchar("scheduledDate", { length: 10 }), // YYYY-MM-DD format
+  scheduledStartTime: varchar("scheduledStartTime", { length: 5 }), // HH:MM format
+  scheduledEndTime: varchar("scheduledEndTime", { length: 5 }), // HH:MM format
+  action: mysqlEnum("action", ["created", "updated", "deleted", "reassigned"]).notNull(),
+  assignedBy: int("assignedBy"), // User ID who performed the action
+  assignedByName: varchar("assignedByName", { length: 255 }), // User name at time of action
+  notes: text("notes"), // Optional notes about the action
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AssignmentHistory = typeof assignmentHistory.$inferSelect;
+export type InsertAssignmentHistory = typeof assignmentHistory.$inferInsert;

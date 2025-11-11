@@ -62,7 +62,6 @@ export const appRouter = router({
     update: protectedProcedure.input(z.object({
       id: z.number(),
       orderNumber: z.string().optional(),
-      ticketNumber: z.string().optional(),
       serviceNumber: z.string().optional(),
       customerName: z.string().optional(),
       customerPhone: z.string().optional(),
@@ -82,76 +81,52 @@ export const appRouter = router({
       notes: z.string().optional(),
       docketFileUrl: z.string().optional(),
       docketFileName: z.string().optional(),
-    })).mutation(async ({ input, ctx }) => {
+    })).mutation(async ({ input }) => {
       const { id, ...data } = input;
       
-      // Get old order data for audit log
-      const oldOrder = await db.getOrderById(id);
+      // Get order and assignment info before update for notifications
+      const order = await db.getOrderById(id);
+      const oldStatus = order?.status;
       
       await db.updateOrder(id, data);
       
-      // Log changes in audit log
-      if (oldOrder) {
-        const changes: Record<string, { old: any, new: any }> = {};
-        for (const [key, newValue] of Object.entries(data)) {
-          if (newValue !== undefined) {
-            const oldValue = oldOrder[key as keyof typeof oldOrder];
-            if (oldValue !== newValue) {
-              changes[key] = { old: oldValue, new: newValue };
-            }
+      // Send notifications based on status change
+      if (data.status && data.status !== oldStatus) {
+        try {
+          // Get assignment to find installer name
+          const assignments = await db.getAssignmentsByOrder(id);
+          const assignment = assignments[0];
+          let installerName = "Unknown";
+          
+          if (assignment) {
+            const installer = await db.getInstallerById(assignment.installerId);
+            installerName = installer?.name || "Unknown";
           }
-        }
-        
-        if (Object.keys(changes).length > 0) {
-          await db.logOrderUpdate(
-            id,
-            ctx.user?.id || null,
-            ctx.user?.name || null,
-            changes
-          );
-        }
-      }
-      
-      // Send notifications for status changes
-      try {
-        const updatedOrder = await db.getOrderById(id);
-        if (updatedOrder) {
-          if (data.status === "completed") {
-            // Get installer name from assignment
-            const assignments = await db.getAssignmentsByOrder(id);
-            const installerName = assignments.length > 0 
-              ? (await db.getInstallerById(assignments[0].installerId))?.name || "Unknown"
-              : "Unknown";
-            
+          
+          if (data.status === "completed" && order) {
             await notifyOrderCompleted({
-              orderNumber: updatedOrder.orderNumber,
+              orderNumber: order.orderNumber,
               installerName,
-              customerName: updatedOrder.customerName,
+              customerName: order.customerName,
             });
-          } else if (data.status === "rescheduled" && data.rescheduleReason) {
-            // Get installer name from assignment
-            const assignments = await db.getAssignmentsByOrder(id);
-            const installerName = assignments.length > 0 
-              ? (await db.getInstallerById(assignments[0].installerId))?.name || "Unknown"
-              : "Unknown";
-            
+          } else if (data.status === "rescheduled" && order && data.rescheduleReason && data.rescheduledDate && data.rescheduledTime) {
             await notifyOrderRescheduled({
-              orderNumber: updatedOrder.orderNumber,
+              orderNumber: order.orderNumber,
               installerName,
-              customerName: updatedOrder.customerName,
+              customerName: order.customerName,
               reason: data.rescheduleReason,
-              newDate: data.rescheduledDate?.toLocaleDateString() || "TBD",
-              newTime: data.rescheduledTime || "TBD",
+              newDate: new Date(data.rescheduledDate).toLocaleDateString(),
+              newTime: data.rescheduledTime,
             });
-          } else if (data.status === "withdrawn") {
+          } else if (data.status === "withdrawn" && order) {
             await notifyOrderWithdrawn({
-              orderNumber: updatedOrder.orderNumber,
-              customerName: updatedOrder.customerName,
+              orderNumber: order.orderNumber,
+              customerName: order.customerName,
             });
           }
+        } catch (error) {
+          console.error("Failed to send status change notification:", error);
         }
-      } catch (error) {
-        console.error("Failed to send status change notification:", error);
       }
       
       return { success: true };
@@ -179,6 +154,33 @@ export const appRouter = router({
     }))).mutation(async ({ input }) => {
       await db.bulkCreateOrders(input);
       return { success: true, count: input.length };
+    }),
+    uploadDocketFile: protectedProcedure.input(z.object({
+      orderId: z.number(),
+      fileData: z.string(), // Base64 encoded file
+      fileName: z.string(),
+      fileType: z.string(),
+    })).mutation(async ({ input }) => {
+      const { storagePut } = await import("./storage");
+      
+      // Decode base64 file data
+      const buffer = Buffer.from(input.fileData, "base64");
+      
+      // Generate unique file key
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(7);
+      const fileKey = `dockets/${input.orderId}-${timestamp}-${randomSuffix}-${input.fileName}`;
+      
+      // Upload to S3
+      const { url } = await storagePut(fileKey, buffer, input.fileType);
+      
+      // Update order with file URL and name
+      await db.updateOrder(input.orderId, {
+        docketFileUrl: url,
+        docketFileName: input.fileName,
+      });
+      
+      return { success: true, fileUrl: url, fileName: input.fileName };
     }),
     clearAll: protectedProcedure.mutation(async () => {
       await db.clearAllOrders();
@@ -256,32 +258,14 @@ export const appRouter = router({
       scheduledStartTime: z.string().regex(/^\d{2}:\d{2}$/),
       scheduledEndTime: z.string().regex(/^\d{2}:\d{2}$/),
       notes: z.string().optional(),
-    })).mutation(async ({ input, ctx }) => {
+    })).mutation(async ({ input }) => {
       const result = await db.createAssignment(input);
-      const insertId = (result as any).insertId || (result as any)[0]?.insertId;
       
-      // Log assignment history and send notification
+      // Send notification
       try {
         const order = await db.getOrderById(input.orderId);
         const installer = await db.getInstallerById(input.installerId);
         if (order && installer) {
-          // Log history
-          await db.logAssignmentHistory({
-            assignmentId: insertId,
-            orderId: input.orderId,
-            orderNumber: order.orderNumber,
-            installerId: input.installerId,
-            installerName: installer.name,
-            scheduledDate: input.scheduledDate.toISOString().split('T')[0],
-            scheduledStartTime: input.scheduledStartTime,
-            scheduledEndTime: input.scheduledEndTime,
-            action: "created",
-            assignedBy: ctx.user?.id || null,
-            assignedByName: ctx.user?.name || null,
-            notes: input.notes || null,
-          });
-          
-          // Send notification
           await notifyOrderAssigned({
             orderNumber: order.orderNumber,
             installerName: installer.name,
@@ -291,7 +275,7 @@ export const appRouter = router({
           });
         }
       } catch (error) {
-        console.error("Failed to log assignment history or send notification:", error);
+        console.error("Failed to send assignment notification:", error);
       }
       
       return result;
@@ -305,79 +289,13 @@ export const appRouter = router({
       scheduledEndTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
       status: z.enum(["scheduled", "in_progress", "completed", "cancelled"]).optional(),
       notes: z.string().optional(),
-    })).mutation(async ({ input, ctx }) => {
+    })).mutation(async ({ input }) => {
       const { id, ...data } = input;
-      
-      // Get old assignment for history
-      const oldAssignment = await db.getAssignmentById(id);
-      
       await db.updateAssignment(id, data);
-      
-      // Log history if installer or schedule changed (reassignment)
-      if (oldAssignment && (data.installerId || data.scheduledDate || data.scheduledStartTime)) {
-        try {
-          const order = await db.getOrderById(oldAssignment.orderId);
-          const newInstallerId = data.installerId || oldAssignment.installerId;
-          const installer = await db.getInstallerById(newInstallerId);
-          
-          if (order && installer) {
-            const action = data.installerId && data.installerId !== oldAssignment.installerId ? "reassigned" : "updated";
-            
-            await db.logAssignmentHistory({
-              assignmentId: id,
-              orderId: oldAssignment.orderId,
-              orderNumber: order.orderNumber,
-              installerId: newInstallerId,
-              installerName: installer.name,
-              scheduledDate: data.scheduledDate ? data.scheduledDate.toISOString().split('T')[0] : oldAssignment.scheduledDate.toISOString().split('T')[0],
-              scheduledStartTime: data.scheduledStartTime || oldAssignment.scheduledStartTime,
-              scheduledEndTime: data.scheduledEndTime || oldAssignment.scheduledEndTime,
-              action,
-              assignedBy: ctx.user?.id || null,
-              assignedByName: ctx.user?.name || null,
-              notes: data.notes || null,
-            });
-          }
-        } catch (error) {
-          console.error("Failed to log assignment history:", error);
-        }
-      }
-      
       return { success: true };
     }),
-    delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input, ctx }) => {
-      // Get assignment before deletion for history
-      const assignment = await db.getAssignmentById(input.id);
-      
+    delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
       await db.deleteAssignment(input.id);
-      
-      // Log deletion
-      if (assignment) {
-        try {
-          const order = await db.getOrderById(assignment.orderId);
-          const installer = await db.getInstallerById(assignment.installerId);
-          
-          if (order && installer) {
-            await db.logAssignmentHistory({
-              assignmentId: null, // Assignment is deleted
-              orderId: assignment.orderId,
-              orderNumber: order.orderNumber,
-              installerId: assignment.installerId,
-              installerName: installer.name,
-              scheduledDate: assignment.scheduledDate.toISOString().split('T')[0],
-              scheduledStartTime: assignment.scheduledStartTime,
-              scheduledEndTime: assignment.scheduledEndTime,
-              action: "deleted",
-              assignedBy: ctx.user?.id || null,
-              assignedByName: ctx.user?.name || null,
-              notes: null,
-            });
-          }
-        } catch (error) {
-          console.error("Failed to log assignment deletion:", error);
-        }
-      }
-      
       return { success: true };
     }),
   }),
@@ -401,7 +319,6 @@ export const appRouter = router({
     })).query(async ({ input }) => {
       return await db.getNotesByDateRange(input.startDate, input.endDate);
     }),
-
     create: protectedProcedure.input(z.object({
       date: z.string(),
       serviceNumber: z.string().optional(),
@@ -413,8 +330,12 @@ export const appRouter = router({
       priority: z.enum(["low", "medium", "high"]).default("medium"),
       status: z.enum(["open", "in_progress", "resolved", "closed"]).default("open"),
       createdBy: z.string().optional(),
-    })).mutation(async ({ input }) => {
-      return await db.createNote(input);
+    })).mutation(async ({ input, ctx }) => {
+      const noteData = {
+        ...input,
+        createdBy: input.createdBy || ctx.user?.name || "Unknown",
+      };
+      return await db.createNote(noteData);
     }),
     update: protectedProcedure.input(z.object({
       id: z.number(),
@@ -427,7 +348,6 @@ export const appRouter = router({
       content: z.string().optional(),
       priority: z.enum(["low", "medium", "high"]).optional(),
       status: z.enum(["open", "in_progress", "resolved", "closed"]).optional(),
-      createdBy: z.string().optional(),
     })).mutation(async ({ input }) => {
       const { id, ...data } = input;
       await db.updateNote(id, data);
