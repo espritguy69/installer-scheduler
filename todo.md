@@ -697,3 +697,13 @@
 - [x] Add clickable column headers with sort indicators (arrows)
 - [x] Add visual feedback showing current sort column and direction
 - [x] Test sorting on all four columns (ascending and descending)
+
+## Navigation Bar Reordering (USER REQUESTED)
+- [ ] Update Navigation component to reorder menu items
+- [ ] New order: Home, Dashboard, Performance, Orders, Schedule, Notes, History, Installers, Upload
+- [ ] Test navigation bar displays in correct order
+
+## Navigation Bar Reordering - COMPLETED
+- [x] Update Navigation component to reorder menu items
+- [x] New order: Home, Dashboard, Performance, Orders, Schedule, Notes, History, Installers, Upload
+- [x] Test navigation bar displays in correct order

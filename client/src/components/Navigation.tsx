@@ -10,14 +10,14 @@ export function Navigation() {
 
   const navItems = [
     { href: "/", label: "Home", icon: Home },
-    { href: "/upload", label: "Upload", icon: Upload },
-    { href: "/orders", label: "Orders", icon: FileText },
-    { href: "/installers", label: "Installers", icon: Users },
-    { href: "/schedule", label: "Schedule", icon: Calendar },
     { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { href: "/performance", label: "Performance", icon: BarChart3 },
+    { href: "/orders", label: "Orders", icon: FileText },
+    { href: "/schedule", label: "Schedule", icon: Calendar },
     { href: "/notes", label: "Notes", icon: StickyNote },
     { href: "/history", label: "History", icon: History },
+    { href: "/installers", label: "Installers", icon: Users },
+    { href: "/upload", label: "Upload", icon: Upload },
   ];
 
   const isActive = (href: string) => {
