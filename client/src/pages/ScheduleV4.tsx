@@ -247,7 +247,7 @@ export default function ScheduleV4() {
     setSelectedDate(newDate);
   };
 
-  const handleAssignInstaller = async (
+  const handleAssign = async (
     orderId: number,
     installerId: number,
     installerName: string
@@ -259,6 +259,17 @@ export default function ScheduleV4() {
         return;
       }
 
+      // Check if order is already assigned to a different installer
+      const existingAssignment = assignments.find((a) => a.orderId === orderId);
+      if (existingAssignment && existingAssignment.installerId !== installerId) {
+        // Delete old assignment
+        await deleteAssignmentMutation.mutateAsync({ id: existingAssignment.id });
+      } else if (existingAssignment && existingAssignment.installerId === installerId) {
+        // Already assigned to this installer
+        toast.info("Already assigned to this installer");
+        return;
+      }
+
       // Update order status
       await updateOrderMutation.mutateAsync({
         id: orderId,
@@ -266,7 +277,18 @@ export default function ScheduleV4() {
       });
 
       // Create assignment
-      const [hours, minutes] = order.appointmentTime.split(":");
+      // Parse appointment date from MM/DD/YYYY format
+      const dateParts = order.appointmentDate.split("/");
+      const scheduledDate = new Date(
+        parseInt(dateParts[2]), // year
+        parseInt(dateParts[0]) - 1, // month (0-indexed)
+        parseInt(dateParts[1]) // day
+      );
+      
+      // Parse appointment time and calculate end time
+      const timeParts = order.appointmentTime.replace(/\s*(AM|PM|am|pm)\s*/g, "").split(":");
+      const hours = timeParts[0];
+      const minutes = timeParts[1] || "00";
       const scheduledStartTime = `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
       const endHour = (parseInt(hours) + 2).toString().padStart(2, "0");
       const scheduledEndTime = `${endHour}:${minutes.padStart(2, "0")}`;
@@ -274,7 +296,7 @@ export default function ScheduleV4() {
       await createAssignmentMutation.mutateAsync({
         orderId,
         installerId,
-        scheduledDate: new Date(order.appointmentDate),
+        scheduledDate,
         scheduledStartTime,
         scheduledEndTime,
       });
@@ -397,7 +419,7 @@ export default function ScheduleV4() {
                                 key={order.id}
                                 order={order}
                                 assignedInstaller={orderInstallerMap[order.id] || null}
-                                onAssign={handleAssignInstaller}
+                                onAssign={handleAssign}
                                 onUnassign={handleUnassign}
                                 onTimeChange={handleTimeChange}
                               />

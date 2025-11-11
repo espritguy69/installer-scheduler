@@ -498,3 +498,12 @@
 - [ ] Test time adjustment feature
 - [ ] Verify calendar updates in real-time after changes
 - [ ] Fix date filtering to properly show orders for selected date only
+
+## Drag-and-Drop Bug Fixes
+- [x] Fix "failed to assign installer" error when dropping installers onto orders
+- [x] Fix date/time parsing to handle MM/DD/YYYY and "HH:MM AM/PM" formats
+- [x] Implement drag-out functionality to unassign installers from orders (via X button)
+- [x] Enable drag-to-replace to reassign different installer to same order
+- [x] Add check to prevent assigning same installer twice
+- [ ] Test complete drag-and-drop workflow (assign, unassign, reassign)
+- [ ] Verify error handling and user feedback for failed operations
