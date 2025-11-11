@@ -206,9 +206,32 @@ export default function ScheduleV4() {
   }
 
   // Filter orders for selected date
-  // TODO: Fix date filtering - for now show all orders to test drag-and-drop
   const ordersForDate = orders.filter((order) => {
-    return order.appointmentDate && order.appointmentTime;
+    if (!order.appointmentDate || !order.appointmentTime) return false;
+    
+    // Parse appointment date - handle both "Nov 11, 2025" and "MM/DD/YYYY" formats
+    let orderDate: Date;
+    
+    if (order.appointmentDate.includes("/")) {
+      // MM/DD/YYYY format
+      const dateParts = order.appointmentDate.split("/");
+      if (dateParts.length !== 3) return false;
+      
+      const orderMonth = parseInt(dateParts[0], 10);
+      const orderDay = parseInt(dateParts[1], 10);
+      const orderYear = parseInt(dateParts[2], 10);
+      
+      orderDate = new Date(orderYear, orderMonth - 1, orderDay);
+    } else {
+      // "Nov 11, 2025" format
+      orderDate = new Date(order.appointmentDate);
+      if (isNaN(orderDate.getTime())) return false;
+    }
+    
+    // Compare with selected date (compare year, month, day only)
+    return orderDate.getFullYear() === selectedDate.getFullYear() &&
+           orderDate.getMonth() === selectedDate.getMonth() &&
+           orderDate.getDate() === selectedDate.getDate();
   });
 
   // Create a map of orderId to installer name
