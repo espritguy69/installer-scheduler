@@ -126,10 +126,11 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 w-6 p-0"
+            className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600 transition-colors"
             onClick={() => onUnassign(order.id)}
+            title="Remove assignment"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </Button>
         )}
       </div>

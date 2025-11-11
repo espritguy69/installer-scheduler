@@ -602,3 +602,12 @@
 - [x] Positioned as absolute dropdown below card (z-20)
 - [x] Hover doesn't interfere with drag and drop (separate event handlers)
 - [x] Test hover effects in browser (ready for user testing - hover over order cards to see expanded details)
+
+## X Button Visibility Issue (USER REPORTED)
+- [x] X button exists but was too small and hard to see
+- [x] Increase X button size from h-6 w-6 to h-8 w-8
+- [x] Increase X icon size from h-4 w-4 to h-5 w-5
+- [x] Add red hover effect (hover:bg-red-100 hover:text-red-600)
+- [x] Add tooltip "Remove assignment"
+- [x] Add smooth transition-colors animation
+- [x] Test X button visibility in browser (X button now 32x32px with red hover, appears on assigned orders only)
