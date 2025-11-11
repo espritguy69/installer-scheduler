@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { APP_TITLE } from "@/const";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2, Upload, X } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -57,6 +57,7 @@ export default function Orders() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [rescheduleReasonFilter, setRescheduleReasonFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [dateFilter, setDateFilter] = useState<string>("");
   
   // Bulk operations
   const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
@@ -98,6 +99,14 @@ export default function Orders() {
     
     // Reschedule reason filter
     if (rescheduleReasonFilter !== "all" && order.rescheduleReason !== rescheduleReasonFilter) return false;
+    
+    // Date filter
+    if (dateFilter && order.appointmentDate) {
+      const orderDate = new Date(order.appointmentDate);
+      const filterDate = new Date(dateFilter);
+      // Compare only the date part (ignore time)
+      if (orderDate.toDateString() !== filterDate.toDateString()) return false;
+    }
     
     // Search query
     if (searchQuery) {
@@ -368,7 +377,7 @@ export default function Orders() {
           </CardHeader>
           <CardContent>
             {/* Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div>
                 <label className="text-sm font-medium mb-2 block">Search</label>
                 <input
@@ -414,6 +423,28 @@ export default function Orders() {
                     <SelectItem value="network_issue">Network Issue</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">Appointment Date</label>
+                <div className="flex gap-2">
+                  <Input
+                    type="date"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    placeholder="Select date"
+                  />
+                  {dateFilter && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setDateFilter("")}
+                      title="Clear date filter"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
             
