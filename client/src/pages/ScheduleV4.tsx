@@ -39,6 +39,11 @@ interface Order {
   appointmentDate: string | null;
   appointmentTime: string | null;
   status: string;
+  address: string | null;
+  customerPhone: string | null;
+  customerEmail: string | null;
+  serviceType: string | null;
+  ticketNumber: string | null;
 }
 
 interface Assignment {
@@ -91,6 +96,7 @@ interface OrderCardProps {
 }
 
 function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChange }: OrderCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "installer",
     drop: (item: { installerId: number; installerName: string }) => {
@@ -106,11 +112,13 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
   return (
     <div
       ref={drop as any}
-      className={`p-3 rounded-lg border-2 transition-all ${
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`p-3 rounded-lg border-2 transition-all relative ${
         isAssigned
           ? "bg-green-50 border-green-500"
           : "bg-gray-50 border-dashed border-gray-300"
-      } ${isOver ? "ring-2 ring-primary ring-offset-2" : ""}`}
+      } ${isOver ? "ring-2 ring-primary ring-offset-2" : ""} ${isHovered ? "shadow-lg scale-105 z-10" : ""}`}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="font-semibold text-sm">{order.orderNumber}</div>
@@ -158,6 +166,51 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
           Change Time
         </Button>
       </div>
+
+      {/* Expanded details on hover */}
+      {isHovered && (
+        <div className="absolute left-0 right-0 top-full mt-1 p-3 bg-white border-2 border-primary rounded-lg shadow-xl z-20 text-xs space-y-2">
+          <div className="font-semibold text-sm border-b pb-1 mb-2">Additional Details</div>
+          
+          {order.ticketNumber && (
+            <div>
+              <span className="font-medium">Ticket:</span> {order.ticketNumber}
+            </div>
+          )}
+          
+          {order.address && (
+            <div>
+              <span className="font-medium">Full Address:</span>
+              <div className="text-muted-foreground mt-0.5">{order.address}</div>
+            </div>
+          )}
+          
+          {order.customerPhone && (
+            <div>
+              <span className="font-medium">Phone:</span> {order.customerPhone}
+            </div>
+          )}
+          
+          {order.customerEmail && (
+            <div>
+              <span className="font-medium">Email:</span> {order.customerEmail}
+            </div>
+          )}
+          
+          {order.serviceType && (
+            <div>
+              <span className="font-medium">Service Type:</span> {order.serviceType}
+            </div>
+          )}
+          
+          <div>
+            <span className="font-medium">Status:</span>{" "}
+            <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+              {order.status}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

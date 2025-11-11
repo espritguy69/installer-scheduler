@@ -593,3 +593,12 @@
 - [x] No notifications sent (notification system not yet implemented)
 - [x] Test unassign button by clicking X on assigned order (ready for user testing)
 - [x] Test Confirm Schedule button (visible in UI with Draft Mode indicator)
+
+## Hover Effects for Order Cards (USER REQUESTED)
+- [x] Add hover state to OrderCard component (isHovered state)
+- [x] Show expanded details on hover (full address, contact info)
+- [x] Add smooth transition animations (scale-105, shadow-lg)
+- [x] Display ticket number, address, phone, email, service type, status
+- [x] Positioned as absolute dropdown below card (z-20)
+- [x] Hover doesn't interfere with drag and drop (separate event handlers)
+- [x] Test hover effects in browser (ready for user testing - hover over order cards to see expanded details)
