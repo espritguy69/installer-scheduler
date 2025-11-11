@@ -184,6 +184,27 @@ export const appRouter = router({
       await db.clearAllOrders();
       return { success: true };
     }),
+    uploadDocketFile: protectedProcedure.input(z.object({
+      orderId: z.number(),
+      fileData: z.string(), // base64 encoded file
+      fileName: z.string(),
+      fileType: z.string(),
+    })).mutation(async ({ input }) => {
+      // Import storage helper
+      const { storagePut } = await import("./storage");
+      
+      // Convert base64 to buffer
+      const fileBuffer = Buffer.from(input.fileData, "base64");
+      
+      // Upload to S3 with unique key
+      const fileKey = `dockets/${input.orderId}-${Date.now()}-${input.fileName}`;
+      const { url } = await storagePut(fileKey, fileBuffer, input.fileType);
+      
+      // Update order with docket file info
+      await db.updateOrderDocketFile(input.orderId, url, input.fileName);
+      
+      return { success: true, url };
+    }),
   }),
 
   installers: router({

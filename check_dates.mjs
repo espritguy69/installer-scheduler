@@ -1,14 +1,16 @@
-import { drizzle } from 'drizzle-orm/mysql2';
-import mysql from 'mysql2/promise';
+import { drizzle } from "drizzle-orm/mysql2";
+import { orders } from "./drizzle/schema.ts";
 
-const connection = await mysql.createConnection(process.env.DATABASE_URL);
-const db = drizzle(connection);
+const db = drizzle(process.env.DATABASE_URL);
+const allOrders = await db.select({
+  orderNumber: orders.orderNumber,
+  customerName: orders.customerName,
+  appointmentDate: orders.appointmentDate,
+  appointmentTime: orders.appointmentTime
+}).from(orders).where(orders.orderNumber.like('AWO%'));
 
-const result = await connection.query(
-  'SELECT orderNumber, appointmentDate, appointmentTime FROM orders LIMIT 10'
-);
-
-console.log('First 10 orders appointment dates:');
-console.log(JSON.stringify(result[0], null, 2));
-
-await connection.end();
+console.log('Total orders:', allOrders.length);
+console.log('\nOrder details:');
+allOrders.forEach(order => {
+  console.log(`${order.orderNumber}: date="${order.appointmentDate}" time="${order.appointmentTime}"`);
+});

@@ -81,10 +81,20 @@ export default function Upload() {
         try {
           const data = e.target?.result;
           const workbook = XLSX.read(data, { type: "binary" });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet);
-          resolve(jsonData);
+          
+          // Read ALL sheets and combine data
+          const allData: any[] = [];
+          workbook.SheetNames.forEach((sheetName) => {
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+            // Add sheet name to each row for date reference
+            jsonData.forEach((row: any) => {
+              row._sheetName = sheetName;
+            });
+            allData.push(...jsonData);
+          });
+          
+          resolve(allData);
         } catch (error) {
           reject(error);
         }
@@ -92,6 +102,29 @@ export default function Upload() {
       reader.onerror = () => reject(new Error("Failed to read file"));
       reader.readAsBinaryString(file);
     });
+  };
+
+  // Helper function to parse sheet name as date (e.g., "11 NOV" → "Nov 11, 2025")
+  const parseSheetNameAsDate = (sheetName: string): string => {
+    if (!sheetName) return "";
+    
+    // Match patterns like "1 NOV", "11 NOV", "3 NOV"
+    const match = sheetName.match(/(\d{1,2})\s*([A-Z]{3})/i);
+    if (match) {
+      const day = match[1];
+      const monthAbbr = match[2].toUpperCase();
+      const monthMap: Record<string, string> = {
+        "JAN": "Jan", "FEB": "Feb", "MAR": "Mar", "APR": "Apr",
+        "MAY": "May", "JUN": "Jun", "JUL": "Jul", "AUG": "Aug",
+        "SEP": "Sep", "OCT": "Oct", "NOV": "Nov", "DEC": "Dec"
+      };
+      const month = monthMap[monthAbbr];
+      if (month) {
+        // Use current year (2025)
+        return `${month} ${day}, 2025`;
+      }
+    }
+    return "";
   };
 
   // Helper function to parse date-time string like "Nov 11, 2025 1:00 PM"
@@ -185,10 +218,18 @@ export default function Upload() {
               row.salesModiType || row.SalesModiType || "",
             address: 
               row.address || row.Address || "",
-            appointmentDate: excelDateToReadable(
-              row["App Date"] || row["Appointment Date"] ||
-              row.appointmentDate || row.AppointmentDate || ""
-            ),
+            appointmentDate: (() => {
+              const appDate = row["App Date"] || row["Appointment Date"] ||
+                row.appointmentDate || row.AppointmentDate || "";
+              
+              // If App Date is missing or looks like a serial number, use sheet name
+              if (!appDate || (typeof appDate === 'number' && appDate > 40000)) {
+                const sheetDate = parseSheetNameAsDate(row._sheetName || "");
+                if (sheetDate) return sheetDate;
+              }
+              
+              return excelDateToReadable(appDate);
+            })(),
             appointmentTime: excelTimeToReadable(
               row["App Time"] || row["Appointment Time"] ||
               row.appointmentTime || row.AppointmentTime || ""

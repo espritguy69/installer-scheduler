@@ -122,6 +122,15 @@ export async function deleteOrder(id: number) {
   await db.delete(orders).where(eq(orders.id, id));
 }
 
+export async function updateOrderDocketFile(orderId: number, fileUrl: string, fileName: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(orders).set({ 
+    docketFileUrl: fileUrl, 
+    docketFileName: fileName 
+  }).where(eq(orders.id, orderId));
+}
+
 export async function clearAllOrders() {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

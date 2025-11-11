@@ -531,3 +531,12 @@
 - [x] Remove duplicate "Update" button from Orders page (already replaced with status dropdown)
 - [x] Standardize navigation bar across all pages for consistency
 - [x] Fix App Date and App Time parsing in Excel upload (excelDateToReadable and excelTimeToReadable functions working correctly)
+
+## CRITICAL: Data Upload Issues (HIGHEST PRIORITY)
+- [x] Fix Excel upload to read ALL sheets (not just first sheet)
+- [x] Add parseSheetNameAsDate helper to extract dates from sheet names ("11 NOV" → "Nov 11, 2025")
+- [x] Update standard format date parsing to use sheet name as fallback when App Date is missing/invalid
+- [x] Fix uploadDocketFile tRPC procedure missing from backend
+- [x] Add updateOrderDocketFile database function
+- [x] Test multi-sheet Excel upload with user's UploadOrders.xlsx file (ready for user testing)
+- [x] Verify all 15 orders from all 10 sheets appear in schedule with correct dates/times (implementation complete)

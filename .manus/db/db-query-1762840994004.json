@@ -1,0 +1,130 @@
+{
+  "query": "SELECT id, orderNumber, customerName, appointmentDate, appointmentTime, status FROM orders ORDER BY id DESC LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, orderNumber, customerName, appointmentDate, appointmentTime, status FROM orders ORDER BY id DESC LIMIT 20",
+  "rows": [
+    {
+      "id": "150170",
+      "orderNumber": "AWO436900",
+      "customerName": "AIDA SALWA BINTI ABDULLAH",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "9:00 AM",
+      "status": "pending"
+    },
+    {
+      "id": "150169",
+      "orderNumber": "AWO436895",
+      "customerName": "CHAN KIAT THING",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "9:00 AM",
+      "status": "pending"
+    },
+    {
+      "id": "150168",
+      "orderNumber": "AWO436704",
+      "customerName": "SYED MOHD FIRDAUS BIN SYED ZAINUDDIN",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "9:00 AM",
+      "status": "pending"
+    },
+    {
+      "id": "150167",
+      "orderNumber": "AWO436732",
+      "customerName": "ARIVUKKARASI HARIDASS",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "9:00 AM",
+      "status": "pending"
+    },
+    {
+      "id": "150166",
+      "orderNumber": "AWO437076",
+      "customerName": "PAIS SERHII",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "9:00 AM",
+      "status": "pending"
+    },
+    {
+      "id": "150165",
+      "orderNumber": "AWO437026",
+      "customerName": "KONG SUWEN",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "3:00 PM",
+      "status": "pending"
+    },
+    {
+      "id": "150164",
+      "orderNumber": "AWO436808",
+      "customerName": "WONG JING JYH",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "3:00 PM",
+      "status": "pending"
+    },
+    {
+      "id": "150163",
+      "orderNumber": "AWO437153",
+      "customerName": "LIM YIE JIE",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "3:00 PM",
+      "status": "pending"
+    },
+    {
+      "id": "150162",
+      "orderNumber": "AWO436400",
+      "customerName": "CHOME PLT",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "11:00 AM",
+      "status": "pending"
+    },
+    {
+      "id": "150161",
+      "orderNumber": "AWO436909",
+      "customerName": "LAM HIN WAI IAN",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "11:00 AM",
+      "status": "pending"
+    },
+    {
+      "id": "150160",
+      "orderNumber": "AWO436779",
+      "customerName": "AZUIN BINTI MOHD RAZALI",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "11:00 AM",
+      "status": "pending"
+    },
+    {
+      "id": "150159",
+      "orderNumber": "AWO436961",
+      "customerName": "LIM BOON HOOI",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "11:00 AM",
+      "status": "pending"
+    },
+    {
+      "id": "150158",
+      "orderNumber": "AWO436701",
+      "customerName": "CHIN YEE MAI",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "1:00 PM",
+      "status": "pending"
+    },
+    {
+      "id": "150157",
+      "orderNumber": "AWO437144",
+      "customerName": "MOHD HANIF BIN YUSOFF",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "1:00 PM",
+      "status": "pending"
+    },
+    {
+      "id": "150156",
+      "orderNumber": "AWO437166",
+      "customerName": "NGOO YEE TING",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "1:00 PM",
+      "status": "pending"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\tcustomerName\tappointmentDate\tappointmentTime\tstatus\n150170\tAWO436900\tAIDA SALWA BINTI ABDULLAH\tNov 11, 2025\t9:00 AM\tpending\n150169\tAWO436895\tCHAN KIAT THING\tNov 11, 2025\t9:00 AM\tpending\n150168\tAWO436704\tSYED MOHD FIRDAUS BIN SYED ZAINUDDIN\tNov 11, 2025\t9:00 AM\tpending\n150167\tAWO436732\tARIVUKKARASI HARIDASS\tNov 11, 2025\t9:00 AM\tpending\n150166\tAWO437076\tPAIS SERHII\tNov 11, 2025\t9:00 AM\tpending\n150165\tAWO437026\tKONG SUWEN\tNov 11, 2025\t3:00 PM\tpending\n150164\tAWO436808\tWONG JING JYH\tNov 11, 2025\t3:00 PM\tpending\n150163\tAWO437153\tLIM YIE JIE\tNov 11, 2025\t3:00 PM\tpending\n150162\tAWO436400\tCHOME PLT\tNov 11, 2025\t11:00 AM\tpending\n150161\tAWO436909\tLAM HIN WAI IAN\tNov 11, 2025\t11:00 AM\tpending\n150160\tAWO436779\tAZUIN BINTI MOHD RAZALI\tNov 11, 2025\t11:00 AM\tpending\n150159\tAWO436961\tLIM BOON HOOI\tNov 11, 2025\t11:00 AM\tpending\n150158\tAWO436701\tCHIN YEE MAI\tNov 11, 2025\t1:00 PM\tpending\n150157\tAWO437144\tMOHD HANIF BIN YUSOFF\tNov 11, 2025\t1:00 PM\tpending\n150156\tAWO437166\tNGOO YEE TING\tNov 11, 2025\t1:00 PM\tpending\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}
