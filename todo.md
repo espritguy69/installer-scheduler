@@ -639,3 +639,21 @@
 - [x] Add ticketNumber field to search filter logic in Orders page
 - [x] Update search placeholder to indicate ticket number is searchable
 - [x] Test search with ticket number (placeholder updated, search functionality working)
+
+## Clear Orders Access Control (USER REQUESTED)
+- [x] Restrict "Clear All Orders" button to espritguy69@gmail.com only
+- [x] Hide button for all other users using conditional rendering
+- [x] Test with admin account - Clear All Orders button visible
+
+## Service Type Dropdown in Add Order (USER REQUESTED)
+- [x] Add service type dropdown to Add Order form
+- [x] Include options: ACTIVATION, MODIFICATION, ASSURANCE, DIGI/CELCOM, U-MOBILE, VALUE ADDED SERVICES
+- [x] Make service type a required field (marked with *)
+- [x] Test service type selection - all 6 options display correctly
+
+## Full CRUD for Orders (USER REQUESTED)
+- [x] Implement Edit order functionality (update all order fields)
+- [x] Add Edit button/dialog for each order (already exists)
+- [x] Implement Delete order functionality
+- [x] Add Delete button with confirmation dialog
+- [x] Test Create (Add Order form working), Read (list view working), Update (Edit button working), Delete (Delete button working)

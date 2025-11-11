@@ -89,6 +89,10 @@ export default function Orders() {
   // Edit order dialog
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editOrder, setEditOrder] = useState<any>(null);
+  
+  // Delete order dialog
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteOrderId, setDeleteOrderId] = useState<number | null>(null);
 
   const { data: allOrders = [], isLoading } = trpc.orders.list.useQuery();
   
@@ -127,6 +131,7 @@ export default function Orders() {
   const uploadDocketFile = trpc.orders.uploadDocketFile.useMutation();
   const clearAllOrders = trpc.orders.clearAll.useMutation();
   const createOrder = trpc.orders.create.useMutation();
+  const deleteOrder = trpc.orders.delete.useMutation();
   const utils = trpc.useUtils();
 
   const getStatusBadgeColor = (status: string) => {
@@ -224,7 +229,7 @@ export default function Orders() {
   };
   
   const handleSaveEdit = async () => {
-    if (!editOrder || !editOrder.orderNumber || !editOrder.customerName) {
+    if (!editOrder.orderNumber || !editOrder.customerName) {
       toast.error("Order number and customer name are required");
       return;
     }
@@ -237,6 +242,21 @@ export default function Orders() {
       setEditOrder(null);
     } catch (error) {
       toast.error("Failed to update order");
+      console.error(error);
+    }
+  };
+  
+  const handleDeleteOrder = async () => {
+    if (!deleteOrderId) return;
+    
+    try {
+      await deleteOrder.mutateAsync({ id: deleteOrderId });
+      await utils.orders.list.invalidate();
+      toast.success("Order deleted successfully");
+      setIsDeleteDialogOpen(false);
+      setDeleteOrderId(null);
+    } catch (error) {
+      toast.error("Failed to delete order");
       console.error(error);
     }
   };
@@ -366,13 +386,15 @@ export default function Orders() {
                 >
                   Add Order
                 </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={() => setIsClearDialogOpen(true)}
-                  disabled={orders.length === 0}
-                >
-                  Clear All Orders
-                </Button>
+                {user?.email === "espritguy69@gmail.com" && (
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => setIsClearDialogOpen(true)}
+                    disabled={orders.length === 0}
+                  >
+                    Clear All Orders
+                  </Button>
+                )}
               </div>
             </div>
           </CardHeader>
@@ -621,7 +643,16 @@ export default function Orders() {
                               >
                                 Edit
                               </Button>
-
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  setDeleteOrderId(order.id);
+                                  setIsDeleteDialogOpen(true);
+                                }}
+                              >
+                                Delete
+                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -1072,13 +1103,23 @@ export default function Orders() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="serviceType">Service Type</Label>
-                <Input
-                  id="serviceType"
+                <Label htmlFor="serviceType">Service Type *</Label>
+                <Select
                   value={newOrderData.serviceType}
-                  onChange={(e) => setNewOrderData({...newOrderData, serviceType: e.target.value})}
-                  placeholder="ACTIVATION"
-                />
+                  onValueChange={(value) => setNewOrderData({...newOrderData, serviceType: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select service type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ACTIVATION">ACTIVATION</SelectItem>
+                    <SelectItem value="MODIFICATION">MODIFICATION</SelectItem>
+                    <SelectItem value="ASSURANCE">ASSURANCE</SelectItem>
+                    <SelectItem value="DIGI/CELCOM">DIGI/CELCOM</SelectItem>
+                    <SelectItem value="U-MOBILE">U-MOBILE</SelectItem>
+                    <SelectItem value="VALUE ADDED SERVICES">VALUE ADDED SERVICES</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="salesModiType">Sales/Modi Type</Label>
@@ -1120,6 +1161,30 @@ export default function Orders() {
             </Button>
             <Button onClick={handleAddOrder} disabled={createOrder.isPending}>
               {createOrder.isPending ? "Creating..." : "Create Order"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Order Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Order?</DialogTitle>
+            <DialogDescription>
+              This will permanently delete this order and its assignments. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteOrder}
+              disabled={deleteOrder.isPending}
+            >
+              {deleteOrder.isPending ? "Deleting..." : "Delete Order"}
             </Button>
           </DialogFooter>
         </DialogContent>
