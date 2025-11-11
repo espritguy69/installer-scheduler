@@ -49,6 +49,8 @@ export const orders = mysqlTable("orders", {
   rescheduledDate: timestamp("rescheduledDate"),
   rescheduledTime: varchar("rescheduledTime", { length: 10 }),
   notes: text("notes"),
+  docketFileUrl: varchar("docketFileUrl", { length: 500 }),
+  docketFileName: varchar("docketFileName", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

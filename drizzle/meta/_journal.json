@@ -64,6 +64,13 @@
       "when": 1762831238135,
       "tag": "0008_lucky_rattler",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1762832501398,
+      "tag": "0009_strong_grim_reaper",
+      "breakpoints": true
     }
   ]
 }

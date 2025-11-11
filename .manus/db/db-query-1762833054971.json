@@ -1,0 +1,16 @@
+{
+  "query": "SELECT orderNumber, status, docketFileName, docketFileUrl FROM orders WHERE orderNumber = 'A1775621';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT orderNumber, status, docketFileName, docketFileUrl FROM orders WHERE orderNumber = 'A1775621';",
+  "rows": [
+    {
+      "orderNumber": "A1775621",
+      "status": "docket_received",
+      "docketFileName": "test_docket.pdf",
+      "docketFileUrl": "https://forge.manus.ai/v1/storage/download/gDvR7gc8E7a6PwW9XUQCo3/dockets/120023-1762833005675-7t1i-test_docket.pdf"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNumber\tstatus\tdocketFileName\tdocketFileUrl\nA1775621\tdocket_received\ttest_docket.pdf\thttps://forge.manus.ai/v1/storage/download/gDvR7gc8E7a6PwW9XUQCo3/dockets/120023-1762833005675-7t1i-test_docket.pdf\n",
+  "stderr": "",
+  "execution_time_ms": 184
+}

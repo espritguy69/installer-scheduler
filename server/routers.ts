@@ -79,6 +79,8 @@ export const appRouter = router({
       rescheduledDate: z.date().optional(),
       rescheduledTime: z.string().optional(),
       notes: z.string().optional(),
+      docketFileUrl: z.string().optional(),
+      docketFileName: z.string().optional(),
     })).mutation(async ({ input }) => {
       const { id, ...data } = input;
       
@@ -152,6 +154,33 @@ export const appRouter = router({
     }))).mutation(async ({ input }) => {
       await db.bulkCreateOrders(input);
       return { success: true, count: input.length };
+    }),
+    uploadDocketFile: protectedProcedure.input(z.object({
+      orderId: z.number(),
+      fileData: z.string(), // Base64 encoded file
+      fileName: z.string(),
+      fileType: z.string(),
+    })).mutation(async ({ input }) => {
+      const { storagePut } = await import("./storage");
+      
+      // Decode base64 file data
+      const buffer = Buffer.from(input.fileData, "base64");
+      
+      // Generate unique file key
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(7);
+      const fileKey = `dockets/${input.orderId}-${timestamp}-${randomSuffix}-${input.fileName}`;
+      
+      // Upload to S3
+      const { url } = await storagePut(fileKey, buffer, input.fileType);
+      
+      // Update order with file URL and name
+      await db.updateOrder(input.orderId, {
+        docketFileUrl: url,
+        docketFileName: input.fileName,
+      });
+      
+      return { success: true, fileUrl: url, fileName: input.fileName };
     }),
     clearAll: protectedProcedure.mutation(async () => {
       await db.clearAllOrders();

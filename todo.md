@@ -351,13 +351,13 @@
 - [x] Test quick status updates and verify changes persist
 
 ## Add New Order Statuses (Docket Received & Docket Uploaded)
-- [ ] Update orders table schema to add docket_received and docket_uploaded to status enum
+- [x] Update orders table schema to add docket_received and docket_uploaded to status enum
 - [ ] Push database schema changes
 - [ ] Update backend tRPC validation schemas for create/update/bulkCreate procedures
 - [ ] Add new statuses to Orders page status dropdown
 - [ ] Add new statuses to Schedule page status dropdown
 - [ ] Add new statuses to status filter dropdowns
-- [ ] Define badge colors for docket_received and docket_uploaded statuses
+- [x] Define badge colors for docket_received and docket_uploaded statuses
 - [ ] Test status changes with new statuses
 - [ ] Verify new statuses appear correctly in all views
 
@@ -398,3 +398,19 @@
 - [x] Add ticketNumber display to Schedule page order cards
 - [x] Add ticketNumber field to Add/Edit Order dialogs
 - [x] Test assurance file upload and verify all fields populate correctly
+
+## Implement Docket File Upload
+- [x] Add docketFileUrl and docketFileName fields to orders table schema
+- [ ] Push database schema changes
+- [x] Create file upload tRPC procedure for docket files
+- [x] Implement S3 upload logic for docket files (PDF/images)
+- [x] Update Orders page status dropdown to trigger file upload dialog for docket statuses
+- [ ] Create file upload dialog component with drag-and-drop support
+- [ ] Add file type validation (PDF, JPG, PNG, max 10MB)
+- [ ] Show file preview after upload
+- [x] Display docket file link/download button in Orders table
+- [x] Add docket file display in Edit Order dialog
+- [x] Test uploading PDF docket file
+- [x] Test uploading image docket file
+- [x] Test downloading uploaded docket files
+- [ ] Verify S3 storage and file URLs work correctly

@@ -46,6 +46,9 @@ export default function Orders() {
   const [rescheduledDate, setRescheduledDate] = useState<string>("");
   const [rescheduledTime, setRescheduledTime] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDocketUploadOpen, setIsDocketUploadOpen] = useState(false);
+  const [docketUploadOrder, setDocketUploadOrder] = useState<{ id: number; status: string; orderNumber: string } | null>(null);
+  const [docketFile, setDocketFile] = useState<File | null>(null);
   
   // Filter states
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -89,6 +92,7 @@ export default function Orders() {
   });
   const { data: assignments = [] } = trpc.assignments.list.useQuery();
   const updateOrder = trpc.orders.update.useMutation();
+  const uploadDocketFile = trpc.orders.uploadDocketFile.useMutation();
   const clearAllOrders = trpc.orders.clearAll.useMutation();
   const utils = trpc.useUtils();
 
@@ -144,6 +148,16 @@ export default function Orders() {
   };
   
   const handleQuickStatusUpdate = async (orderId: number, newStatus: string) => {
+    // If status is docket_received or docket_uploaded, show file upload dialog
+    if (newStatus === "docket_received" || newStatus === "docket_uploaded") {
+      const order = orders?.find(o => o.id === orderId);
+      if (order) {
+        setDocketUploadOrder({ id: orderId, status: newStatus, orderNumber: order.orderNumber });
+        setIsDocketUploadOpen(true);
+      }
+      return;
+    }
+    
     try {
       await updateOrder.mutateAsync({
         id: orderId,
@@ -354,13 +368,14 @@ export default function Orders() {
                     <TableHead>Priority</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Assignment</TableHead>
+                    <TableHead>Docket File</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {orders.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                         No orders found. Upload orders to get started.
                       </TableCell>
                     </TableRow>
@@ -467,6 +482,21 @@ export default function Orders() {
                               </div>
                             ) : (
                               <span className="text-xs text-muted-foreground">Not assigned</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {order.docketFileUrl ? (
+                              <a
+                                href={order.docketFileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                              >
+                                <FileText className="w-3 h-3" />
+                                {order.docketFileName || "View File"}
+                              </a>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">-</span>
                             )}
                           </TableCell>
                           <TableCell>
@@ -726,6 +756,99 @@ export default function Orders() {
             </Button>
             <Button onClick={handleSaveEdit} disabled={updateOrder.isPending}>
               {updateOrder.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Docket File Upload Dialog */}
+      <Dialog open={isDocketUploadOpen} onOpenChange={setIsDocketUploadOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Upload Docket File</DialogTitle>
+            <DialogDescription>
+              Upload a PDF or image file for order {docketUploadOrder?.orderNumber}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Select File</label>
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    // Validate file size (max 10MB)
+                    if (file.size > 10 * 1024 * 1024) {
+                      toast.error("File size must be less than 10MB");
+                      return;
+                    }
+                    // Validate file type
+                    const validTypes = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+                    if (!validTypes.includes(file.type)) {
+                      toast.error("Only PDF, JPG, and PNG files are allowed");
+                      return;
+                    }
+                    setDocketFile(file);
+                  }
+                }}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              />
+              {docketFile && (
+                <div className="text-sm text-muted-foreground">
+                  Selected: {docketFile.name} ({(docketFile.size / 1024 / 1024).toFixed(2)} MB)
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setIsDocketUploadOpen(false);
+              setDocketFile(null);
+              setDocketUploadOrder(null);
+            }}>
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                if (!docketFile || !docketUploadOrder) return;
+                
+                try {
+                  // Convert file to base64
+                  const reader = new FileReader();
+                  reader.onload = async () => {
+                    const base64 = (reader.result as string).split(",")[1];
+                    
+                    // Upload file
+                    await uploadDocketFile.mutateAsync({
+                      orderId: docketUploadOrder.id,
+                      fileData: base64,
+                      fileName: docketFile.name,
+                      fileType: docketFile.type,
+                    });
+                    
+                    // Update order status
+                    await updateOrder.mutateAsync({
+                      id: docketUploadOrder.id,
+                      status: docketUploadOrder.status as any,
+                    });
+                    
+                    await utils.orders.list.invalidate();
+                    toast.success("Docket file uploaded successfully");
+                    setIsDocketUploadOpen(false);
+                    setDocketFile(null);
+                    setDocketUploadOrder(null);
+                  };
+                  reader.readAsDataURL(docketFile);
+                } catch (error) {
+                  toast.error("Failed to upload docket file");
+                  console.error(error);
+                }
+              }}
+              disabled={!docketFile || uploadDocketFile.isPending}
+            >
+              {uploadDocketFile.isPending ? "Uploading..." : "Upload & Update Status"}
             </Button>
           </DialogFooter>
         </DialogContent>
