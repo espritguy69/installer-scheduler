@@ -1,0 +1,160 @@
+{
+  "query": "SELECT id, orderNumber, serviceNumber, customerName, appointmentDate, appointmentTime, buildingName, createdAt FROM orders ORDER BY createdAt DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, orderNumber, serviceNumber, customerName, appointmentDate, appointmentTime, buildingName, createdAt FROM orders ORDER BY createdAt DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "150157",
+      "orderNumber": "AWO437144",
+      "serviceNumber": "TBBN862723G",
+      "customerName": "MOHD HANIF BIN YUSOFF",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "1:00 PM",
+      "buildingName": "UNITED POINT RESIDENCE (KEPONG 5)",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150158",
+      "orderNumber": "AWO436701",
+      "serviceNumber": "TBBN985880G",
+      "customerName": "CHIN YEE MAI",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "1:00 PM",
+      "buildingName": "GEMBIRA RESIDEN",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150159",
+      "orderNumber": "AWO436961",
+      "serviceNumber": "TBBN942240G",
+      "customerName": "LIM BOON HOOI",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "11:00 AM",
+      "buildingName": "INDAH VILLA",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150160",
+      "orderNumber": "AWO436779",
+      "serviceNumber": "TBBNA477774G",
+      "customerName": "AZUIN BINTI MOHD RAZALI",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "11:00 AM",
+      "buildingName": "MELAWATI HILLSIDE APARTMENT",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150161",
+      "orderNumber": "AWO436909",
+      "serviceNumber": "TBBNA551325G",
+      "customerName": "LAM HIN WAI IAN",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "11:00 AM",
+      "buildingName": "ROYCE RESIDENCE",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150162",
+      "orderNumber": "AWO436400",
+      "serviceNumber": "TBBN392588G",
+      "customerName": "CHOME PLT",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "11:00 AM",
+      "buildingName": "THE HAMILTON",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150163",
+      "orderNumber": "AWO437153",
+      "serviceNumber": "TBBNA405400G",
+      "customerName": "LIM YIE JIE",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "3:00 PM",
+      "buildingName": "ASTER RESIDENCE",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150164",
+      "orderNumber": "AWO436808",
+      "serviceNumber": "TBBN855101G",
+      "customerName": "WONG JING JYH",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "3:00 PM",
+      "buildingName": "9 SEPUTEH - VIVO RESIDENCE",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150165",
+      "orderNumber": "AWO437026",
+      "serviceNumber": "TBBN861573G",
+      "customerName": "KONG SUWEN",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "3:00 PM",
+      "buildingName": "THE WESTSIDE II",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150166",
+      "orderNumber": "AWO437076",
+      "serviceNumber": "TBBN560139G",
+      "customerName": "PAIS SERHII",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "9:00 AM",
+      "buildingName": "THE WESTSIDE I",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150167",
+      "orderNumber": "AWO436732",
+      "serviceNumber": "TBBNA549981G",
+      "customerName": "ARIVUKKARASI HARIDASS",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "9:00 AM",
+      "buildingName": "9 SEPUTEH - VIVO RESIDENCE",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150168",
+      "orderNumber": "AWO436704",
+      "serviceNumber": "TBBNA162425G",
+      "customerName": "SYED MOHD FIRDAUS BIN SYED ZAINUDDIN",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "9:00 AM",
+      "buildingName": "EMIRA RESIDENCE @ SHAH ALAM",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150169",
+      "orderNumber": "AWO436895",
+      "serviceNumber": "TBBN139258G",
+      "customerName": "CHAN KIAT THING",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "9:00 AM",
+      "buildingName": "CASA RESIDENSI",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150170",
+      "orderNumber": "AWO436900",
+      "serviceNumber": "TBBNA785888G",
+      "customerName": "AIDA SALWA BINTI ABDULLAH",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "9:00 AM",
+      "buildingName": "SURIA RAFFLESIA",
+      "createdAt": "2025-11-11 06:00:39"
+    },
+    {
+      "id": "150156",
+      "orderNumber": "AWO437166",
+      "serviceNumber": "TBBN417003G",
+      "customerName": "NGOO YEE TING",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "1:00 PM",
+      "buildingName": "PANTAI HILL PARK",
+      "createdAt": "2025-11-11 06:00:39"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\tserviceNumber\tcustomerName\tappointmentDate\tappointmentTime\tbuildingName\tcreatedAt\n150157\tAWO437144\tTBBN862723G\tMOHD HANIF BIN YUSOFF\tNov 11, 2025\t1:00 PM\tUNITED POINT RESIDENCE (KEPONG 5)\t2025-11-11 06:00:39\n150158\tAWO436701\tTBBN985880G\tCHIN YEE MAI\tNov 11, 2025\t1:00 PM\tGEMBIRA RESIDEN\t2025-11-11 06:00:39\n150159\tAWO436961\tTBBN942240G\tLIM BOON HOOI\tNov 11, 2025\t11:00 AM\tINDAH VILLA\t2025-11-11 06:00:39\n150160\tAWO436779\tTBBNA477774G\tAZUIN BINTI MOHD RAZALI\tNov 11, 2025\t11:00 AM\tMELAWATI HILLSIDE APARTMENT\t2025-11-11 06:00:39\n150161\tAWO436909\tTBBNA551325G\tLAM HIN WAI IAN\tNov 11, 2025\t11:00 AM\tROYCE RESIDENCE\t2025-11-11 06:00:39\n150162\tAWO436400\tTBBN392588G\tCHOME PLT\tNov 11, 2025\t11:00 AM\tTHE HAMILTON\t2025-11-11 06:00:39\n150163\tAWO437153\tTBBNA405400G\tLIM YIE JIE\tNov 11, 2025\t3:00 PM\tASTER RESIDENCE\t2025-11-11 06:00:39\n150164\tAWO436808\tTBBN855101G\tWONG JING JYH\tNov 11, 2025\t3:00 PM\t9 SEPUTEH - VIVO RESIDENCE\t2025-11-11 06:00:39\n150165\tAWO437026\tTBBN861573G\tKONG SUWEN\tNov 11, 2025\t3:00 PM\tTHE WESTSIDE II\t2025-11-11 06:00:39\n150166\tAWO437076\tTBBN560139G\tPAIS SERHII\tNov 11, 2025\t9:00 AM\tTHE WESTSIDE I\t2025-11-11 06:00:39\n150167\tAWO436732\tTBBNA549981G\tARIVUKKARASI HARIDASS\tNov 11, 2025\t9:00 AM\t9 SEPUTEH - VIVO RESIDENCE\t2025-11-11 06:00:39\n150168\tAWO436704\tTBBNA162425G\tSYED MOHD FIRDAUS BIN SYED ZAINUDDIN\tNov 11, 2025\t9:00 AM\tEMIRA RESIDENCE @ SHAH ALAM\t2025-11-11 06:00:39\n150169\tAWO436895\tTBBN139258G\tCHAN KIAT THING\tNov 11, 2025\t9:00 AM\tCASA RESIDENSI\t2025-11-11 06:00:39\n150170\tAWO436900\tTBBNA785888G\tAIDA SALWA BINTI ABDULLAH\tNov 11, 2025\t9:00 AM\tSURIA RAFFLESIA\t2025-11-11 06:00:39\n150156\tAWO437166\tTBBN417003G\tNGOO YEE TING\tNov 11, 2025\t1:00 PM\tPANTAI HILL PARK\t2025-11-11 06:00:39\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

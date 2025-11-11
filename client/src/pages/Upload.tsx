@@ -245,8 +245,13 @@ export default function Upload() {
         }
       });
 
-      console.log('First mapped order:', orders[0]);
+      console.log('=== UPLOAD DEBUG ===');
+      console.log('First mapped order:', JSON.stringify(orders[0], null, 2));
       console.log('Total mapped orders:', orders.length);
+      console.log('Sample dates from first 3 orders:');
+      orders.slice(0, 3).forEach((o: any, idx: number) => {
+        console.log(`  Order ${idx + 1}: date="${o.appointmentDate}" time="${o.appointmentTime}"`);
+      });
       
       // Filter out completely empty rows (where all key fields are empty)
       const validOrders = orders.filter(o => 
@@ -276,7 +281,11 @@ export default function Upload() {
       }
 
       // No duplicates, proceed with import
-      await bulkCreateOrders.mutateAsync(uniqueOrders);
+      console.log('Calling bulkCreateOrders.mutateAsync with', uniqueOrders.length, 'orders');
+      console.log('First order to be created:', JSON.stringify(uniqueOrders[0], null, 2));
+      
+      const result = await bulkCreateOrders.mutateAsync(uniqueOrders);
+      console.log('bulkCreateOrders result:', result);
       await utils.orders.list.invalidate();
       
       toast.success(`Successfully imported ${uniqueOrders.length} orders`, {
@@ -290,7 +299,9 @@ export default function Upload() {
       const fileInput = document.getElementById("orders-file-input") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
     } catch (error) {
+      console.error("=== UPLOAD ERROR ===");
       console.error("Error uploading orders:", error);
+      console.error("Error stack:", (error as any).stack);
       toast.error("Failed to upload orders. Please check the file format.");
     } finally {
       setIsProcessing(false);

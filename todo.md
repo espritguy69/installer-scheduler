@@ -540,3 +540,27 @@
 - [x] Add updateOrderDocketFile database function
 - [x] Test multi-sheet Excel upload with user's UploadOrders.xlsx file (ready for user testing)
 - [x] Verify all 15 orders from all 10 sheets appear in schedule with correct dates/times (implementation complete)
+
+## URGENT: Schedule Display Issue (HIGHEST PRIORITY - PROJECT BLOCKER)
+- [ ] Query database to verify what appointmentDate and appointmentTime values are actually saved
+- [ ] Test excelDateToReadable and excelTimeToReadable functions with actual Excel serial numbers
+- [ ] Debug Schedule view date filtering to see why orders aren't appearing
+- [ ] Add console logging to trace data flow from upload → database → Schedule view
+- [ ] Fix root cause preventing orders from displaying in Schedule
+- [ ] Verify all uploaded orders appear correctly in Schedule with proper dates/times
+
+## Excel File Verification Checklist
+- [x] Create detailed checklist document for verifying Excel file structure
+- [x] Include App Date column data type verification steps
+- [x] Include sheet name format verification steps
+- [x] Provide examples of correct vs incorrect formats
+- [x] Add troubleshooting guide for common Excel issues
+
+## CRITICAL DISPLAY ISSUES (HIGHEST PRIORITY - USER REPORTED)
+- [x] Fix Schedule view only showing orders at 10:00 AM and 11:30 AM (other time slots not displaying)
+- [x] Changed TIME_SLOTS from 24-hour format to 12-hour format with AM/PM to match database
+- [x] Fix assignment rows in Orders page missing date and time information
+- [x] Show order's appointmentDate and appointmentTime when not assigned
+- [x] Test with actual uploaded data to verify all time slots display correctly
+- [x] Verified 02:30 PM orders now appear in Schedule view
+- [x] Verified Orders page Assignment column shows date/time for unassigned orders

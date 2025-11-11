@@ -481,7 +481,19 @@ export default function Orders() {
                                 </div>
                               </div>
                             ) : (
-                              <span className="text-xs text-muted-foreground">Not assigned</span>
+                              <div className="text-sm">
+                                <div className="text-xs text-muted-foreground">Not assigned</div>
+                                {order.appointmentDate && (
+                                  <div className="text-xs font-medium">
+                                    {order.appointmentDate}
+                                  </div>
+                                )}
+                                {order.appointmentTime && (
+                                  <div className="text-xs">
+                                    {order.appointmentTime}
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </TableCell>
                           <TableCell>

@@ -1,0 +1,130 @@
+{
+  "query": "SELECT orderNumber, appointmentDate, appointmentTime, buildingName FROM orders ORDER BY appointmentTime LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT orderNumber, appointmentDate, appointmentTime, buildingName FROM orders ORDER BY appointmentTime LIMIT 20;",
+  "rows": [
+    {
+      "orderNumber": "TEST",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "",
+      "buildingName": ""
+    },
+    {
+      "orderNumber": "TEST",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "",
+      "buildingName": ""
+    },
+    {
+      "orderNumber": "Legend",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "",
+      "buildingName": ""
+    },
+    {
+      "orderNumber": "TEST",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "",
+      "buildingName": ""
+    },
+    {
+      "orderNumber": "TEST",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "",
+      "buildingName": ""
+    },
+    {
+      "orderNumber": "TEST",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "",
+      "buildingName": ""
+    },
+    {
+      "orderNumber": "TEST",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "",
+      "buildingName": ""
+    },
+    {
+      "orderNumber": "TEST",
+      "appointmentDate": "Nov 11, 2025",
+      "appointmentTime": "",
+      "buildingName": ""
+    },
+    {
+      "orderNumber": "A1789761",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "KELANA PUTERI BLOCK B"
+    },
+    {
+      "orderNumber": "A1790942",
+      "appointmentDate": "Nov 4, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "BLOCK C CEMARA APARTMENT"
+    },
+    {
+      "orderNumber": "A1791607",
+      "appointmentDate": "Nov 4, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "30 - 56 (EVEN), JALAN KUBAH U8/51"
+    },
+    {
+      "orderNumber": "A1790096",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "D RAPPORT AMPANG - BLOCK B"
+    },
+    {
+      "orderNumber": "A1787996",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "SUNWAY VELOCITY 2 - BLOCK A"
+    },
+    {
+      "orderNumber": "A1790218",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "D RAPPORT AMPANG - BLOCK B"
+    },
+    {
+      "orderNumber": "A1790098",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "D RAPPORT AMPANG - BLOCK B"
+    },
+    {
+      "orderNumber": "A1789083",
+      "appointmentDate": "Nov 4, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "SOLARIS PARQ RESIDENSI - BLOCK A"
+    },
+    {
+      "orderNumber": "A1790097",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "D RAPPORT AMPANG - BLOCK B"
+    },
+    {
+      "orderNumber": "",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "KELANA PUTERI BLOCK D"
+    },
+    {
+      "orderNumber": "A1789574",
+      "appointmentDate": "Nov 1, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "TROPICANA AVENUE-RETAIL SHOP"
+    },
+    {
+      "orderNumber": "A1789895",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM",
+      "buildingName": "ECO SANCTUARI - THE PARQUE RESIDENCES - BLOCK C"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNumber\tappointmentDate\tappointmentTime\tbuildingName\nTEST\tNov 11, 2025\t\t\nTEST\tNov 11, 2025\t\t\nLegend\tNov 11, 2025\t\t\nTEST\tNov 11, 2025\t\t\nTEST\tNov 11, 2025\t\t\nTEST\tNov 11, 2025\t\t\nTEST\tNov 11, 2025\t\t\nTEST\tNov 11, 2025\t\t\nA1789761\tNov 3, 2025\t02:30 PM\tKELANA PUTERI BLOCK B\nA1790942\tNov 4, 2025\t02:30 PM\tBLOCK C CEMARA APARTMENT\nA1791607\tNov 4, 2025\t02:30 PM\t30 - 56 (EVEN), JALAN KUBAH U8/51\nA1790096\tNov 3, 2025\t02:30 PM\tD RAPPORT AMPANG - BLOCK B\nA1787996\tNov 3, 2025\t02:30 PM\tSUNWAY VELOCITY 2 - BLOCK A\nA1790218\tNov 3, 2025\t02:30 PM\tD RAPPORT AMPANG - BLOCK B\nA1790098\tNov 3, 2025\t02:30 PM\tD RAPPORT AMPANG - BLOCK B\nA1789083\tNov 4, 2025\t02:30 PM\tSOLARIS PARQ RESIDENSI - BLOCK A\nA1790097\tNov 3, 2025\t02:30 PM\tD RAPPORT AMPANG - BLOCK B\n\tNov 3, 2025\t02:30 PM\tKELANA PUTERI BLOCK D\nA1789574\tNov 1, 2025\t02:30 PM\tTROPICANA AVENUE-RETAIL SHOP\nA1789895\tNov 3, 2025\t02:30 PM\tECO SANCTUARI - THE PARQUE RESIDENCES - BLOCK C\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}
