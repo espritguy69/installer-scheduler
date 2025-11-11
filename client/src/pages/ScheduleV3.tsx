@@ -93,45 +93,32 @@ const DraggableOrder = ({ order }: DraggableOrderProps) => {
   return (
     <div
       ref={drag as any}
-      className={`p-3 border-2 rounded-lg cursor-move ${statusColor} ${
+      className={`p-2 border-2 rounded-lg cursor-move shadow-sm hover:shadow-md transition-shadow ${statusColor} ${
         isDragging ? "opacity-50" : ""
       }`}
-      style={{ minWidth: "200px", maxWidth: "250px" }}
+      style={{ minWidth: "180px", maxWidth: "220px" }}
     >
-      <div className="flex items-center gap-2 mb-2">
-        <div className="font-semibold text-sm">{order.orderNumber}</div>
-        <div className="h-4 w-px bg-border"></div>
-        <div className="text-sm text-muted-foreground truncate flex-1">{order.customerName}</div>
-      </div>
-      <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-        {order.ticketNumber && (
-          <div className="flex items-center gap-1">
-            <span className="font-medium">Ticket:</span>
-            <span className="truncate">{order.ticketNumber}</span>
-          </div>
-        )}
+      <div className="space-y-1">
+        <div className="font-bold text-sm">{order.orderNumber}</div>
+        <div className="text-sm truncate">{order.customerName}</div>
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          {order.appointmentTime && (
+            <span>⏰ {order.appointmentTime}</span>
+          )}
+          {order.appointmentTime && order.buildingName && <span>•</span>}
+          {order.buildingName && (
+            <span className="truncate">📍 {order.buildingName}</span>
+          )}
+        </div>
         {order.serviceNumber && (
-          <div className="flex items-center gap-1">
-            <span className="font-medium">Service No:</span>
-            <span>{order.serviceNumber}</span>
-          </div>
-        )}
-        {order.appointmentTime && (
-          <div className="flex items-center gap-1">
-            <span className="font-medium">Time:</span>
-            <span>{order.appointmentTime}</span>
-          </div>
-        )}
-        {order.buildingName && (
-          <div className="flex items-center gap-1">
-            <span className="font-medium">Building:</span>
-            <span className="truncate">{order.buildingName}</span>
+          <div className="text-xs text-muted-foreground">
+            SN: {order.serviceNumber}
           </div>
         )}
       </div>
-      <div className="flex justify-between items-center mt-2">
-        <span className="text-xs text-muted-foreground">{getStatusLabel(order.status)}</span>
-        <span className="text-xs font-medium bg-white/50 px-1.5 py-0.5 rounded">{estimatedDuration}</span>
+      <div className="flex justify-between items-center mt-2 pt-1 border-t border-current/20">
+        <span className="text-xs font-medium">{getStatusLabel(order.status)}</span>
+        <span className="text-xs font-bold bg-white/60 px-1.5 py-0.5 rounded">{estimatedDuration}</span>
       </div>
     </div>
   );
@@ -185,22 +172,37 @@ const TimeSlotCell = ({ installerId, timeSlot, assignment, onDrop, onRemove, onR
   return (
     <td
       ref={drop as any}
-      className={`border p-2 min-w-[120px] h-16 ${
-        isOver ? "bg-primary/20" : ""
+      className={`border-2 p-1 min-w-[140px] h-24 transition-all ${
+        isOver && assignment && assignment.order ? "bg-red-100 border-red-400 border-dashed" :
+        isOver ? "bg-blue-100 border-blue-400 border-dashed" : 
+        assignment && assignment.order ? "border-solid" : "bg-gray-50 border-gray-200 border-dashed"
       } ${assignment && assignment.order ? getStatusColor(assignment.order.status) : ""} ${
         isDragging ? "opacity-50" : ""
       }`}
     >
-      {assignment && assignment.order && (
-        <div ref={drag as any} className="text-center relative group cursor-move">
-          <div className="text-xs font-semibold">{assignment.order.orderNumber}</div>
-          <div className="text-xs">{assignment.order.customerName}</div>
+      {assignment && assignment.order ? (
+        <div ref={drag as any} className="relative group cursor-move h-full flex flex-col justify-between p-1">
+          <div className="space-y-0.5">
+            <div className="text-xs font-bold truncate">{assignment.order.orderNumber}</div>
+            <div className="text-xs truncate">{assignment.order.customerName}</div>
+            {assignment.order.appointmentTime && (
+              <div className="text-xs text-muted-foreground">⏰ {assignment.order.appointmentTime}</div>
+            )}
+            {assignment.order.buildingName && (
+              <div className="text-xs text-muted-foreground truncate">📍 {assignment.order.buildingName}</div>
+            )}
+          </div>
           <button
             onClick={() => onRemove(assignment.id)}
-            className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-4 h-4 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+            title="Remove assignment"
           >
             ×
           </button>
+        </div>
+      ) : (
+        <div className="h-full flex items-center justify-center text-gray-400 text-xs">
+          Drop here
         </div>
       )}
     </td>

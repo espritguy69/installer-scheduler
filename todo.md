@@ -414,3 +414,28 @@
 - [x] Test uploading image docket file
 - [x] Test downloading uploaded docket files
 - [ ] Verify S3 storage and file URLs work correctly
+
+## Redesign Schedule Page for Easier Job Assignment
+- [ ] Analyze current ScheduleV3.tsx implementation and identify pain points
+- [ ] Redesign time slot grid with clear visual availability indicators
+- [ ] Make empty time slots clearly visible and clickable
+- [ ] Add color-coding for occupied vs. available slots
+- [ ] Implement drag-and-drop from unassigned orders directly onto installer time slots
+- [ ] Remove need for intermediate dialogs when assigning orders
+- [ ] Add time conflict detection to prevent overlapping assignments
+- [ ] Show visual warnings when dragging orders to conflicting time slots
+- [ ] Improve order card design for better at-a-glance readability
+- [ ] Show WO No., Customer, Time, Location compactly
+- [ ] Add visual feedback during drag operations (ghost card, drop zones)
+- [ ] Test complete assignment workflow from unassigned to scheduled
+- [ ] Verify conflict prevention works correctly
+- [ ] Ensure mobile responsiveness for touch-based drag-and-drop
+
+## Schedule Page UX Improvements
+- [x] Update TimeSlotCell component with better empty state visuals (light gray background, dashed border)
+- [x] Add hover effects to empty time slots (blue border highlight)
+- [x] Improve unassigned order cards with compact, readable layout
+- [x] Add icons for time (⏰) and location (📍) in order cards
+- [x] Implement shadow and hover effects on order cards
+- [x] Add visual separator between order info and status/duration
+- [x] Test drag-and-drop with improved visual feedback
