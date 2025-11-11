@@ -628,3 +628,9 @@
 - [x] Add clear button (X) to reset date filter
 - [x] Changed filters grid from 3 columns to 4 columns (responsive)
 - [x] Test date filter with various dates (date input visible in 4th column with clear button)
+
+## Assignment Display Cleanup (USER REQUESTED)
+- [x] Remove 2-hour timestamp (14:30 - 16:30) from Assignment column when order is assigned
+- [x] Keep only appointment date and time for cleaner look
+- [x] Update Orders.tsx Assignment column display logic
+- [x] Test with assigned orders to verify clean display (2-hour timestamp removed, shows only date and time)

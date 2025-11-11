@@ -569,12 +569,16 @@ export default function Orders() {
                           <TableCell>
                             {assignment ? (
                               <div className="text-sm">
-                                <div className="text-xs text-muted-foreground">
-                                  {new Date(assignment.scheduledDate).toLocaleDateString()}
-                                </div>
-                                <div className="text-xs">
-                                  {assignment.scheduledStartTime} - {assignment.scheduledEndTime}
-                                </div>
+                                {order.appointmentDate && (
+                                  <div className="text-xs font-medium">
+                                    {order.appointmentDate}
+                                  </div>
+                                )}
+                                {order.appointmentTime && (
+                                  <div className="text-xs text-muted-foreground">
+                                    {order.appointmentTime}
+                                  </div>
+                                )}
                               </div>
                             ) : (
                               <div className="text-sm">
