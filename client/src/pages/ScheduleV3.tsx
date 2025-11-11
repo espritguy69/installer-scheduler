@@ -75,9 +75,11 @@ const getStatusLabel = (status: string) => {
 
 interface DraggableOrderProps {
   order: any;
+  isSelected: boolean;
+  onSelect: (orderId: number, selected: boolean) => void;
 }
 
-const DraggableOrder = ({ order }: DraggableOrderProps) => {
+const DraggableOrder = ({ order, isSelected, onSelect }: DraggableOrderProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "ORDER",
     item: { orderId: order.id },
@@ -95,11 +97,25 @@ const DraggableOrder = ({ order }: DraggableOrderProps) => {
       ref={drag as any}
       className={`p-2 border-2 rounded-lg cursor-move shadow-sm hover:shadow-md transition-shadow ${statusColor} ${
         isDragging ? "opacity-50" : ""
-      }`}
+      } ${isSelected ? "ring-2 ring-blue-500" : ""}`}
       style={{ minWidth: "180px", maxWidth: "220px" }}
     >
-      <div className="space-y-1">
-        <div className="font-bold text-sm">{order.orderNumber}</div>
+      <div className="flex items-start gap-2 mb-1">
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={(e) => {
+            e.stopPropagation();
+            onSelect(order.id, e.target.checked);
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+        />
+        <div className="flex-1 min-w-0">
+          <div className="font-bold text-sm">{order.orderNumber}</div>
+        </div>
+      </div>
+      <div className="space-y-1 ml-6">
         <div className="text-sm truncate">{order.customerName}</div>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           {order.appointmentTime && (
@@ -116,7 +132,7 @@ const DraggableOrder = ({ order }: DraggableOrderProps) => {
           </div>
         )}
       </div>
-      <div className="flex justify-between items-center mt-2 pt-1 border-t border-current/20">
+      <div className="flex justify-between items-center mt-2 pt-1 border-t border-current/20 ml-6">
         <span className="text-xs font-medium">{getStatusLabel(order.status)}</span>
         <span className="text-xs font-bold bg-white/60 px-1.5 py-0.5 rounded">{estimatedDuration}</span>
       </div>
@@ -214,6 +230,15 @@ export default function ScheduleV3() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<"daily" | "weekly">("daily");
   const [showAddOrderDialog, setShowAddOrderDialog] = useState(false);
+  const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
+  const [showBulkAssignDialog, setShowBulkAssignDialog] = useState(false);
+  const [bulkAssignment, setBulkAssignment] = useState<{
+    installerId: number | null;
+    timeSlot: string | null;
+  }>({
+    installerId: null,
+    timeSlot: null,
+  });
   const [newOrder, setNewOrder] = useState({
     orderNumber: "",
     ticketNumber: "",
@@ -273,6 +298,73 @@ export default function ScheduleV3() {
     const daysToMove = viewMode === "weekly" ? 7 : 1;
     newDate.setDate(currentDate.getDate() + (direction === "next" ? daysToMove : -daysToMove));
     setCurrentDate(newDate);
+  };
+
+  const handleOrderSelect = (orderId: number, selected: boolean) => {
+    if (selected) {
+      setSelectedOrderIds(prev => [...prev, orderId]);
+    } else {
+      setSelectedOrderIds(prev => prev.filter(id => id !== orderId));
+    }
+  };
+
+  const handleSelectAll = () => {
+    setSelectedOrderIds(unassignedOrders.map(o => o.id));
+  };
+
+  const handleClearSelection = () => {
+    setSelectedOrderIds([]);
+  };
+
+  const handleBulkAssign = async () => {
+    if (!bulkAssignment.installerId || !bulkAssignment.timeSlot) {
+      toast.error("Please select both installer and time slot");
+      return;
+    }
+
+    if (selectedOrderIds.length === 0) {
+      toast.error("No orders selected");
+      return;
+    }
+
+    try {
+      // Create assignments for all selected orders
+      const assignmentPromises = selectedOrderIds.map(orderId => {
+        return createAssignment.mutateAsync({
+          orderId,
+          installerId: bulkAssignment.installerId!,
+          scheduledDate: currentDate,
+          scheduledStartTime: bulkAssignment.timeSlot!,
+          scheduledEndTime: "18:00", // Default end time
+        });
+      });
+
+      await Promise.all(assignmentPromises);
+
+      // Update all orders to assigned status
+      const updatePromises = selectedOrderIds.map(orderId => {
+        return updateOrder.mutateAsync({
+          id: orderId,
+          status: "assigned",
+        });
+      });
+
+      await Promise.all(updatePromises);
+
+      // Refresh data
+      await utils.assignments.list.invalidate();
+      await utils.orders.list.invalidate();
+
+      toast.success(`Successfully assigned ${selectedOrderIds.length} orders`);
+      
+      // Reset state
+      setSelectedOrderIds([]);
+      setShowBulkAssignDialog(false);
+      setBulkAssignment({ installerId: null, timeSlot: null });
+    } catch (error) {
+      console.error("Bulk assignment error:", error);
+      toast.error("Failed to assign orders. Please try again.");
+    }
   };
 
   const handleAddOrder = async () => {
@@ -482,6 +574,38 @@ export default function ScheduleV3() {
             </Button>
           </div>
 
+          {/* Bulk Action Toolbar */}
+          {selectedOrderIds.length > 0 && (
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <span className="font-semibold text-blue-900">
+                  {selectedOrderIds.length} order{selectedOrderIds.length > 1 ? 's' : ''} selected
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleSelectAll}
+                  disabled={selectedOrderIds.length === unassignedOrders.length}
+                >
+                  Select All ({unassignedOrders.length})
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleClearSelection}
+                >
+                  Clear Selection
+                </Button>
+              </div>
+              <Button 
+                onClick={() => setShowBulkAssignDialog(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Assign Selected to Installer
+              </Button>
+            </div>
+          )}
+
           {/* Unassigned Orders */}
           <Card className="mb-6 draggable-orders">
             <CardHeader>
@@ -493,7 +617,12 @@ export default function ScheduleV3() {
                   <p className="text-sm text-muted-foreground">No unassigned orders</p>
                 ) : (
                   unassignedOrders.map(order => (
-                    <DraggableOrder key={order.id} order={order} />
+                    <DraggableOrder 
+                      key={order.id} 
+                      order={order}
+                      isSelected={selectedOrderIds.includes(order.id)}
+                      onSelect={handleOrderSelect}
+                    />
                   ))
                 )}
               </div>
@@ -700,6 +829,79 @@ export default function ScheduleV3() {
                 Cancel
               </Button>
               <Button onClick={handleAddOrder}>Create Order</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Bulk Assignment Dialog */}
+        <Dialog open={showBulkAssignDialog} onOpenChange={setShowBulkAssignDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Bulk Assign Orders</DialogTitle>
+              <DialogDescription>
+                Assign {selectedOrderIds.length} selected order{selectedOrderIds.length > 1 ? 's' : ''} to an installer
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="bulkInstaller">Select Installer *</Label>
+                <Select
+                  value={bulkAssignment.installerId?.toString() || ""}
+                  onValueChange={(value) =>
+                    setBulkAssignment({ ...bulkAssignment, installerId: parseInt(value) })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose an installer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {installers.map((installer) => (
+                      <SelectItem key={installer.id} value={installer.id.toString()}>
+                        {installer.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="bulkTimeSlot">Select Time Slot *</Label>
+                <Select
+                  value={bulkAssignment.timeSlot || ""}
+                  onValueChange={(value) =>
+                    setBulkAssignment({ ...bulkAssignment, timeSlot: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a time slot" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIME_SLOTS.map((slot) => (
+                      <SelectItem key={slot} value={slot}>
+                        {slot}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-900 font-medium mb-2">Selected Orders:</p>
+                <div className="space-y-1 max-h-40 overflow-y-auto">
+                  {selectedOrderIds.map(orderId => {
+                    const order = orders.find(o => o.id === orderId);
+                    return order ? (
+                      <div key={orderId} className="text-xs text-blue-800">
+                        • {order.orderNumber} - {order.customerName}
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowBulkAssignDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleBulkAssign}>Assign All</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

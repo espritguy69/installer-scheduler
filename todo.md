@@ -439,3 +439,26 @@
 - [x] Implement shadow and hover effects on order cards
 - [x] Add visual separator between order info and status/duration
 - [x] Test drag-and-drop with improved visual feedback
+
+## Bulk Assignment Feature
+- [ ] Add checkbox to each unassigned order card for multi-selection
+- [ ] Implement selection state management (selected order IDs array)
+- [ ] Create bulk action toolbar showing selected count
+- [ ] Add "Assign Selected" button to toolbar
+- [ ] Build installer and time slot selection dialog
+- [ ] Add "Select All" and "Clear Selection" buttons
+- [ ] Implement backend tRPC procedure for bulk assignment creation
+- [ ] Add validation to prevent double-booking during bulk assignment
+- [ ] Show success/error messages after bulk assignment
+- [ ] Clear selection after successful assignment
+- [ ] Test with multiple orders across different time slots
+- [ ] Test error handling for conflicts
+
+## Bulk Assignment Feature
+- [x] Add checkboxes to order cards for multi-selection
+- [x] Create bulk action toolbar with selected count
+- [x] Add "Select All" and "Clear Selection" buttons
+- [x] Implement bulk assignment dialog with installer and time slot selection
+- [x] Create backend logic for bulk assignment creation
+- [x] Test bulk assignment with multiple orders
+- [x] Verify assignments appear correctly in schedule grid
