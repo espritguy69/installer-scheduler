@@ -486,20 +486,20 @@ export default function Orders() {
               Showing {orders.length} of {allOrders.length} orders
             </div>
             
-            <div className="overflow-x-auto">
-              <Table>
+            <div className="w-full">
+              <Table className="table-fixed w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>WO No.</TableHead>
-                    <TableHead>Ticket No.</TableHead>
-                    <TableHead>Service No.</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>WO Type</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Assignment</TableHead>
-                    <TableHead>Docket File</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="w-[120px]">WO No.</TableHead>
+                    <TableHead className="w-[140px]">Ticket No.</TableHead>
+                    <TableHead className="w-[120px]">Service No.</TableHead>
+                    <TableHead className="w-[180px]">Customer</TableHead>
+                    <TableHead className="w-[140px]">WO Type</TableHead>
+                    <TableHead className="w-[90px]">Priority</TableHead>
+                    <TableHead className="w-[140px]">Status</TableHead>
+                    <TableHead className="w-[120px]">Assignment</TableHead>
+                    <TableHead className="w-[100px]">Docket</TableHead>
+                    <TableHead className="w-[80px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -646,25 +646,13 @@ export default function Orders() {
                             )}
                           </TableCell>
                           <TableCell>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEditOrder(order)}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => {
-                                  setDeleteOrderId(order.id);
-                                  setIsDeleteDialogOpen(true);
-                                }}
-                              >
-                                Delete
-                              </Button>
-                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditOrder(order)}
+                            >
+                              Edit
+                            </Button>
                           </TableCell>
                         </TableRow>
                       );
@@ -899,13 +887,26 @@ export default function Orders() {
               </div>
             </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancel
+          <DialogFooter className="flex justify-between items-center">
+            <Button 
+              variant="destructive" 
+              onClick={() => {
+                setDeleteOrderId(editOrder.id);
+                setIsDeleteDialogOpen(true);
+                setIsEditDialogOpen(false);
+              }}
+              className="mr-auto"
+            >
+              Delete Order
             </Button>
-            <Button onClick={handleSaveEdit} disabled={updateOrder.isPending}>
-              {updateOrder.isPending ? "Saving..." : "Save Changes"}
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveEdit} disabled={updateOrder.isPending}>
+                {updateOrder.isPending ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -663,3 +663,17 @@
 - [x] Show X button only when search text is not empty (conditional rendering)
 - [x] Clear search text when X button is clicked (onClick={() => setSearchQuery("")))
 - [x] Test search clear functionality (X button appears when text entered, clears on click)
+
+## Move Delete Button to Edit Dialog & Fix Table Layout (USER REQUESTED)
+- [ ] Move Delete button from table Actions column into Edit dialog footer (bottom left corner)
+- [ ] Remove Delete button from Orders table to simplify Actions column
+- [ ] Optimize table column widths to prevent horizontal scrolling
+- [ ] Ensure all table content is viewable without left/right scrolling
+- [ ] Test on different screen sizes to verify responsive layout
+
+## Move Delete Button to Edit Dialog & Fix Table Layout - COMPLETED
+- [x] Move Delete button from table Actions column into Edit dialog footer (bottom left corner)
+- [x] Remove Delete button from Orders table to simplify Actions column
+- [x] Optimize table column widths to prevent horizontal scrolling
+- [x] Ensure all table content is viewable without left/right scrolling
+- [x] Test on different screen sizes to verify responsive layout
