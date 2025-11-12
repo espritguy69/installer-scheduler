@@ -882,3 +882,16 @@
 - [x] Add "All" button to clear filters
 - [x] Style active/inactive filter buttons
 - [x] Test filtering with different status combinations
+
+## Optimize Orders Table Layout
+
+- [ ] Review current Orders table and identify overlapping columns
+- [ ] Adjust column widths to fit all 10 columns without horizontal scrolling
+- [ ] Reduce font sizes where needed for better fit
+- [ ] Add text truncation with tooltips for long content
+- [ ] Test on published site to verify no horizontal scrolling
+
+- [x] Optimize Orders table layout to prevent overlapping
+- [x] Reduce column widths and font sizes
+- [x] Add text truncation with tooltips
+- [x] Eliminate horizontal scrolling completely

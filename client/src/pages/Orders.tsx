@@ -538,64 +538,64 @@ export default function Orders() {
               <Table className="table-fixed w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[120px]">
+                    <TableHead className="w-[85px]">
                       <button
                         onClick={() => handleSort("orderNumber")}
-                        className="flex items-center gap-1 hover:text-foreground transition-colors font-medium"
+                        className="flex items-center gap-1 hover:text-primary transition-colors text-xs"
                       >
-                        WO No.
+                        <span>WO No.</span>
                         {sortColumn === "orderNumber" ? (
-                          sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                          sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                         ) : (
-                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                          <ArrowUpDown className="h-3 w-3" />
                         )}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[140px]">Ticket No.</TableHead>
-                    <TableHead className="w-[120px]">Service No.</TableHead>
-                    <TableHead className="w-[180px]">
+                    <TableHead className="w-[80px] text-xs">Ticket No.</TableHead>
+                    <TableHead className="w-[95px] text-xs">Service No.</TableHead>
+                    <TableHead className="w-[125px]">
                       <button
                         onClick={() => handleSort("customerName")}
-                        className="flex items-center gap-1 hover:text-foreground transition-colors font-medium"
+                        className="flex items-center gap-1 hover:text-primary transition-colors text-xs"
                       >
-                        Customer
+                        <span>Customer</span>
                         {sortColumn === "customerName" ? (
-                          sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                          sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                         ) : (
-                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                          <ArrowUpDown className="h-3 w-3" />
                         )}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[140px]">WO Type</TableHead>
-                    <TableHead className="w-[90px]">Priority</TableHead>
-                    <TableHead className="w-[140px]">
+                    <TableHead className="w-[100px] text-xs">WO Type</TableHead>
+                    <TableHead className="w-[70px] text-xs">Priority</TableHead>
+                    <TableHead className="w-[100px]">
                       <button
                         onClick={() => handleSort("status")}
-                        className="flex items-center gap-1 hover:text-foreground transition-colors font-medium"
+                        className="flex items-center gap-1 hover:text-primary transition-colors text-xs"
                       >
-                        Status
+                        <span>Status</span>
                         {sortColumn === "status" ? (
-                          sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                          sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                         ) : (
-                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                          <ArrowUpDown className="h-3 w-3" />
                         )}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[120px]">
+                    <TableHead className="w-[95px]">
                       <button
                         onClick={() => handleSort("appointmentDate")}
-                        className="flex items-center gap-1 hover:text-foreground transition-colors font-medium"
+                        className="flex items-center gap-1 hover:text-primary transition-colors text-xs"
                       >
-                        Assignment
+                        <span>Assignment</span>
                         {sortColumn === "appointmentDate" ? (
-                          sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                          sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                         ) : (
-                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                          <ArrowUpDown className="h-3 w-3" />
                         )}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[100px]">Docket</TableHead>
-                    <TableHead className="w-[80px]">Actions</TableHead>
+                    <TableHead className="w-[75px] text-xs">Docket</TableHead>
+                    <TableHead className="w-[60px] text-xs">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -610,19 +610,25 @@ export default function Orders() {
                       const assignment = getAssignmentInfo(order.id);
                       return (
                         <TableRow key={order.id}>
-                          <TableCell className="font-medium">{order.orderNumber}</TableCell>
-                          <TableCell className="text-xs">{order.ticketNumber || "-"}</TableCell>
-                          <TableCell className="text-xs">{order.serviceNumber || "-"}</TableCell>
-                          <TableCell>
-                            <div>{order.customerName}</div>
+                          <TableCell className="font-medium text-xs">
+                            <div className="truncate" title={order.orderNumber}>{order.orderNumber}</div>
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            <div className="truncate" title={order.ticketNumber || "-"}>{order.ticketNumber || "-"}</div>
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            <div className="truncate" title={order.serviceNumber || "-"}>{order.serviceNumber || "-"}</div>
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            <div className="truncate font-medium" title={order.customerName}>{order.customerName}</div>
                             {order.customerPhone && (
-                              <div className="text-xs text-muted-foreground">{order.customerPhone}</div>
+                              <div className="text-xs text-muted-foreground truncate" title={order.customerPhone}>{order.customerPhone}</div>
                             )}
                           </TableCell>
-                          <TableCell>
-                            <div className="text-xs">{order.serviceType || "-"}</div>
+                          <TableCell className="text-xs">
+                            <div className="truncate" title={order.serviceType || "-"}>{order.serviceType || "-"}</div>
                             {order.salesModiType && (
-                              <div className="text-xs text-muted-foreground">{order.salesModiType}</div>
+                              <div className="text-xs text-muted-foreground truncate" title={order.salesModiType}>{order.salesModiType}</div>
                             )}
                           </TableCell>
                           <TableCell>
