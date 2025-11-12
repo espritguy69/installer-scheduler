@@ -29,7 +29,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 
-const TIME_SLOTS = ["09:00 AM", "10:00 AM", "11:00 AM", "11:30 AM", "01:00 PM", "02:30 PM", "03:00 PM", "04:00 PM", "06:00 PM"];
+const TIME_SLOTS = ["9:00 AM", "10:00 AM", "11:00 AM", "11:30 AM", "1:00 PM", "2:30 PM", "3:00 PM", "4:00 PM", "6:00 PM"];
 
 interface Order {
   id: number;

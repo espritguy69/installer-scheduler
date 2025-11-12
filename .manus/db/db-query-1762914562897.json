@@ -1,0 +1,30 @@
+{
+  "query": "SELECT orderNumber, appointmentTime FROM orders WHERE appointmentTime LIKE '9:%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT orderNumber, appointmentTime FROM orders WHERE appointmentTime LIKE '9:%' LIMIT 5;",
+  "rows": [
+    {
+      "orderNumber": "AWO437076",
+      "appointmentTime": "9:00 AM"
+    },
+    {
+      "orderNumber": "AWO437309",
+      "appointmentTime": "9:00 AM"
+    },
+    {
+      "orderNumber": "AWO436837",
+      "appointmentTime": "9:00 AM"
+    },
+    {
+      "orderNumber": "AWO437248",
+      "appointmentTime": "9:00 AM"
+    },
+    {
+      "orderNumber": "AWO436732",
+      "appointmentTime": "9:00 AM"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNumber\tappointmentTime\nAWO437076\t9:00 AM\nAWO437309\t9:00 AM\nAWO436837\t9:00 AM\nAWO437248\t9:00 AM\nAWO436732\t9:00 AM\n",
+  "stderr": "",
+  "execution_time_ms": 124
+}
