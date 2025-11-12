@@ -14,6 +14,7 @@ import Installers from "./pages/Installers";
 import Dashboard from "./pages/Dashboard";
 import Notes from "./pages/Notes";
 import AssignmentHistory from "./pages/AssignmentHistory";
+import Settings from "./pages/Settings";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -28,6 +29,7 @@ function Router() {
       <Route path={"/installers"} component={Installers} />      <Route path={"/schedule"} component={Schedule} />
       <Route path={"/notes"} component={Notes} />
       <Route path={"/history"} component={AssignmentHistory} />
+      <Route path={"/settings"} component={Settings} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

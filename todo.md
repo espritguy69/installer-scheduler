@@ -908,3 +908,17 @@
 - [x] Verify time parsing and matching logic
 - [x] Fix time slot display to include 9:00 AM orders
 - [x] Test with actual 9:00 AM orders from database
+
+## Admin Time Slot Customization
+- [x] Create timeSlots database table with fields (id, time, sortOrder, isActive)
+- [x] Implement backend tRPC procedures (getTimeSlots, createTimeSlot, updateTimeSlot, deleteTimeSlot, reorderTimeSlots)
+- [x] Create Settings page component with admin-only access
+- [x] Add time slot list display with current slots
+- [x] Implement add new time slot functionality with time picker
+- [x] Implement delete time slot functionality with confirmation
+- [x] Implement drag-and-drop reordering for time slots
+- [x] Add toggle to enable/disable time slots without deleting
+- [x] Update ScheduleV4 to fetch time slots from database instead of hardcoded array
+- [x] Add default time slots seeding on first run
+- [x] Test time slot CRUD operations
+- [x] Test schedule view updates when time slots change

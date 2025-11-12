@@ -1,6 +1,6 @@
 import { and, eq, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { assignmentHistory, assignments, InsertAssignment, InsertAssignmentHistory, InsertInstaller, InsertNote, InsertOrder, InsertOrderHistory, installers, InsertUser, notes, orderHistory, orders, users } from "../drizzle/schema";
+import { assignmentHistory, assignments, InsertAssignment, InsertAssignmentHistory, InsertInstaller, InsertNote, InsertOrder, InsertOrderHistory, installers, InsertTimeSlot, InsertUser, notes, orderHistory, orders, timeSlots, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -430,3 +430,79 @@ export async function getAssignmentHistory(filters?: {
   return await query.orderBy(assignmentHistory.createdAt);
 }
 
+
+// ==================== TIME SLOTS ====================
+
+export async function getAllTimeSlots() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(timeSlots).orderBy(timeSlots.sortOrder);
+}
+
+export async function getActiveTimeSlots() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(timeSlots).where(eq(timeSlots.isActive, 1)).orderBy(timeSlots.sortOrder);
+}
+
+export async function createTimeSlot(timeSlot: InsertTimeSlot) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(timeSlots).values(timeSlot);
+  return result;
+}
+
+export async function updateTimeSlot(id: number, updates: Partial<InsertTimeSlot>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(timeSlots).set(updates).where(eq(timeSlots.id, id));
+}
+
+export async function deleteTimeSlot(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(timeSlots).where(eq(timeSlots.id, id));
+}
+
+export async function reorderTimeSlots(timeSlotIds: number[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Update sortOrder for each time slot based on array index
+  for (let i = 0; i < timeSlotIds.length; i++) {
+    await db.update(timeSlots).set({ sortOrder: i }).where(eq(timeSlots.id, timeSlotIds[i]));
+  }
+}
+
+export async function seedDefaultTimeSlots() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if time slots already exist
+  const existing = await db.select().from(timeSlots).limit(1);
+  if (existing.length > 0) {
+    return; // Already seeded
+  }
+  
+  // Insert default time slots
+  const defaultSlots = [
+    { time: "9:00 AM", sortOrder: 0, isActive: 1 },
+    { time: "10:00 AM", sortOrder: 1, isActive: 1 },
+    { time: "11:00 AM", sortOrder: 2, isActive: 1 },
+    { time: "11:30 AM", sortOrder: 3, isActive: 1 },
+    { time: "1:00 PM", sortOrder: 4, isActive: 1 },
+    { time: "2:30 PM", sortOrder: 5, isActive: 1 },
+    { time: "3:00 PM", sortOrder: 6, isActive: 1 },
+    { time: "4:00 PM", sortOrder: 7, isActive: 1 },
+    { time: "6:00 PM", sortOrder: 8, isActive: 1 },
+  ];
+  
+  for (const slot of defaultSlots) {
+    await db.insert(timeSlots).values(slot);
+  }
+}

@@ -510,6 +510,48 @@ export const appRouter = router({
       return { success: true };
     }),
   }),
+
+  timeSlots: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllTimeSlots();
+    }),
+    listActive: protectedProcedure.query(async () => {
+      return await db.getActiveTimeSlots();
+    }),
+    create: protectedProcedure.input(z.object({
+      time: z.string(),
+      sortOrder: z.number(),
+      isActive: z.number().default(1),
+    })).mutation(async ({ input }) => {
+      return await db.createTimeSlot(input);
+    }),
+    update: protectedProcedure.input(z.object({
+      id: z.number(),
+      time: z.string().optional(),
+      sortOrder: z.number().optional(),
+      isActive: z.number().optional(),
+    })).mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db.updateTimeSlot(id, data);
+      return { success: true };
+    }),
+    delete: protectedProcedure.input(z.object({
+      id: z.number(),
+    })).mutation(async ({ input }) => {
+      await db.deleteTimeSlot(input.id);
+      return { success: true };
+    }),
+    reorder: protectedProcedure.input(z.object({
+      timeSlotIds: z.array(z.number()),
+    })).mutation(async ({ input }) => {
+      await db.reorderTimeSlots(input.timeSlotIds);
+      return { success: true };
+    }),
+    seedDefaults: protectedProcedure.mutation(async () => {
+      await db.seedDefaultTimeSlots();
+      return { success: true };
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

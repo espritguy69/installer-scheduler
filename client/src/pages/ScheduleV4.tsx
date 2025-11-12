@@ -29,7 +29,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 
-const TIME_SLOTS = ["9:00 AM", "10:00 AM", "11:00 AM", "11:30 AM", "1:00 PM", "2:30 PM", "3:00 PM", "4:00 PM", "6:00 PM"];
+// TIME_SLOTS are now fetched dynamically from database
 
 interface Order {
   id: number;
@@ -306,6 +306,10 @@ export default function ScheduleV4() {
   const { data: orders = [], refetch: refetchOrders } = trpc.orders.list.useQuery();
   const { data: installers = [] } = trpc.installers.list.useQuery();
   const { data: assignments = [], refetch: refetchAssignments } = trpc.assignments.list.useQuery();
+  const { data: timeSlotsData = [] } = trpc.timeSlots.listActive.useQuery();
+  
+  // Convert time slots data to array of time strings
+  const TIME_SLOTS = timeSlotsData.map((slot: any) => slot.time);
   const updateOrderMutation = trpc.orders.update.useMutation();
   const createAssignmentMutation = trpc.assignments.create.useMutation();
   const deleteAssignmentMutation = trpc.assignments.delete.useMutation();

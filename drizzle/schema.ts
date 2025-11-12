@@ -162,3 +162,18 @@ export const assignmentHistory = mysqlTable("assignmentHistory", {
 
 export type AssignmentHistory = typeof assignmentHistory.$inferSelect;
 export type InsertAssignmentHistory = typeof assignmentHistory.$inferInsert;
+
+/**
+ * Time slots configuration table - stores customizable time slots for schedule view
+ */
+export const timeSlots = mysqlTable("timeSlots", {
+  id: int("id").autoincrement().primaryKey(),
+  time: varchar("time", { length: 20 }).notNull().unique(), // e.g., "9:00 AM", "2:30 PM"
+  sortOrder: int("sortOrder").notNull(), // Determines display order
+  isActive: int("isActive").default(1).notNull(), // 1 = active, 0 = disabled
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TimeSlot = typeof timeSlots.$inferSelect;
+export type InsertTimeSlot = typeof timeSlots.$inferInsert;
