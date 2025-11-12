@@ -223,38 +223,52 @@ export default function InstallerView() {
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-lg">{item.orderNumber}</CardTitle>
+                          <CardTitle className="text-lg">{item.serviceNumber || 'N/A'}</CardTitle>
                           <CardDescription className="mt-1">
-                            {item.serviceType} {item.salesModiType && `- ${item.salesModiType}`}
+                            {item.customerName}
                           </CardDescription>
                         </div>
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(item.status)}`}>
-                          {item.status.replace("_", " ")}
-                        </span>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="flex items-start gap-2">
-                          <User className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
-                          <div className="text-sm">
-                            <div className="font-medium">{item.customerName}</div>
-                            {item.customerPhone && (
-                              <div className="text-muted-foreground flex items-center gap-1 mt-1">
-                                <Phone className="h-3 w-3" />
-                                {item.customerPhone}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-2">
                           <Clock className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
                           <div className="text-sm">
                             <div className="font-medium">
-                              {item.assignment.scheduledStartTime} - {item.assignment.scheduledEndTime}
+                              {item.assignment.scheduledStartTime}
                             </div>
-                            <div className="text-muted-foreground">{item.estimatedDuration} minutes</div>
+                            <div className="text-muted-foreground">{new Date(item.assignment.scheduledDate).toLocaleDateString()}</div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                          <div className="text-sm">
+                            <div className="font-medium">Status</div>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(item.status)}`}>
+                              {item.status.replace("_", " ")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {item.customerPhone && (
+                          <div className="flex items-start gap-2">
+                            <Phone className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                            <div className="text-sm">
+                              <div className="font-medium">Phone</div>
+                              <div className="text-muted-foreground">{item.customerPhone}</div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-start gap-2">
+                          <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                          <div className="text-sm">
+                            <div className="font-medium">WO No.</div>
+                            <div className="text-muted-foreground">{item.orderNumber || 'N/A'}</div>
                           </div>
                         </div>
                       </div>

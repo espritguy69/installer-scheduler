@@ -707,3 +707,39 @@
 - [x] Update Navigation component to reorder menu items
 - [x] New order: Home, Dashboard, Performance, Orders, Schedule, Notes, History, Installers, Upload
 - [x] Test navigation bar displays in correct order
+
+## Navigation Enhancements (USER REQUESTED)
+
+### Breadcrumb Navigation
+- [ ] Create Breadcrumb component with dynamic path generation
+- [ ] Add breadcrumb display below main navigation bar
+- [ ] Implement clickable breadcrumb links for parent pages
+- [ ] Style breadcrumbs with separators and hover effects
+
+### Mobile Navigation Menu
+- [ ] Add hamburger menu icon for mobile devices
+- [ ] Implement collapsible sidebar/dropdown for mobile nav
+- [ ] Add responsive breakpoints to show/hide mobile menu
+- [ ] Ensure smooth animations for menu open/close
+- [ ] Test navigation on mobile viewport sizes
+
+### Keyboard Shortcuts
+- [ ] Create useKeyboardShortcuts hook
+- [ ] Implement Alt+1 through Alt+9 for navigation pages
+- [ ] Add keyboard shortcut indicators in UI (optional tooltip)
+- [ ] Test keyboard shortcuts across all pages
+- [ ] Document shortcuts for users
+
+## Installer View Card Layout Reorganization (USER REQUESTED)
+- [ ] Move Service No. to primary display position (top of card)
+- [ ] Move WO No. from primary to additional details section
+- [ ] Move Status from additional details to main details section
+- [ ] Update card layout for better visual hierarchy
+- [ ] Test installer view with new layout
+
+## Installer View Card Layout Reorganization - COMPLETED
+- [x] Move Service No. to primary display position (top of card)
+- [x] Move WO No. from primary to additional details section
+- [x] Move Status from additional details to main details section
+- [x] Update card layout for better visual hierarchy
+- [x] Test installer view with new layout (code verified)
