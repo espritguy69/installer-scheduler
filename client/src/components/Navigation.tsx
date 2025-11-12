@@ -16,7 +16,6 @@ export function Navigation() {
     { href: "/schedule", label: "Schedule", icon: Calendar },
     { href: "/notes", label: "Notes", icon: StickyNote },
     { href: "/history", label: "History", icon: History },
-    { href: "/installers", label: "Installers", icon: Users },
     { href: "/upload", label: "Upload", icon: Upload },
     { href: "/settings", label: "Settings", icon: Settings },
   ];

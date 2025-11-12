@@ -931,3 +931,12 @@
 - [x] Test with AWO orders in different statuses (assigned, on_the_way, met_customer, completed)
 - [x] Test with no-WO orders in different statuses
 - [x] Test with regular WO orders to ensure they maintain original colors
+
+## Consolidate Settings into Tabbed Interface
+- [x] Update Settings page to use Tabs component from shadcn/ui
+- [x] Create "Time Slots" tab with existing time slot management UI
+- [x] Create "Installers" tab by moving Installers page content
+- [x] Remove Installers navigation link from main menu
+- [x] Update route structure if needed
+- [x] Test both tabs functionality (time slots CRUD and installers CRUD)
+- [x] Ensure admin-only access for both tabs
