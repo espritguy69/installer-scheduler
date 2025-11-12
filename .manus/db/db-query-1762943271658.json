@@ -1,0 +1,59 @@
+{
+  "query": "SELECT id, orderNumber, appointmentDate, appointmentTime, status FROM orders WHERE appointmentTime LIKE '%2:30%' AND (appointmentDate LIKE '%Nov 13%' OR appointmentDate LIKE '%11/13%' OR appointmentDate LIKE '%13/11%');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, orderNumber, appointmentDate, appointmentTime, status FROM orders WHERE appointmentTime LIKE '%2:30%' AND (appointmentDate LIKE '%Nov 13%' OR appointmentDate LIKE '%11/13%' OR appointmentDate LIKE '%13/11%');",
+  "rows": [
+    {
+      "id": "390004",
+      "orderNumber": "A1796516",
+      "appointmentDate": "Nov 13, 2025",
+      "appointmentTime": "02:30 PM",
+      "status": "pending"
+    },
+    {
+      "id": "390008",
+      "orderNumber": "A1796328",
+      "appointmentDate": "Nov 13, 2025",
+      "appointmentTime": "02:30 PM",
+      "status": "pending"
+    },
+    {
+      "id": "390009",
+      "orderNumber": "M1795173",
+      "appointmentDate": "Nov 13, 2025",
+      "appointmentTime": "02:30 PM",
+      "status": "pending"
+    },
+    {
+      "id": "390014",
+      "orderNumber": "A1797227",
+      "appointmentDate": "Nov 13, 2025",
+      "appointmentTime": "02:30 PM",
+      "status": "pending"
+    },
+    {
+      "id": "390015",
+      "orderNumber": "A1797224",
+      "appointmentDate": "Nov 13, 2025",
+      "appointmentTime": "02:30 PM",
+      "status": "pending"
+    },
+    {
+      "id": "390016",
+      "orderNumber": "A1797222",
+      "appointmentDate": "Nov 13, 2025",
+      "appointmentTime": "02:30 PM",
+      "status": "pending"
+    },
+    {
+      "id": "390017",
+      "orderNumber": "A1797217",
+      "appointmentDate": "Nov 13, 2025",
+      "appointmentTime": "02:30 PM",
+      "status": "pending"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\tappointmentDate\tappointmentTime\tstatus\n390004\tA1796516\tNov 13, 2025\t02:30 PM\tpending\n390008\tA1796328\tNov 13, 2025\t02:30 PM\tpending\n390009\tM1795173\tNov 13, 2025\t02:30 PM\tpending\n390014\tA1797227\tNov 13, 2025\t02:30 PM\tpending\n390015\tA1797224\tNov 13, 2025\t02:30 PM\tpending\n390016\tA1797222\tNov 13, 2025\t02:30 PM\tpending\n390017\tA1797217\tNov 13, 2025\t02:30 PM\tpending\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

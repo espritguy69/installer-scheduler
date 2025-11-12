@@ -436,7 +436,15 @@ export default function ScheduleV4() {
 
   ordersForDate.forEach((order) => {
     if (order.appointmentTime) {
-      const timeSlot = TIME_SLOTS.find((slot) => order.appointmentTime?.startsWith(slot));
+      // Normalize time format by removing leading zeros for matching
+      // e.g., "02:30 PM" becomes "2:30 PM"
+      const normalizedOrderTime = order.appointmentTime.replace(/^0(\d)/, '$1');
+      
+      const timeSlot = TIME_SLOTS.find((slot) => {
+        const normalizedSlot = slot.replace(/^0(\d)/, '$1');
+        return normalizedOrderTime.startsWith(normalizedSlot);
+      });
+      
       if (timeSlot) {
         ordersByTimeSlot[timeSlot].push(order);
       }

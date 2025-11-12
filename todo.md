@@ -1059,3 +1059,17 @@
 - [x] Add InstallerView route for user role (/installer - My Tasks)
 - [x] Test user management interface (list, add, edit, delete users)
 - [x] Verify role-based navigation (Admin sees all, Supervisor sees all except Settings, User sees Home + My Tasks)
+
+## Schedule Synchronization Issue - November 13th
+- [ ] Investigate why 2:30 PM orders on November 13th are not showing in Schedule view
+- [ ] Verify orders exist in database and are visible in Orders page
+- [ ] Check Schedule page time slot filtering logic
+- [ ] Fix synchronization between Orders and Schedule views
+- [ ] Test with November 13th data (7 AWO + 18 non-AWO = 25 total orders)
+
+## Schedule Synchronization Issue - 2:30 PM Orders Not Showing
+- [x] Investigate why 2:30 PM orders visible in Orders page don't appear in Schedule view
+- [x] Check if 2:30 PM time slot exists and is active in database
+- [x] Identify time format mismatch between orders and time slots (found "2:30 PM" vs "02:30 PM")
+- [x] Fix time slot matching logic to handle both "2:30 PM" and "02:30 PM" formats
+- [x] Test fix with November 12th data - 2:30 PM orders now visible in Schedule view
