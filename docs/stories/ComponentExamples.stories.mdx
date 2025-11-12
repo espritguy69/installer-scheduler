@@ -1,0 +1,144 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Components/Overview" />
+
+# Component Examples
+
+This section contains comprehensive examples of the key components in the Service Installer Scheduler application.
+
+## Component Documentation
+
+All component examples are located in `docs/examples/` and demonstrate best practices for:
+
+- **API Integration**: Using tRPC hooks for data fetching and mutations
+- **State Management**: Handling loading, error, and success states
+- **User Interactions**: Forms, drag-and-drop, filtering, and sorting
+- **Optimistic Updates**: Instant UI feedback with rollback on errors
+- **Type Safety**: Full TypeScript coverage
+
+## Available Examples
+
+### 1. OrdersListExample.tsx
+
+A comprehensive orders table component demonstrating:
+- tRPC query usage for fetching data
+- Client-side filtering (search + status filter)
+- Table sorting with direction toggle
+- Excel export functionality
+- Optimistic updates for status changes
+- Responsive design with shadcn/ui components
+
+**Key Features:**
+- Search across multiple fields (order number, customer name, service number)
+- Status filter dropdown
+- Sortable columns
+- Export filtered/sorted data to Excel
+- Color-coded status badges
+
+### 2. InstallerScheduleViewExample.tsx
+
+A drag-and-drop scheduling interface showing:
+- Multiple tRPC queries (orders, installers, assignments, time slots)
+- Native HTML5 drag-and-drop for installer assignment
+- Date navigation with calendar picker
+- Time slot organization
+- Color-coded order cards (AWO=Cyan, No-WO=Pink, Regular=Blue)
+- Real-time installer availability tracking
+
+**Key Features:**
+- Drag installer badges onto order cards to assign
+- Visual feedback during drag operations
+- Automatic workload calculation
+- Date range navigation
+- Unassigned orders queue
+
+### 3. OrderDetailExample.tsx
+
+A view/edit form for individual orders featuring:
+- Dynamic routing with wouter (`/orders/:id`)
+- Form state management with change tracking
+- Client-side input validation
+- Tabbed interface (Details + History)
+- Conditional fields (reschedule fields when status="rescheduled")
+- Visual history timeline
+
+**Key Features:**
+- Edit mode with unsaved changes warning
+- Status-dependent field visibility
+- Order history audit log
+- Form validation with error messages
+- Optimistic updates with rollback
+
+### 4. TimeSlotSettingsExample.tsx
+
+An admin interface for time slot management with:
+- Drag-and-drop reordering using @dnd-kit
+- Full CRUD operations
+- Toggle active/inactive status
+- Time format validation
+- Duplicate checking
+- Confirmation dialogs for destructive actions
+
+**Key Features:**
+- Reorder time slots by dragging
+- Add new time slots with validation
+- Toggle active/inactive without deleting
+- Delete with confirmation
+- Seed default time slots
+
+## Usage
+
+To use these examples in your application:
+
+```bash
+# Copy the component you need
+cp docs/examples/OrdersListExample.tsx client/src/pages/OrdersList.tsx
+
+# Add route in App.tsx
+<Route path="/orders" component={OrdersList} />
+
+# Add navigation link
+{ href: "/orders", label: "Orders", icon: FileText }
+```
+
+## Testing
+
+Each component example includes:
+- Comprehensive inline comments
+- Type definitions for all data structures
+- Error handling patterns
+- Loading states with spinners
+- Empty states with helpful messages
+- Accessibility considerations
+
+## Related Documentation
+
+- [API Documentation](../API.md) - Complete tRPC API reference
+- [Examples README](../examples/README.md) - Detailed usage guide
+- [Project README](../../README.md) - Setup and installation
+
+## Best Practices
+
+When building new components, follow these patterns:
+
+1. **Use tRPC hooks** - Never introduce Axios/fetch wrappers
+2. **Optimistic updates** - For instant feedback on list operations
+3. **Type safety** - Leverage TypeScript and tRPC's generated types
+4. **Consistent UI** - Use shadcn/ui components for uniformity
+5. **Error handling** - Always handle loading, error, and empty states
+6. **Accessibility** - Ensure keyboard navigation and screen reader support
+
+## Contributing
+
+When adding new component examples:
+
+1. Create the component in `docs/examples/`
+2. Add comprehensive inline comments
+3. Include all states (loading, error, empty, success)
+4. Write usage documentation in `docs/examples/README.md`
+5. Add a story file in `docs/stories/` if needed
+6. Test with realistic mock data
+
+---
+
+For questions or issues, please refer to the project README or API documentation.

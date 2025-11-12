@@ -1,0 +1,55 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Introduction/Getting Started" />
+
+# Service Installer Scheduler - Storybook
+
+Welcome to the Storybook documentation for the Service Installer Scheduler application!
+
+## What is this?
+
+This Storybook contains interactive component examples demonstrating the key UI patterns and components used in the application. Each story showcases different states and interactions of the components.
+
+## Available Stories
+
+### 1. Orders List Example
+Demonstrates the orders table with filtering, sorting, and Excel export functionality.
+
+### 2. Installer Schedule View
+Shows the drag-and-drop scheduling interface with time slots and installer assignments.
+
+### 3. Order Detail Form
+Displays the view/edit form for individual orders with validation and history tracking.
+
+### 4. Time Slot Settings
+Demonstrates the admin interface for managing customizable time slots with drag-and-drop reordering.
+
+## Running Storybook
+
+```bash
+# Start Storybook development server
+pnpm storybook
+
+# Build static Storybook
+pnpm build-storybook
+```
+
+## Component Architecture
+
+All components follow these principles:
+
+- **tRPC Integration**: Components use `trpc.*` hooks for data fetching and mutations
+- **Optimistic Updates**: Instant UI feedback with automatic rollback on errors
+- **Type Safety**: Full TypeScript coverage with generated types from tRPC procedures
+- **Responsive Design**: Mobile-first approach using Tailwind CSS
+- **Accessibility**: Keyboard navigation and ARIA labels throughout
+
+## Mock Data
+
+Stories use realistic mock data from `docs/stories/mocks/mockData.ts`. This allows testing components in isolation without requiring a live backend.
+
+## Learn More
+
+- [API Documentation](../API.md)
+- [Component Examples](../examples/README.md)
+- [Project README](../../README.md)
