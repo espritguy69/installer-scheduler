@@ -32,9 +32,11 @@ export default function Installers() {
   const [selectedInstaller, setSelectedInstaller] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: installers = [], isLoading } = trpc.installers.list.useQuery();
+  const createInstaller = trpc.installers.create.useMutation();
   const updateInstaller = trpc.installers.update.useMutation();
   const deleteInstaller = trpc.installers.delete.useMutation();
   const utils = trpc.useUtils();
@@ -53,6 +55,17 @@ export default function Installers() {
     installer.phone?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleCreate = () => {
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      skills: "",
+      isActive: 1,
+    });
+    setIsCreateDialogOpen(true);
+  };
+
   const handleEdit = (installer: any) => {
     setSelectedInstaller(installer);
     setFormData({
@@ -68,6 +81,30 @@ export default function Installers() {
   const handleDelete = (installer: any) => {
     setSelectedInstaller(installer);
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleCreateInstaller = async () => {
+    if (!formData.name.trim()) {
+      toast.error("Installer name is required");
+      return;
+    }
+
+    try {
+      await createInstaller.mutateAsync(formData);
+      await utils.installers.list.invalidate();
+      toast.success("Installer created successfully");
+      setIsCreateDialogOpen(false);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        skills: "",
+        isActive: 1,
+      });
+    } catch (error) {
+      console.error("Error creating installer:", error);
+      toast.error("Failed to create installer");
+    }
   };
 
   const handleUpdateInstaller = async () => {
@@ -140,12 +177,16 @@ export default function Installers() {
                   Total: {installers.length} installers ({installers.filter(i => i.isActive).length} active)
                 </CardDescription>
               </div>
-              <div className="w-64">
+              <div className="flex gap-2">
                 <Input
                   placeholder="Search installers..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-64"
                 />
+                <Button onClick={handleCreate}>
+                  Add Installer
+                </Button>
               </div>
             </div>
           </CardHeader>
@@ -216,6 +257,77 @@ export default function Installers() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Create Installer Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Installer</DialogTitle>
+            <DialogDescription>
+              Create a new installer profile
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="create-name">Name *</Label>
+              <Input
+                id="create-name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Installer name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="create-email">Email</Label>
+              <Input
+                id="create-email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="email@example.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="create-phone">Phone</Label>
+              <Input
+                id="create-phone"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="Phone number"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="create-skills">Skills</Label>
+              <Input
+                id="create-skills"
+                value={formData.skills}
+                onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                placeholder="Comma-separated skills"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="create-isActive">Status</Label>
+              <select
+                id="create-isActive"
+                value={formData.isActive}
+                onChange={(e) => setFormData({ ...formData, isActive: Number(e.target.value) })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value={1}>Active</option>
+                <option value={0}>Inactive</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateInstaller} disabled={!formData.name.trim()}>
+              Create Installer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

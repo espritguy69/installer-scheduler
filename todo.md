@@ -743,3 +743,34 @@
 - [x] Move Status from additional details to main details section
 - [x] Update card layout for better visual hierarchy
 - [x] Test installer view with new layout (code verified)
+
+## CRUD Operations for Installers List (USER REQUESTED)
+
+### Create Installer
+- [ ] Add "Add Installer" button to Installers page
+- [ ] Create form dialog with all installer fields
+- [ ] Implement backend create procedure
+- [ ] Add form validation
+- [ ] Test installer creation
+
+### Read Installers
+- [ ] Display installers list in table format
+- [ ] Show all installer details (name, email, phone, status, etc.)
+- [ ] Implement search/filter functionality
+
+### Update Installer
+- [ ] Add Edit button for each installer
+- [ ] Create edit dialog with pre-filled form
+- [ ] Implement backend update procedure
+- [ ] Test installer updates
+
+### Delete Installer
+- [ ] Add Delete button for each installer
+- [ ] Implement confirmation dialog
+- [ ] Implement backend delete procedure
+- [ ] Test installer deletion
+
+- [x] Implement Create installer functionality with Add Installer button and form dialog
+- [x] Verify Update installer functionality works with edit dialog
+- [x] Verify Delete installer functionality works with confirmation dialog
+- [x] Test all CRUD operations (Create, Read, Update, Delete)
