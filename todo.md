@@ -966,3 +966,20 @@
 - [x] Show confirmation dialog before marking order as Completed
 - [x] Allow user to confirm or cancel the status change
 - [x] Test confirmation dialog with various orders
+
+## Debug AWO436913 and AWO436400 Color Issue
+- [ ] Navigate to Schedule page and inspect these specific orders
+- [ ] Check database for WO numbers and status of these orders
+- [ ] Verify WO number format matches AWO pattern
+- [ ] Check if status is non-pending
+- [ ] Identify why getStatusColor is not returning Light Steel Blue
+- [ ] Fix the color logic issue
+- [ ] Test with these specific orders to verify color change
+
+## Debug AWO436913 and AWO436400 Color Display Issue
+- [x] Navigate to Schedule page and inspect the problematic orders
+- [x] Check database for WO numbers and status of these orders
+- [x] Identify why getStatusColor is not applying to card backgrounds
+- [x] Fix card background to use getStatusColor instead of assignment-based colors
+- [x] Test with AWO436913 and AWO436400 to verify Light Steel Blue background
+- [x] Verify all other AWO orders still display correctly

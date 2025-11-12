@@ -174,16 +174,15 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
 
   const isAssigned = !!assignedInstaller;
 
+  // Get the background color based on status and WO type
+  const cardBgColor = getStatusColor(order.status);
+
   return (
     <div
       ref={drop as any}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`p-3 rounded-lg border-2 transition-all relative ${
-        isAssigned
-          ? "bg-green-50 border-green-500"
-          : "bg-gray-50 border-dashed border-gray-300"
-      } ${isOver ? "ring-2 ring-primary ring-offset-2" : ""} ${isHovered ? "shadow-lg scale-105 z-10" : ""}`}
+      className={`p-3 rounded-lg border-2 transition-all relative ${cardBgColor} ${isOver ? "ring-2 ring-primary ring-offset-2" : ""} ${isHovered ? "shadow-lg scale-105 z-10" : ""}`}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex items-center gap-2 flex-1 min-w-0">
