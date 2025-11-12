@@ -186,9 +186,11 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
           <div className="font-semibold text-xs truncate" title={order.serviceNumber || 'N/A'}>
             SN: {order.serviceNumber || 'N/A'}
           </div>
-          <div className="text-xs text-muted-foreground truncate" title={order.orderNumber || 'N/A'}>
-            WO: {order.orderNumber || 'N/A'}
-          </div>
+          {order.orderNumber && order.orderNumber.trim() !== '' && (
+            <div className="text-xs text-muted-foreground truncate" title={order.orderNumber}>
+              WO: {order.orderNumber}
+            </div>
+          )}
         </div>
         {isAssigned && (
           <Button

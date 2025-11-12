@@ -63,7 +63,7 @@ export default function Orders() {
 
     // Prepare data for export
     const exportData = currentOrders.map((order: any) => ({
-      "WO No.": order.orderNumber || "-",
+      "WO No.": order.orderNumber || (order.serviceNumber ? `SN: ${order.serviceNumber}` : "-"),
       "Ticket No.": order.ticketNumber || "-",
       "Service No.": order.serviceNumber || "-",
       "Customer": order.customerName || "-",
@@ -708,7 +708,14 @@ export default function Orders() {
                       return (
                         <TableRow key={order.id}>
                           <TableCell className="font-medium text-xs">
-                            <div className="truncate" title={order.orderNumber || "-"}>{order.orderNumber || "-"}</div>
+                            {order.orderNumber ? (
+                              <div className="truncate" title={order.orderNumber}>{order.orderNumber}</div>
+                            ) : (
+                              <div className="flex items-center gap-1">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-700">SN</span>
+                                <span className="truncate font-semibold text-blue-600" title={order.serviceNumber || "-"}>{order.serviceNumber || "-"}</span>
+                              </div>
+                            )}
                           </TableCell>
                           <TableCell className="text-xs">
                             <div className="truncate" title={order.ticketNumber || "-"}>{order.ticketNumber || "-"}</div>

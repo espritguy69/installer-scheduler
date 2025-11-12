@@ -1129,3 +1129,18 @@
 - [x] Highlighted Service No. in blue as the most important field
 - [x] Set max height to 500px for better UX
 - [x] All important fields now visible in preview (Order No., Service No., Customer, App Date, App Time, Building, Status)
+
+## Orders Page - Service No. as Primary Identifier
+- [ ] Investigate Orders.tsx table structure for WO No. column
+- [ ] Update WO No. column to display Service No. when orderNumber is null/empty
+- [ ] Add visual indicator (badge/label) to distinguish Service No. from WO No.
+- [ ] Ensure sorting and filtering work correctly with the updated display
+- [ ] Test with mixed data (orders with and without WO numbers)
+
+## Orders Page - Service No. as Primary Identifier (COMPLETED)
+- [x] Investigated Orders.tsx table structure for WO No. column
+- [x] Updated WO No. column to display Service No. with "SN" badge when orderNumber is null/empty
+- [x] Added visual indicator (blue badge + bold blue text) to distinguish Service No. from WO No.
+- [x] Updated Excel export to show "SN: [Service Number]" in WO No. column when orderNumber is missing
+- [x] Updated Schedule page cards to hide "WO:" label when orderNumber is missing
+- [x] Ensured consistent Service No. display across Orders page, Schedule page, and Excel exports
