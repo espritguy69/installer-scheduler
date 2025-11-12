@@ -339,6 +339,17 @@ export default function ScheduleV4() {
     currentTime: "",
   });
   const [newTime, setNewTime] = useState("");
+  const [completionConfirmDialog, setCompletionConfirmDialog] = useState<{
+    open: boolean;
+    orderId: number | null;
+    orderNumber: string;
+    customerName: string;
+  }>({
+    open: false,
+    orderId: null,
+    orderNumber: "",
+    customerName: "",
+  });
 
   const { data: orders = [], refetch: refetchOrders } = trpc.orders.list.useQuery();
   const { data: installers = [] } = trpc.installers.list.useQuery();
@@ -588,6 +599,21 @@ export default function ScheduleV4() {
   };
 
   const handleStatusChange = async (orderId: number, newStatus: string) => {
+    // If changing to completed, show confirmation dialog first
+    if (newStatus === 'completed') {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        setCompletionConfirmDialog({
+          open: true,
+          orderId,
+          orderNumber: order.orderNumber || 'N/A',
+          customerName: order.customerName || 'Unknown Customer',
+        });
+      }
+      return; // Don't proceed with status change yet
+    }
+
+    // For other statuses, proceed normally
     try {
       // Optimistic update
       await utils.orders.list.cancel();
@@ -611,6 +637,42 @@ export default function ScheduleV4() {
       toast.error("Failed to update status");
       // Rollback on error
       await refetchOrders();
+    }
+  };
+
+  const handleConfirmCompletion = async () => {
+    const { orderId } = completionConfirmDialog;
+    if (!orderId) return;
+
+    try {
+      // Optimistic update
+      await utils.orders.list.cancel();
+      const previousOrders = utils.orders.list.getData();
+      
+      utils.orders.list.setData(undefined, (old) => 
+        old?.map((order) => 
+          order.id === orderId ? { ...order, status: 'completed' as typeof order.status } : order
+        )
+      );
+
+      await updateOrderMutation.mutateAsync({
+        id: orderId,
+        status: "completed",
+      });
+
+      toast.success("Order marked as completed");
+      await refetchOrders();
+    } catch (error) {
+      toast.error("Failed to mark order as completed");
+      await refetchOrders();
+    } finally {
+      // Close dialog
+      setCompletionConfirmDialog({
+        open: false,
+        orderId: null,
+        orderNumber: "",
+        customerName: "",
+      });
     }
   };
 
@@ -856,6 +918,62 @@ export default function ScheduleV4() {
                 Cancel
               </Button>
               <Button onClick={handleTimeChangeSubmit}>Update Time</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Completion Confirmation Dialog */}
+        <Dialog
+          open={completionConfirmDialog.open}
+          onOpenChange={(open) =>
+            !open &&
+            setCompletionConfirmDialog({
+              open: false,
+              orderId: null,
+              orderNumber: "",
+              customerName: "",
+            })
+          }
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Order Completion</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to mark this order as completed?
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2 py-4">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">Order Number:</span>
+                <span>{completionConfirmDialog.orderNumber}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">Customer:</span>
+                <span>{completionConfirmDialog.customerName}</span>
+              </div>
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ This action will mark the order as completed. Make sure all work has been finished and documented.
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setCompletionConfirmDialog({
+                    open: false,
+                    orderId: null,
+                    orderNumber: "",
+                    customerName: "",
+                  })
+                }
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmCompletion}>
+                Confirm Completion
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

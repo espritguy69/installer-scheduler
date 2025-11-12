@@ -958,3 +958,11 @@
 - [x] Keep all pending orders gray regardless of WO type
 - [x] Test with actual AWO orders in schedule view
 - [x] Verify color consistency across all status changes
+
+## Add Completion Confirmation Dialog
+- [x] Add state management for confirmation dialog in ScheduleV4
+- [x] Create confirmation dialog component with order details
+- [x] Update status change handler to intercept Completed status changes
+- [x] Show confirmation dialog before marking order as Completed
+- [x] Allow user to confirm or cancel the status change
+- [x] Test confirmation dialog with various orders
