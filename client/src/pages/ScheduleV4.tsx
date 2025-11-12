@@ -111,34 +111,13 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       return 'bg-gray-100 text-gray-800 border-gray-300';
     }
     
-    // For non-pending statuses, only AWO orders get special color
+    // For non-pending statuses: AWO = Light Steel Blue, Non-AWO = Green
     if (isAWO) {
       // AWO orders use Light Steel Blue (#B0C4DE) for all non-pending statuses
-      // Using Tailwind arbitrary values for exact color match
       return 'bg-[#B0C4DE] text-gray-800 border-[#B0C4DE]';
     } else {
-      // All non-AWO orders (including No-WO) use original color scheme
-      // Regular WO orders use original colors
-      switch (status) {
-        case 'assigned':
-          return 'bg-blue-100 text-blue-800 border-blue-300';
-        case 'on_the_way':
-          return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-        case 'met_customer':
-          return 'bg-green-100 text-green-800 border-green-300';
-        case 'completed':
-          return 'bg-green-100 text-green-800 border-green-300';
-        case 'docket_received':
-          return 'bg-orange-100 text-orange-800 border-orange-300';
-        case 'docket_uploaded':
-          return 'bg-orange-100 text-orange-800 border-orange-300';
-        case 'rescheduled':
-          return 'bg-purple-100 text-purple-800 border-purple-300';
-        case 'withdrawn':
-          return 'bg-red-100 text-red-800 border-red-300';
-        default:
-          return 'bg-gray-100 text-gray-800 border-gray-300';
-      }
+      // All non-AWO orders use green background for all non-pending statuses
+      return 'bg-green-100 text-green-800 border-green-300';
     }
   };
   const [{ isOver }, drop] = useDrop(() => ({

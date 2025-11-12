@@ -990,3 +990,10 @@
 - [x] Ensure only AWO orders get Light Steel Blue background when not pending
 - [x] Verify all pending orders remain gray
 - [x] Test with AWO, No-WO, and regular orders
+
+## Simplify Card Background to 3 Colors Only
+- [x] Update getStatusColor to return gray background for ALL pending orders
+- [x] Update getStatusColor to return Light Steel Blue background for ALL AWO orders (non-pending)
+- [x] Update getStatusColor to return green background for ALL non-AWO orders (non-pending)
+- [x] Remove status-based color variations for card backgrounds
+- [x] Test with pending, AWO, and non-AWO orders
