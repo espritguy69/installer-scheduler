@@ -121,7 +121,7 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       } ${isOver ? "ring-2 ring-primary ring-offset-2" : ""} ${isHovered ? "shadow-lg scale-105 z-10" : ""}`}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="font-semibold text-sm">{order.orderNumber}</div>
+        <div className="font-semibold text-sm">{order.serviceNumber || 'N/A'}</div>
         {isAssigned && (
           <Button
             variant="ghost"
@@ -145,7 +145,11 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
           <MapPin className="h-3 w-3" />
           {order.buildingName}
         </div>
-        <div className="text-muted-foreground">SN: {order.serviceNumber}</div>
+        <div className="mt-1">
+          <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+            {order.status}
+          </span>
+        </div>
       </div>
 
       {isAssigned && (
@@ -172,6 +176,12 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       {isHovered && (
         <div className="absolute left-0 right-0 top-full mt-1 p-3 bg-white border-2 border-primary rounded-lg shadow-xl z-20 text-xs space-y-2">
           <div className="font-semibold text-sm border-b pb-1 mb-2">Additional Details</div>
+          
+          {order.orderNumber && (
+            <div>
+              <span className="font-medium">WO No.:</span> {order.orderNumber}
+            </div>
+          )}
           
           {order.ticketNumber && (
             <div>
@@ -204,12 +214,7 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
             </div>
           )}
           
-          <div>
-            <span className="font-medium">Status:</span>{" "}
-            <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800">
-              {order.status}
-            </span>
-          </div>
+
         </div>
       )}
     </div>

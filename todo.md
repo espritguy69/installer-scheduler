@@ -798,3 +798,15 @@
 - [x] Ensure Status is in main details section  
 - [x] Confirm WO No. is in additional details section
 - [x] Test with linked user account to see actual cards
+
+## Update Schedule Page Card Layout
+
+- [ ] Change Schedule page cards to show Service No. on top (primary display)
+- [ ] Move WO No. from top to additional details section
+- [ ] Move Status from additional details to main details section
+- [ ] Apply consistent card hierarchy across all order cards in Schedule
+
+- [x] Change Schedule page cards to show Service No. on top (primary display)
+- [x] Move WO No. from top to additional details section
+- [x] Move Status from additional details to main details section
+- [x] Apply consistent card hierarchy across all order cards in Schedule
