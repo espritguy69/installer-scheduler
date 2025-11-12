@@ -787,3 +787,14 @@
 - [x] Add "User Link" column to Installers table
 - [x] Create Link User dialog with user selection
 - [x] Implement link/unlink user handlers
+
+## Bug Fix - Installer View Card Layout
+- [ ] Verify InstallerView card layout shows Service No. on top
+- [ ] Ensure Status is in main details section
+- [ ] Confirm WO No. is in additional details section
+- [ ] Test with linked user account to see actual cards
+
+- [x] Verify InstallerView card layout shows Service No. on top
+- [x] Ensure Status is in main details section  
+- [x] Confirm WO No. is in additional details section
+- [x] Test with linked user account to see actual cards
