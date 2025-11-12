@@ -35,7 +35,8 @@ import {
 } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
 import { APP_TITLE } from "@/const";
-import { ArrowDown, ArrowUp, ArrowUpDown, FileText, Loader2, Upload, X } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Download, FileText, Loader2, Upload, X } from "lucide-react";
+import * as XLSX from 'xlsx';
 import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -48,6 +49,70 @@ export default function Orders() {
   const [rescheduleReason, setRescheduleReason] = useState<string>("");
   const [rescheduledDate, setRescheduledDate] = useState<string>("");
   const [rescheduledTime, setRescheduledTime] = useState<string>("");
+
+  // Export to Excel function
+  const handleExportToExcel = () => {
+    // Get the current filtered and sorted orders
+    const currentOrders = orders || [];
+    
+    if (currentOrders.length === 0) {
+      toast.error("No orders to export");
+      return;
+    }
+
+    // Prepare data for export
+    const exportData = currentOrders.map((order: any) => ({
+      "WO No.": order.orderNumber || "-",
+      "Ticket No.": order.ticketNumber || "-",
+      "Service No.": order.serviceNumber || "-",
+      "Customer": order.customerName || "-",
+      "Phone": order.customerPhone || "-",
+      "Address": order.address || "-",
+      "WO Type": order.woType || "-",
+      "Priority": order.priority || "-",
+      "Status": order.status || "-",
+      "Appointment Date": order.appointmentDate ? new Date(order.appointmentDate).toLocaleDateString() : "-",
+      "Appointment Time": order.appointmentTime || "-",
+      "Installer": order.installerName || "Unassigned",
+      "Docket Status": order.docketStatus || "-",
+      "Notes": order.notes || "-",
+      "Reschedule Reason": order.rescheduleReason || "-",
+    }));
+
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    
+    // Set column widths
+    ws['!cols'] = [
+      { wch: 12 }, // WO No.
+      { wch: 12 }, // Ticket No.
+      { wch: 15 }, // Service No.
+      { wch: 25 }, // Customer
+      { wch: 15 }, // Phone
+      { wch: 30 }, // Address
+      { wch: 20 }, // WO Type
+      { wch: 10 }, // Priority
+      { wch: 15 }, // Status
+      { wch: 15 }, // Appointment Date
+      { wch: 15 }, // Appointment Time
+      { wch: 20 }, // Installer
+      { wch: 15 }, // Docket Status
+      { wch: 30 }, // Notes
+      { wch: 20 }, // Reschedule Reason
+    ];
+
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Orders");
+
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().split('T')[0];
+    const filename = `Orders_Export_${timestamp}.xlsx`;
+
+    // Download file
+    XLSX.writeFile(wb, filename);
+    toast.success(`Exported ${currentOrders.length} orders to ${filename}`);
+  };
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDocketUploadOpen, setIsDocketUploadOpen] = useState(false);
   const [docketUploadOrder, setDocketUploadOrder] = useState<{ id: number; status: string; orderNumber: string } | null>(null);
@@ -433,6 +498,14 @@ export default function Orders() {
                   onClick={() => setIsAddOrderDialogOpen(true)}
                 >
                   Add Order
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={handleExportToExcel}
+                  disabled={orders.length === 0}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export to Excel
                 </Button>
                 {user?.email === "espritguy69@gmail.com" && (
                   <Button 

@@ -895,3 +895,9 @@
 - [x] Reduce column widths and font sizes
 - [x] Add text truncation with tooltips
 - [x] Eliminate horizontal scrolling completely
+
+## Export to Excel Feature
+- [x] Install Excel export library (xlsx)
+- [x] Implement export function for filtered/sorted orders
+- [x] Add Export to Excel button to Orders page header
+- [x] Test Excel export with various filters and sorts
