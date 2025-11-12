@@ -1038,3 +1038,9 @@
 - [x] Add unique colors for new statuses (Ready to Invoice: Indigo, Invoiced: Violet, Customer Issue: Orange, Building Issue: Yellow, Network Issue: Pink)
 - [x] Update status filter buttons in Schedule page with new order
 - [x] Test all 15 statuses across all pages
+
+## Status Badge Color Consistency
+- [x] Review color differences between Schedule and Orders pages
+- [x] Update Orders page badge colors to match Schedule page exactly
+- [x] Ensure all 15 statuses use identical colors across all pages
+- [x] Verify color consistency in InstallerView page
