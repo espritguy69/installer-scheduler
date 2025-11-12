@@ -81,3 +81,51 @@ export function isValidTimeFormat(time: string | null | undefined): boolean {
   const timeRegex = /^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i;
   return timeRegex.test(time);
 }
+
+/**
+ * Parses appointment date string in various formats to Date object
+ * Handles:
+ * - DD/MM/YYYY format (e.g., "13/11/2025") - International standard
+ * - MM/DD/YYYY format (e.g., "11/13/2025") - American format
+ * - "Nov 13, 2025" format - Text format
+ * 
+ * @param dateStr - Date string in various formats
+ * @returns Date object or null if parsing fails
+ */
+export function parseAppointmentDate(dateStr: string | null | undefined): Date | null {
+  if (!dateStr) return null;
+  
+  // Handle slash-separated dates (DD/MM/YYYY or MM/DD/YYYY)
+  if (dateStr.includes("/")) {
+    const dateParts = dateStr.split("/");
+    if (dateParts.length !== 3) return null;
+    
+    const part1 = parseInt(dateParts[0], 10);
+    const part2 = parseInt(dateParts[1], 10);
+    const year = parseInt(dateParts[2], 10);
+    
+    // If first part > 12, it must be DD/MM/YYYY format
+    // If second part > 12, it must be MM/DD/YYYY format
+    let month: number, day: number;
+    if (part1 > 12) {
+      // DD/MM/YYYY format
+      day = part1;
+      month = part2;
+    } else if (part2 > 12) {
+      // MM/DD/YYYY format
+      month = part1;
+      day = part2;
+    } else {
+      // Ambiguous - assume DD/MM/YYYY (international standard)
+      day = part1;
+      month = part2;
+    }
+    
+    const date = new Date(year, month - 1, day);
+    return isNaN(date.getTime()) ? null : date;
+  }
+  
+  // Handle text format like "Nov 13, 2025"
+  const date = new Date(dateStr);
+  return isNaN(date.getTime()) ? null : date;
+}

@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, orderNumber, serviceNumber, customerName, appointmentDate, appointmentTime, buildingName, status FROM orders WHERE serviceNumber IN ('CELCOM0016828', 'DIGI0017347') ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, orderNumber, serviceNumber, customerName, appointmentDate, appointmentTime, buildingName, status FROM orders WHERE serviceNumber IN ('CELCOM0016828', 'DIGI0017347') ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "450024",
+      "orderNumber": "",
+      "serviceNumber": "DIGI0017347",
+      "customerName": "SATISWARAN A/L MEROGAN",
+      "appointmentDate": "13/11/2025",
+      "appointmentTime": "2:30 PM",
+      "buildingName": "UNITED POINT RESI",
+      "status": "pending"
+    },
+    {
+      "id": "450023",
+      "orderNumber": "",
+      "serviceNumber": "CELCOM0016828",
+      "customerName": "SYED MUHAMMAD QOTADDAH BIN SYED JAMAL ABDUL NASIR",
+      "appointmentDate": "13/11/2025",
+      "appointmentTime": "10:00 AM",
+      "buildingName": "EMIRA RESIDENCES",
+      "status": "pending"
+    },
+    {
+      "id": "450022",
+      "orderNumber": "",
+      "serviceNumber": "DIGI0017347",
+      "customerName": "SATISWARAN A/L MEROGAN",
+      "appointmentDate": "13/11/2025",
+      "appointmentTime": "2:30 PM",
+      "buildingName": "UNITED POINT RESI",
+      "status": "pending"
+    },
+    {
+      "id": "450021",
+      "orderNumber": "",
+      "serviceNumber": "CELCOM0016828",
+      "customerName": "SYED MUHAMMAD QOTADDAH BIN SYED JAMAL ABDUL NASIR",
+      "appointmentDate": "13/11/2025",
+      "appointmentTime": "10:00 AM",
+      "buildingName": "EMIRA RESIDENCES",
+      "status": "pending"
+    },
+    {
+      "id": "450020",
+      "orderNumber": "",
+      "serviceNumber": "DIGI0017347",
+      "customerName": "SATISWARAN A/L MEROGAN",
+      "appointmentDate": "13/11/2025",
+      "appointmentTime": "2:30 PM",
+      "buildingName": "UNITED POINT RESI",
+      "status": "pending"
+    },
+    {
+      "id": "450019",
+      "orderNumber": "",
+      "serviceNumber": "CELCOM0016828",
+      "customerName": "SYED MUHAMMAD QOTADDAH BIN SYED JAMAL ABDUL NASIR",
+      "appointmentDate": "13/11/2025",
+      "appointmentTime": "10:00 AM",
+      "buildingName": "EMIRA RESIDENCES",
+      "status": "pending"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\tserviceNumber\tcustomerName\tappointmentDate\tappointmentTime\tbuildingName\tstatus\n450024\t\tDIGI0017347\tSATISWARAN A/L MEROGAN\t13/11/2025\t2:30 PM\tUNITED POINT RESI\tpending\n450023\t\tCELCOM0016828\tSYED MUHAMMAD QOTADDAH BIN SYED JAMAL ABDUL NASIR\t13/11/2025\t10:00 AM\tEMIRA RESIDENCES\tpending\n450022\t\tDIGI0017347\tSATISWARAN A/L MEROGAN\t13/11/2025\t2:30 PM\tUNITED POINT RESI\tpending\n450021\t\tCELCOM0016828\tSYED MUHAMMAD QOTADDAH BIN SYED JAMAL ABDUL NASIR\t13/11/2025\t10:00 AM\tEMIRA RESIDENCES\tpending\n450020\t\tDIGI0017347\tSATISWARAN A/L MEROGAN\t13/11/2025\t2:30 PM\tUNITED POINT RESI\tpending\n450019\t\tCELCOM0016828\tSYED MUHAMMAD QOTADDAH BIN SYED JAMAL ABDUL NASIR\t13/11/2025\t10:00 AM\tEMIRA RESIDENCES\tpending\n",
+  "stderr": "",
+  "execution_time_ms": 579
+}

@@ -22,7 +22,7 @@ import { APP_TITLE, getLoginUrl } from "@/const";
 import { Navigation } from "@/components/Navigation";
 import { OrderHistoryDialog } from "@/components/OrderHistoryDialog";
 import { trpc } from "@/lib/trpc";
-import { normalizeTimeFormat } from "@shared/timeUtils";
+import { normalizeTimeFormat, parseAppointmentDate } from "@shared/timeUtils";
 import { ChevronLeft, ChevronRight, Clock, MapPin, User, X, History } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -392,24 +392,9 @@ export default function ScheduleV4() {
   const ordersForDate = orders.filter((order) => {
     if (!order.appointmentDate || !order.appointmentTime) return false;
     
-    // Parse appointment date - handle both "Nov 11, 2025" and "MM/DD/YYYY" formats
-    let orderDate: Date;
-    
-    if (order.appointmentDate.includes("/")) {
-      // MM/DD/YYYY format
-      const dateParts = order.appointmentDate.split("/");
-      if (dateParts.length !== 3) return false;
-      
-      const orderMonth = parseInt(dateParts[0], 10);
-      const orderDay = parseInt(dateParts[1], 10);
-      const orderYear = parseInt(dateParts[2], 10);
-      
-      orderDate = new Date(orderYear, orderMonth - 1, orderDay);
-    } else {
-      // "Nov 11, 2025" format
-      orderDate = new Date(order.appointmentDate);
-      if (isNaN(orderDate.getTime())) return false;
-    }
+    // Parse appointment date using shared utility
+    const orderDate = parseAppointmentDate(order.appointmentDate);
+    if (!orderDate) return false;
     
     // Compare with selected date (compare year, month, day only)
     const dateMatches = orderDate.getFullYear() === selectedDate.getFullYear() &&

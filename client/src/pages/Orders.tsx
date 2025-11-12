@@ -34,7 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
-import { normalizeTimeFormat } from "@shared/timeUtils";
+import { normalizeTimeFormat, parseAppointmentDate } from "@shared/timeUtils";
 import { APP_TITLE } from "@/const";
 import { ArrowDown, ArrowUp, ArrowUpDown, Download, FileText, Loader2, Upload, X } from "lucide-react";
 import * as XLSX from 'xlsx';
@@ -72,7 +72,7 @@ export default function Orders() {
       "WO Type": order.woType || "-",
       "Priority": order.priority || "-",
       "Status": order.status || "-",
-      "Appointment Date": order.appointmentDate ? new Date(order.appointmentDate).toLocaleDateString() : "-",
+      "Appointment Date": order.appointmentDate ? (parseAppointmentDate(order.appointmentDate)?.toLocaleDateString() || order.appointmentDate) : "-",
       "Appointment Time": order.appointmentTime || "-",
       "Installer": order.installerName || "Unassigned",
       "Docket Status": order.docketStatus || "-",
@@ -176,10 +176,10 @@ export default function Orders() {
     
     // Date filter
     if (dateFilter && order.appointmentDate) {
-      const orderDate = new Date(order.appointmentDate);
+      const orderDate = parseAppointmentDate(order.appointmentDate);
       const filterDate = new Date(dateFilter);
       // Compare only the date part (ignore time)
-      if (orderDate.toDateString() !== filterDate.toDateString()) return false;
+      if (!orderDate || orderDate.toDateString() !== filterDate.toDateString()) return false;
     }
     
     // Search query

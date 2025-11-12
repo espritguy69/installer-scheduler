@@ -1144,3 +1144,21 @@
 - [x] Updated Excel export to show "SN: [Service Number]" in WO No. column when orderNumber is missing
 - [x] Updated Schedule page cards to hide "WO:" label when orderNumber is missing
 - [x] Ensured consistent Service No. display across Orders page, Schedule page, and Excel exports
+
+## Investigation - Missing Orders (CELCOM0016828, DIGI0017347)
+- [ ] Query database to check if orders exist
+- [ ] Check if orders were imported from Excel upload
+- [ ] Verify serviceNumber field is populated correctly
+- [ ] Check if filtering logic is excluding these orders
+- [ ] Verify orders appear in Orders page
+- [ ] Verify orders appear in Schedule page
+
+## Investigation - Missing Orders (CELCOM0016828, DIGI0017347) - RESOLVED
+- [x] Queried database and confirmed orders exist (6 duplicate rows found)
+- [x] Identified root cause: Date format mismatch (DD/MM/YYYY vs MM/DD/YYYY)
+- [x] Created shared parseAppointmentDate() utility function in shared/timeUtils.ts
+- [x] Updated ScheduleV4.tsx to use shared date parsing utility
+- [x] Updated Orders.tsx to use shared date parsing utility
+- [x] Fixed Excel export date formatting in Orders.tsx
+- [x] Now supports both DD/MM/YYYY (international) and MM/DD/YYYY (American) formats
+- [x] Orders now display correctly in both Orders and Schedule pages
