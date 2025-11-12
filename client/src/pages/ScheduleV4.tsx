@@ -149,16 +149,23 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       } ${isOver ? "ring-2 ring-primary ring-offset-2" : ""} ${isHovered ? "shadow-lg scale-105 z-10" : ""}`}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="font-semibold text-sm">{order.serviceNumber || 'N/A'}</div>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="font-semibold text-xs truncate" title={order.serviceNumber || 'N/A'}>
+            SN: {order.serviceNumber || 'N/A'}
+          </div>
+          <div className="text-xs text-muted-foreground truncate" title={order.orderNumber}>
+            WO: {order.orderNumber}
+          </div>
+        </div>
         {isAssigned && (
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600 transition-colors"
+            className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600 transition-colors flex-shrink-0"
             onClick={() => onUnassign(order.id)}
             title="Remove assignment"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </Button>
         )}
       </div>

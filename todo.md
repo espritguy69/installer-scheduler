@@ -852,3 +852,17 @@
 - [x] Add View History button to Schedule cards
 - [x] Test history logging when changing status
 - [x] Test history viewing in timeline UI
+
+## Reorganize Schedule Card Header Layout
+
+- [ ] Update card header to show SN and WO No. in same row
+- [ ] Position Service No. on the left side
+- [ ] Position WO No. on the right side
+- [ ] Optimize font sizing to prevent overlapping
+- [ ] Test layout with various SN and WO No. lengths
+
+- [x] Update card header to show SN and WO No. in same row
+- [x] Position Service No. on the left side
+- [x] Position WO No. on the right side
+- [x] Optimize font sizing to prevent overlapping
+- [x] Test layout with various SN and WO No. lengths
