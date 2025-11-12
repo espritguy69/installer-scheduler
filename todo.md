@@ -983,3 +983,10 @@
 - [x] Fix card background to use getStatusColor instead of assignment-based colors
 - [x] Test with AWO436913 and AWO436400 to verify Light Steel Blue background
 - [x] Verify all other AWO orders still display correctly
+
+## Correct AWO Color Scheme Logic
+- [x] Remove pink/rose colors for No-WO orders
+- [x] Keep No-WO orders with original color scheme (green/blue/yellow/orange)
+- [x] Ensure only AWO orders get Light Steel Blue background when not pending
+- [x] Verify all pending orders remain gray
+- [x] Test with AWO, No-WO, and regular orders

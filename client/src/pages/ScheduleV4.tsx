@@ -111,34 +111,13 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       return 'bg-gray-100 text-gray-800 border-gray-300';
     }
     
-    // For non-pending statuses, differentiate by WO type
+    // For non-pending statuses, only AWO orders get special color
     if (isAWO) {
       // AWO orders use Light Steel Blue (#B0C4DE) for all non-pending statuses
       // Using Tailwind arbitrary values for exact color match
       return 'bg-[#B0C4DE] text-gray-800 border-[#B0C4DE]';
-    } else if (hasNoWO) {
-      // Orders with no WO use pink/rose colors for non-pending statuses
-      switch (status) {
-        case 'assigned':
-          return 'bg-pink-100 text-pink-800 border-pink-300';
-        case 'on_the_way':
-          return 'bg-pink-200 text-pink-900 border-pink-400';
-        case 'met_customer':
-          return 'bg-rose-100 text-rose-800 border-rose-300';
-        case 'completed':
-          return 'bg-rose-200 text-rose-900 border-rose-400';
-        case 'docket_received':
-          return 'bg-pink-100 text-pink-800 border-pink-300';
-        case 'docket_uploaded':
-          return 'bg-pink-200 text-pink-900 border-pink-400';
-        case 'rescheduled':
-          return 'bg-purple-100 text-purple-800 border-purple-300';
-        case 'withdrawn':
-          return 'bg-red-100 text-red-800 border-red-300';
-        default:
-          return 'bg-pink-100 text-pink-800 border-pink-300';
-      }
     } else {
+      // All non-AWO orders (including No-WO) use original color scheme
       // Regular WO orders use original colors
       switch (status) {
         case 'assigned':
