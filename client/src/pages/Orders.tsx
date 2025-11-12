@@ -34,6 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
+import { normalizeTimeFormat } from "@shared/timeUtils";
 import { APP_TITLE } from "@/const";
 import { ArrowDown, ArrowUp, ArrowUpDown, Download, FileText, Loader2, Upload, X } from "lucide-react";
 import * as XLSX from 'xlsx';
@@ -360,7 +361,12 @@ export default function Orders() {
     }
     
     try {
-      await updateOrder.mutateAsync(editOrder);
+      // Normalize appointment time before saving
+      const normalizedOrder = {
+        ...editOrder,
+        appointmentTime: editOrder.appointmentTime ? (normalizeTimeFormat(editOrder.appointmentTime) || editOrder.appointmentTime) : editOrder.appointmentTime
+      };
+      await updateOrder.mutateAsync(normalizedOrder);
       await utils.orders.list.invalidate();
       toast.success("Order updated successfully");
       setIsEditDialogOpen(false);

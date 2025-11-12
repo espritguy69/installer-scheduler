@@ -22,6 +22,7 @@ import { APP_TITLE, getLoginUrl } from "@/const";
 import { Navigation } from "@/components/Navigation";
 import { OrderHistoryDialog } from "@/components/OrderHistoryDialog";
 import { trpc } from "@/lib/trpc";
+import { normalizeTimeFormat } from "@shared/timeUtils";
 import { ChevronLeft, ChevronRight, Clock, MapPin, User, X, History } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -594,7 +595,7 @@ export default function ScheduleV4() {
     try {
       await updateOrderMutation.mutateAsync({
         id: timeChangeDialog.orderId,
-        appointmentTime: newTime,
+        appointmentTime: normalizeTimeFormat(newTime) || newTime,
       });
 
       toast.success("Appointment time updated");
