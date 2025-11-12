@@ -997,3 +997,9 @@
 - [x] Update getStatusColor to return green background for ALL non-AWO orders (non-pending)
 - [x] Remove status-based color variations for card backgrounds
 - [x] Test with pending, AWO, and non-AWO orders
+
+## Add Light Yellow Background for No-WO Orders
+- [x] Update getStatusColor to check for null or empty WO numbers
+- [x] Add light yellow background for no-WO orders when status is not pending
+- [x] Maintain 4-color scheme: Gray (pending), Light Steel Blue (AWO), Light Yellow (no-WO), Green (regular)
+- [x] Test with orders that have null or empty WO numbers

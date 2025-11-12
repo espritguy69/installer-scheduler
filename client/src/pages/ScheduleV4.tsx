@@ -111,12 +111,15 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       return 'bg-gray-100 text-gray-800 border-gray-300';
     }
     
-    // For non-pending statuses: AWO = Light Steel Blue, Non-AWO = Green
+    // For non-pending statuses: AWO = Light Steel Blue, No-WO = Light Yellow, Regular = Green
     if (isAWO) {
       // AWO orders use Light Steel Blue (#B0C4DE) for all non-pending statuses
       return 'bg-[#B0C4DE] text-gray-800 border-[#B0C4DE]';
+    } else if (hasNoWO) {
+      // Orders with no WO number use light yellow for all non-pending statuses
+      return 'bg-yellow-100 text-yellow-800 border-yellow-300';
     } else {
-      // All non-AWO orders use green background for all non-pending statuses
+      // All regular WO orders use green background for all non-pending statuses
       return 'bg-green-100 text-green-800 border-green-300';
     }
   };
