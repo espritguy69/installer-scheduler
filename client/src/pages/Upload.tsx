@@ -428,17 +428,18 @@ export default function Upload() {
               )}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex-1 overflow-y-auto border rounded-lg">
+          <div className="flex-1 overflow-x-auto overflow-y-auto border rounded-lg max-h-[500px]">
             <table className="w-full text-sm">
               <thead className="bg-muted sticky top-0">
                 <tr>
-                  <th className="px-2 py-2 text-left font-medium">#</th>
-                  <th className="px-2 py-2 text-left font-medium">Order No.</th>
-                  <th className="px-2 py-2 text-left font-medium">Customer</th>
-                  <th className="px-2 py-2 text-left font-medium">App Date</th>
-                  <th className="px-2 py-2 text-left font-medium">App Time</th>
-                  <th className="px-2 py-2 text-left font-medium">Building</th>
-                  <th className="px-2 py-2 text-left font-medium">Status</th>
+                  <th className="px-2 py-2 text-left font-medium w-12">#</th>
+                  <th className="px-2 py-2 text-left font-medium min-w-[100px]">Order No.</th>
+                  <th className="px-2 py-2 text-left font-medium min-w-[100px]">Service No.</th>
+                  <th className="px-2 py-2 text-left font-medium min-w-[150px]">Customer</th>
+                  <th className="px-2 py-2 text-left font-medium min-w-[100px]">App Date</th>
+                  <th className="px-2 py-2 text-left font-medium min-w-[80px]">App Time</th>
+                  <th className="px-2 py-2 text-left font-medium min-w-[120px]">Building</th>
+                  <th className="px-2 py-2 text-left font-medium w-20">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -448,6 +449,7 @@ export default function Upload() {
                     <tr key={index} className={hasError ? "bg-red-50" : index % 2 === 0 ? "bg-background" : "bg-muted/50"}>
                       <td className="px-2 py-2 text-muted-foreground">{index + 1}</td>
                       <td className="px-2 py-2 font-mono text-xs">{order.orderNumber || "-"}</td>
+                      <td className="px-2 py-2 font-mono text-xs font-semibold text-blue-600">{order.serviceNumber || "-"}</td>
                       <td className="px-2 py-2">{order.customerName || "-"}</td>
                       <td className="px-2 py-2">{order.appointmentDate || "-"}</td>
                       <td className={`px-2 py-2 ${hasError ? "text-red-600 font-semibold" : ""}`}>

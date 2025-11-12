@@ -1115,3 +1115,17 @@
 - [x] Update Upload.tsx validation to require serviceNumber instead of orderNumber
 - [x] Service Number is now the most important required field, WO Number is optional
 - [x] Rows 20-21 from user's Excel file will now import successfully
+
+## Preview Dialog Improvements
+- [ ] Add Service No. column to preview dialog table
+- [ ] Remove horizontal scrolling from preview dialog
+- [ ] Optimize column widths for better visibility
+- [ ] Ensure all important fields are visible without scrolling
+- [ ] Test preview dialog with user's Excel file (rows 19-20 have no WO numbers)
+
+## Preview Dialog Improvements (COMPLETED)
+- [x] Added Service No. column to preview dialog table
+- [x] Removed horizontal scrolling from preview dialog with optimized column widths
+- [x] Highlighted Service No. in blue as the most important field
+- [x] Set max height to 500px for better UX
+- [x] All important fields now visible in preview (Order No., Service No., Customer, App Date, App Time, Building, Status)
