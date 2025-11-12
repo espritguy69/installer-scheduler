@@ -21,8 +21,54 @@ export const appRouter = router({
   }),
 
   users: router({
-    list: protectedProcedure.query(async () => {
+    list: protectedProcedure.query(async ({ ctx }) => {
+      // Only admin can list users
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
       return await db.getAllUsers();
+    }),
+    getById: protectedProcedure.input(z.object({ id: z.number() })).query(async ({ ctx, input }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
+      return await db.getUserById(input.id);
+    }),
+    create: protectedProcedure.input(z.object({
+      openId: z.string(),
+      name: z.string().optional(),
+      email: z.string().optional(),
+      loginMethod: z.string().optional(),
+      role: z.enum(['user', 'admin', 'supervisor']),
+    })).mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
+      return await db.createUser(input);
+    }),
+    update: protectedProcedure.input(z.object({
+      id: z.number(),
+      name: z.string().optional(),
+      email: z.string().optional(),
+      role: z.enum(['user', 'admin', 'supervisor']).optional(),
+    })).mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
+      const { id, ...data } = input;
+      await db.updateUser(id, data);
+      return { success: true };
+    }),
+    delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
+      // Prevent deleting yourself
+      if (ctx.user.id === input.id) {
+        throw new Error('Cannot delete your own account');
+      }
+      await db.deleteUser(input.id);
+      return { success: true };
     }),
   }),
 

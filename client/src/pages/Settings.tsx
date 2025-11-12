@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Clock, Users } from "lucide-react";
 import { TimeSlotSettings } from "@/components/TimeSlotSettings";
 import { InstallersManagement } from "@/components/InstallersManagement";
+import { UserManagement } from "@/components/UserManagement";
 
 export default function Settings() {
   const { user, loading } = useAuth();
@@ -57,7 +58,7 @@ export default function Settings() {
         </div>
 
         <Tabs defaultValue="timeslots" className="space-y-4">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-2xl grid-cols-3">
             <TabsTrigger value="timeslots" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
               Time Slots
@@ -65,6 +66,10 @@ export default function Settings() {
             <TabsTrigger value="installers" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Installers
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              User Management
             </TabsTrigger>
           </TabsList>
 
@@ -74,6 +79,10 @@ export default function Settings() {
 
           <TabsContent value="installers">
             <InstallersManagement />
+          </TabsContent>
+
+          <TabsContent value="users">
+            <UserManagement />
           </TabsContent>
         </Tabs>
       </div>

@@ -1044,3 +1044,18 @@
 - [x] Update Orders page badge colors to match Schedule page exactly
 - [x] Ensure all 15 statuses use identical colors across all pages
 - [x] Verify color consistency in InstallerView page
+
+## User Management System with Role-Based Access Control
+- [x] Update database schema to add 'supervisor' role to users table
+- [x] Push database schema changes
+- [x] Create backend tRPC procedures for user management (list, create, update, delete)
+- [x] Add role-based middleware (admin-only access control)
+- [x] Create Settings page with User Management tab
+- [x] Create User Management page component
+- [x] Add user list table with role badges (Admin=Red, Supervisor=Blue, User=Gray)
+- [x] Create Add/Edit User dialog with role selection
+- [x] Implement user deletion with confirmation
+- [x] Add role-based navigation (hide menu items based on role)
+- [x] Add InstallerView route for user role (/installer - My Tasks)
+- [x] Test user management interface (list, add, edit, delete users)
+- [x] Verify role-based navigation (Admin sees all, Supervisor sees all except Settings, User sees Home + My Tasks)
