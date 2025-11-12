@@ -1199,3 +1199,19 @@
 - [x] Fixed orders stuck in "assigned" status without actual assignments
 - [x] Reset CELCOM0016828 and DIGI0017347 to pending status
 - [x] Orders now ready for proper installer assignment
+
+## Assignment Creation Bug - CRITICAL
+- [ ] Investigate "Failed to assign installer" error during drag-and-drop
+- [ ] Order status updates to "assigned" but assignment record not created
+- [ ] Check tRPC assignment procedure for error handling issues
+- [ ] Fix assignment creation logic to ensure atomic operation (status + assignment record)
+- [ ] Add transaction or rollback mechanism to prevent data inconsistency
+- [ ] Test with DIGI/CELCOM orders to verify fix
+
+## Assignment Creation Bug - FIXED
+- [x] Investigated "Failed to assign installer" error (root cause: wrong operation order)
+- [x] Fixed operation order: create assignment FIRST, then update status
+- [x] Prevents data inconsistency where status="assigned" but no assignment record
+- [x] Fixed date parsing to use parseAppointmentDate() utility for DD/MM/YYYY format
+- [x] Added validation to show clear error if date format is invalid
+- [x] Assignment now atomic: if assignment fails, status won't be updated

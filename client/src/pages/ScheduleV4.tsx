@@ -474,15 +474,13 @@ export default function ScheduleV4() {
         return;
       }
 
-      // Update order status
-      await updateOrderMutation.mutateAsync({
-        id: orderId,
-        status: "assigned",
-      });
-
-      // Create assignment
-      // Parse appointment date from "Nov 1, 2025" format
-      const scheduledDate = new Date(order.appointmentDate);
+      // Create assignment FIRST (before updating status)
+      // Parse appointment date using shared utility (handles DD/MM/YYYY and other formats)
+      const scheduledDate = parseAppointmentDate(order.appointmentDate);
+      if (!scheduledDate) {
+        toast.error("Invalid appointment date format");
+        return;
+      }
       
       // Parse appointment time and calculate end time
       // Support both 12-hour format ("10:00 AM", "02:30 PM") and 24-hour format ("10:00", "14:30")
@@ -531,6 +529,12 @@ export default function ScheduleV4() {
         scheduledDate,
         scheduledStartTime,
         scheduledEndTime,
+      });
+
+      // Update order status ONLY after assignment is successfully created
+      await updateOrderMutation.mutateAsync({
+        id: orderId,
+        status: "assigned",
       });
 
       toast.success(`Assigned to ${installerName}`);
