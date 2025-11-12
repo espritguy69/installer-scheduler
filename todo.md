@@ -866,3 +866,19 @@
 - [x] Position WO No. on the right side
 - [x] Optimize font sizing to prevent overlapping
 - [x] Test layout with various SN and WO No. lengths
+
+## Implement Status Filter Buttons
+
+- [ ] Add filter state to Schedule component
+- [ ] Create filter button UI with status chips above calendar
+- [ ] Implement filter logic to show/hide cards by status
+- [ ] Add "All" button to clear filters
+- [ ] Style active/inactive filter buttons
+- [ ] Test filtering with different status combinations
+
+- [x] Add filter state to Schedule component
+- [x] Create filter button UI with status chips above calendar
+- [x] Implement filter logic to show/hide cards by status
+- [x] Add "All" button to clear filters
+- [x] Style active/inactive filter buttons
+- [x] Test filtering with different status combinations

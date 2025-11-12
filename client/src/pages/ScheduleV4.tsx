@@ -290,6 +290,7 @@ export default function ScheduleV4() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [, navigate] = useLocation();
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [isScheduleConfirmed, setIsScheduleConfirmed] = useState(false);
   const [timeChangeDialog, setTimeChangeDialog] = useState<{
     open: boolean;
@@ -355,9 +356,14 @@ export default function ScheduleV4() {
     }
     
     // Compare with selected date (compare year, month, day only)
-    return orderDate.getFullYear() === selectedDate.getFullYear() &&
+    const dateMatches = orderDate.getFullYear() === selectedDate.getFullYear() &&
            orderDate.getMonth() === selectedDate.getMonth() &&
            orderDate.getDate() === selectedDate.getDate();
+    
+    // Apply status filter if set
+    const statusMatches = !statusFilter || order.status === statusFilter;
+    
+    return dateMatches && statusMatches;
   });
 
   // Create a map of orderId to installer name
@@ -646,6 +652,90 @@ export default function ScheduleV4() {
                 </div>
                 <Button variant="outline" size="sm" onClick={handleNextDay}>
                   <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Status Filter Buttons */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                <Button
+                  variant={statusFilter === null ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter(null)}
+                  className="text-xs"
+                >
+                  All
+                </Button>
+                <Button
+                  variant={statusFilter === "pending" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("pending")}
+                  className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
+                >
+                  Pending
+                </Button>
+                <Button
+                  variant={statusFilter === "assigned" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("assigned")}
+                  className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 border-blue-300"
+                >
+                  Assigned
+                </Button>
+                <Button
+                  variant={statusFilter === "on_the_way" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("on_the_way")}
+                  className="text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-yellow-300"
+                >
+                  On the Way
+                </Button>
+                <Button
+                  variant={statusFilter === "met_customer" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("met_customer")}
+                  className="text-xs bg-green-100 hover:bg-green-200 text-green-700 border-green-300"
+                >
+                  Met Customer
+                </Button>
+                <Button
+                  variant={statusFilter === "completed" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("completed")}
+                  className="text-xs bg-green-100 hover:bg-green-200 text-green-700 border-green-300"
+                >
+                  Completed
+                </Button>
+                <Button
+                  variant={statusFilter === "docket_received" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("docket_received")}
+                  className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-300"
+                >
+                  Docket Received
+                </Button>
+                <Button
+                  variant={statusFilter === "docket_uploaded" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("docket_uploaded")}
+                  className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-300"
+                >
+                  Docket Uploaded
+                </Button>
+                <Button
+                  variant={statusFilter === "rescheduled" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("rescheduled")}
+                  className="text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 border-purple-300"
+                >
+                  Rescheduled
+                </Button>
+                <Button
+                  variant={statusFilter === "withdrawn" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("withdrawn")}
+                  className="text-xs bg-red-100 hover:bg-red-200 text-red-700 border-red-300"
+                >
+                  Withdrawn
                 </Button>
               </div>
 
