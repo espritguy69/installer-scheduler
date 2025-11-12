@@ -1027,3 +1027,14 @@
 - [x] Update frontend Orders page status filters
 - [x] Add unique color for Order Completed status badge (Lime green)
 - [x] Test Order Completed status across all pages (Schedule, Orders, Dashboard, Performance, History)
+
+## Status Workflow Reorganization
+- [x] Add 5 new statuses to database schema: ready_to_invoice, invoiced, customer_issue, building_issue, network_issue
+- [x] Push database schema changes
+- [x] Update backend routers validation to include all new statuses
+- [x] Reorder status lists in Schedule page to match new workflow
+- [x] Reorder status lists in Orders page to match new workflow
+- [x] Reorder status lists in InstallerView page to match new workflow
+- [x] Add unique colors for new statuses (Ready to Invoice: Indigo, Invoiced: Violet, Customer Issue: Orange, Building Issue: Yellow, Network Issue: Pink)
+- [x] Update status filter buttons in Schedule page with new order
+- [x] Test all 15 statuses across all pages

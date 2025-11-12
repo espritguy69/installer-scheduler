@@ -44,7 +44,7 @@ export const orders = mysqlTable("orders", {
   buildingName: varchar("buildingName", { length: 255 }),
   estimatedDuration: int("estimatedDuration").default(60).notNull(),
   priority: mysqlEnum("priority", ["low", "medium", "high"]).default("medium").notNull(),
-  status: mysqlEnum("status", ["pending", "assigned", "on_the_way", "met_customer", "completed", "order_completed", "docket_received", "docket_uploaded", "rescheduled", "withdrawn"]).default("pending").notNull(),
+  status: mysqlEnum("status", ["pending", "assigned", "on_the_way", "met_customer", "order_completed", "docket_received", "docket_uploaded", "ready_to_invoice", "invoiced", "completed", "customer_issue", "building_issue", "network_issue", "rescheduled", "withdrawn"]).default("pending").notNull(),
   rescheduleReason: mysqlEnum("rescheduleReason", ["customer_issue", "building_issue", "network_issue"]),
   rescheduledDate: timestamp("rescheduledDate"),
   rescheduledTime: varchar("rescheduledTime", { length: 10 }),

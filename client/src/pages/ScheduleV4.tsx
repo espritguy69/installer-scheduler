@@ -132,14 +132,24 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
         return 'bg-amber-100 text-amber-800 border-amber-300';
       case 'met_customer':
         return 'bg-emerald-100 text-emerald-800 border-emerald-300';
-      case 'completed':
-        return 'bg-green-600 text-white border-green-700';
       case 'order_completed':
         return 'bg-lime-100 text-lime-800 border-lime-300';
       case 'docket_received':
         return 'bg-teal-100 text-teal-800 border-teal-300';
       case 'docket_uploaded':
         return 'bg-cyan-100 text-cyan-800 border-cyan-300';
+      case 'ready_to_invoice':
+        return 'bg-indigo-100 text-indigo-800 border-indigo-300';
+      case 'invoiced':
+        return 'bg-violet-100 text-violet-800 border-violet-300';
+      case 'completed':
+        return 'bg-green-600 text-white border-green-700';
+      case 'customer_issue':
+        return 'bg-orange-100 text-orange-800 border-orange-300';
+      case 'building_issue':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'network_issue':
+        return 'bg-pink-100 text-pink-800 border-pink-300';
       case 'rescheduled':
         return 'bg-purple-100 text-purple-800 border-purple-300';
       case 'withdrawn':
@@ -212,10 +222,15 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
               <SelectItem value="assigned">Assigned</SelectItem>
               <SelectItem value="on_the_way">On the Way</SelectItem>
               <SelectItem value="met_customer">Met Customer</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
               <SelectItem value="order_completed">Order Completed</SelectItem>
               <SelectItem value="docket_received">Docket Received</SelectItem>
               <SelectItem value="docket_uploaded">Docket Uploaded</SelectItem>
+              <SelectItem value="ready_to_invoice">Ready to Invoice</SelectItem>
+              <SelectItem value="invoiced">Invoiced</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="customer_issue">Customer Issue</SelectItem>
+              <SelectItem value="building_issue">Building Issue</SelectItem>
+              <SelectItem value="network_issue">Network Issue</SelectItem>
               <SelectItem value="rescheduled">Rescheduled</SelectItem>
               <SelectItem value="withdrawn">Withdrawn</SelectItem>
             </SelectContent>
@@ -613,7 +628,7 @@ export default function ScheduleV4() {
 
       await updateOrderMutation.mutateAsync({
         id: orderId,
-        status: newStatus as "pending" | "assigned" | "on_the_way" | "met_customer" | "completed" | "order_completed" | "docket_received" | "docket_uploaded" | "rescheduled" | "withdrawn",
+        status: newStatus as "pending" | "assigned" | "on_the_way" | "met_customer" | "order_completed" | "docket_received" | "docket_uploaded" | "ready_to_invoice" | "invoiced" | "completed" | "customer_issue" | "building_issue" | "network_issue" | "rescheduled" | "withdrawn",
       });
 
       toast.success("Status updated");
@@ -787,14 +802,6 @@ export default function ScheduleV4() {
                   Met Customer
                 </Button>
                 <Button
-                  variant={statusFilter === "completed" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStatusFilter("completed")}
-                  className="text-xs bg-green-600 hover:bg-green-700 text-white border-green-700"
-                >
-                  Completed
-                </Button>
-                <Button
                   variant={statusFilter === "order_completed" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("order_completed")}
@@ -806,7 +813,7 @@ export default function ScheduleV4() {
                   variant={statusFilter === "docket_received" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("docket_received")}
-                  className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-300"
+                  className="text-xs bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300"
                 >
                   Docket Received
                 </Button>
@@ -814,9 +821,57 @@ export default function ScheduleV4() {
                   variant={statusFilter === "docket_uploaded" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("docket_uploaded")}
-                  className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-300"
+                  className="text-xs bg-cyan-100 hover:bg-cyan-200 text-cyan-700 border-cyan-300"
                 >
                   Docket Uploaded
+                </Button>
+                <Button
+                  variant={statusFilter === "ready_to_invoice" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("ready_to_invoice")}
+                  className="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 border-indigo-300"
+                >
+                  Ready to Invoice
+                </Button>
+                <Button
+                  variant={statusFilter === "invoiced" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("invoiced")}
+                  className="text-xs bg-violet-100 hover:bg-violet-200 text-violet-700 border-violet-300"
+                >
+                  Invoiced
+                </Button>
+                <Button
+                  variant={statusFilter === "completed" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("completed")}
+                  className="text-xs bg-green-600 hover:bg-green-700 text-white border-green-700"
+                >
+                  Completed
+                </Button>
+                <Button
+                  variant={statusFilter === "customer_issue" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("customer_issue")}
+                  className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-300"
+                >
+                  Customer Issue
+                </Button>
+                <Button
+                  variant={statusFilter === "building_issue" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("building_issue")}
+                  className="text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-yellow-300"
+                >
+                  Building Issue
+                </Button>
+                <Button
+                  variant={statusFilter === "network_issue" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("network_issue")}
+                  className="text-xs bg-pink-100 hover:bg-pink-200 text-pink-700 border-pink-300"
+                >
+                  Network Issue
                 </Button>
                 <Button
                   variant={statusFilter === "rescheduled" ? "default" : "outline"}
