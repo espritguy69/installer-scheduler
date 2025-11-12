@@ -1006,3 +1006,9 @@
 
 ## Status Badge Color Restoration
 - [x] Restore status badge colors (blue for Assigned, green for Completed, etc.) while keeping simplified 4-color card backgrounds
+
+## Status Badge Color Improvements
+- [x] Remove repetitive green colors from status badges (Met Customer vs Completed)
+- [x] Make each status badge color unique and distinct
+- [x] Improve assigned installer text visibility on colored card backgrounds
+- [x] Change installer name text from green to high-contrast color (dark gray or black)

@@ -121,7 +121,7 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
     }
   };
   
-  // Status badge color based on actual status (original color scheme)
+  // Status badge color based on actual status (each status has unique color)
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case 'pending':
@@ -129,11 +129,11 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       case 'assigned':
         return 'bg-blue-100 text-blue-800 border-blue-300';
       case 'on_the_way':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+        return 'bg-amber-100 text-amber-800 border-amber-300';
       case 'met_customer':
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-emerald-100 text-emerald-800 border-emerald-300';
       case 'completed':
-        return 'bg-green-200 text-green-900 border-green-400';
+        return 'bg-green-600 text-white border-green-700';
       case 'docket_received':
         return 'bg-teal-100 text-teal-800 border-teal-300';
       case 'docket_uploaded':
@@ -222,7 +222,7 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
 
       {isAssigned && (
         <div className="mt-2 pt-2 border-t">
-          <div className="flex items-center gap-1 text-xs font-medium text-green-700">
+          <div className="flex items-center gap-1 text-xs font-semibold text-gray-900 bg-white/80 px-2 py-1 rounded">
             <User className="h-3 w-3" />
             {assignedInstaller}
           </div>
