@@ -940,3 +940,21 @@
 - [x] Update route structure if needed
 - [x] Test both tabs functionality (time slots CRUD and installers CRUD)
 - [x] Ensure admin-only access for both tabs
+
+## Storybook Setup for Component Testing
+- [x] Install Storybook dependencies (@storybook/react-vite, @storybook/addon-essentials, etc.)
+- [x] Create Storybook configuration files (.storybook/main.ts, .storybook/preview.tsx)
+- [x] Create mock data generators for orders, installers, assignments, time slots
+- [x] Create tRPC mock decorator for stories
+- [x] Write stories for InstallerScheduleView component with different states
+- [x] Write stories for OrderDetail component with form interactions
+- [x] Write stories for TimeSlotSettings component with drag-and-drop
+- [x] Test Storybook build and development server
+- [x] Add Storybook scripts to package.json
+- [x] Document Storybook usage in README
+
+## Update AWO Order Color Scheme
+- [x] Change AWO order color to Light Steel Blue (#B0C4DE) for all non-pending statuses
+- [x] Keep all pending orders gray regardless of WO type
+- [x] Test with actual AWO orders in schedule view
+- [x] Verify color consistency across all status changes
