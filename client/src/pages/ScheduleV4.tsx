@@ -93,9 +93,10 @@ interface OrderCardProps {
   onAssign: (orderId: number, installerId: number, installerName: string) => void;
   onUnassign: (orderId: number) => void;
   onTimeChange: (orderId: number) => void;
+  onStatusChange: (orderId: number, newStatus: string) => void;
 }
 
-function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChange }: OrderCardProps) {
+function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChange, onStatusChange }: OrderCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "installer",
@@ -146,9 +147,22 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
           {order.buildingName}
         </div>
         <div className="mt-1">
-          <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-            {order.status}
-          </span>
+          <Select value={order.status} onValueChange={(value) => onStatusChange(order.id, value)}>
+            <SelectTrigger className="h-6 text-xs w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="assigned">Assigned</SelectItem>
+              <SelectItem value="on_the_way">On the Way</SelectItem>
+              <SelectItem value="met_customer">Met Customer</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="docket_received">Docket Received</SelectItem>
+              <SelectItem value="docket_uploaded">Docket Uploaded</SelectItem>
+              <SelectItem value="rescheduled">Rescheduled</SelectItem>
+              <SelectItem value="withdrawn">Withdrawn</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -475,6 +489,33 @@ export default function ScheduleV4() {
     }
   };
 
+  const handleStatusChange = async (orderId: number, newStatus: string) => {
+    try {
+      // Optimistic update
+      await utils.orders.list.cancel();
+      const previousOrders = utils.orders.list.getData();
+      
+      utils.orders.list.setData(undefined, (old) => 
+        old?.map((order) => 
+          order.id === orderId ? { ...order, status: newStatus as typeof order.status } : order
+        )
+      );
+
+      await updateOrderMutation.mutateAsync({
+        id: orderId,
+        status: newStatus as "pending" | "assigned" | "on_the_way" | "met_customer" | "completed" | "docket_received" | "docket_uploaded" | "rescheduled" | "withdrawn",
+      });
+
+      toast.success("Status updated");
+      await refetchOrders();
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      toast.error("Failed to update status");
+      // Rollback on error
+      await refetchOrders();
+    }
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-background">
@@ -574,6 +615,7 @@ export default function ScheduleV4() {
                                 onAssign={handleAssign}
                                 onUnassign={handleUnassign}
                                 onTimeChange={handleTimeChange}
+                                onStatusChange={handleStatusChange}
                               />
                             ))}
                           </div>

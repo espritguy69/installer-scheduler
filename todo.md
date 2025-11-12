@@ -810,3 +810,17 @@
 - [x] Move WO No. from top to additional details section
 - [x] Move Status from additional details to main details section
 - [x] Apply consistent card hierarchy across all order cards in Schedule
+
+## Add Inline Status Update to Schedule Cards
+
+- [ ] Replace static status badge with interactive dropdown
+- [ ] Add backend mutation for updating order status
+- [ ] Implement status change handler with optimistic updates
+- [ ] Add color-coded status options in dropdown
+- [ ] Test status updates directly from Schedule cards
+
+- [x] Replace static status badge with interactive dropdown
+- [x] Add backend mutation for updating order status
+- [x] Implement status change handler with optimistic updates
+- [x] Add color-coded status options in dropdown
+- [x] Test status updates directly from Schedule cards
