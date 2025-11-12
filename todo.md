@@ -834,3 +834,21 @@
 - [x] Create status color mapping function (gray=Pending, blue=Assigned, yellow=On the Way, green=Completed, orange=Docket stages, purple=Rescheduled, red=Withdrawn)
 - [x] Apply dynamic background colors to status dropdown trigger
 - [x] Test all status colors on Schedule cards
+
+## Implement Status Change History Logging
+
+- [ ] Create orderHistory table in database schema
+- [ ] Add database helper functions for logging and retrieving history
+- [ ] Update status change backend to automatically log changes
+- [ ] Create HistoryTimeline UI component
+- [ ] Add View History button to Schedule cards
+- [ ] Test history logging when changing status
+- [ ] Test history viewing in timeline UI
+
+- [x] Create orderHistory table in database schema
+- [x] Add database helper functions for logging and retrieving history
+- [x] Update status change backend to automatically log changes
+- [x] Create HistoryTimeline UI component
+- [x] Add View History button to Schedule cards
+- [x] Test history logging when changing status
+- [x] Test history viewing in timeline UI

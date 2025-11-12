@@ -20,8 +20,9 @@ import {
 } from "@/components/ui/select";
 import { APP_TITLE, getLoginUrl } from "@/const";
 import { Navigation } from "@/components/Navigation";
+import { OrderHistoryDialog } from "@/components/OrderHistoryDialog";
 import { trpc } from "@/lib/trpc";
-import { ChevronLeft, ChevronRight, Clock, MapPin, User, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MapPin, User, X, History } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -98,6 +99,7 @@ interface OrderCardProps {
 
 function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChange, onStatusChange }: OrderCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -209,7 +211,24 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
         >
           Change Time
         </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-6 text-xs px-2"
+          onClick={() => setShowHistory(true)}
+          title="View History"
+        >
+          <History className="h-3 w-3" />
+        </Button>
       </div>
+
+      {/* History Dialog */}
+      <OrderHistoryDialog
+        orderId={order.id}
+        orderNumber={order.serviceNumber || order.orderNumber}
+        open={showHistory}
+        onOpenChange={setShowHistory}
+      />
 
       {/* Expanded details on hover */}
       {isHovered && (

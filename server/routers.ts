@@ -33,6 +33,9 @@ export const appRouter = router({
     getById: protectedProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
       return await db.getOrderById(input.id);
     }),
+    getHistory: protectedProcedure.input(z.object({ orderId: z.number() })).query(async ({ input }) => {
+      return await db.getOrderHistory(input.orderId);
+    }),
     create: protectedProcedure.input(z.object({
       orderNumber: z.string(),
       ticketNumber: z.string().optional(),
