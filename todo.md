@@ -1012,3 +1012,8 @@
 - [x] Make each status badge color unique and distinct
 - [x] Improve assigned installer text visibility on colored card backgrounds
 - [x] Change installer name text from green to high-contrast color (dark gray or black)
+
+## AWO Card Background Color Replacement
+- [x] Replace Light Steel Blue (#B0C4DE) with better color for AWO cards
+- [x] Test new color for visibility and contrast
+- [x] Applied Light Lavender (bg-purple-100) as chosen by user

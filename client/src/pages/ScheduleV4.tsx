@@ -111,9 +111,9 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       return 'bg-gray-100';
     }
     
-    // For non-pending statuses: AWO = Light Steel Blue, No-WO = Light Yellow, Regular = Green
+    // For non-pending statuses: AWO = Light Lavender, No-WO = Light Yellow, Regular = Green
     if (isAWO) {
-      return 'bg-[#B0C4DE]';
+      return 'bg-purple-100';
     } else if (hasNoWO) {
       return 'bg-yellow-100';
     } else {
