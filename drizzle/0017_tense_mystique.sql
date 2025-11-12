@@ -1,0 +1,1 @@
+ALTER TABLE `orders` ADD CONSTRAINT `service_order_unique` UNIQUE(`serviceNumber`,`orderNumber`);

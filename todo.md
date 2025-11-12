@@ -1162,3 +1162,25 @@
 - [x] Fixed Excel export date formatting in Orders.tsx
 - [x] Now supports both DD/MM/YYYY (international) and MM/DD/YYYY (American) formats
 - [x] Orders now display correctly in both Orders and Schedule pages
+
+## Duplicate Order Prevention
+- [ ] Investigate current duplicate detection logic in Upload.tsx
+- [ ] Update duplicate detection to check Service ID + WO No. combination
+- [ ] Service ID alone is NOT a duplicate (same service can have multiple WOs)
+- [ ] Service ID + WO No. combination IS a duplicate
+- [ ] Service ID + empty WO No. should check against existing orders with same Service ID and empty WO No.
+- [ ] Update backend tRPC procedure to enforce duplicate check
+- [ ] Add database unique constraint on (serviceNumber, orderNumber) combination
+- [ ] Show clear error message when duplicate is detected
+- [ ] Test with various scenarios (same service different WO, same service same WO, etc.)
+
+## Duplicate Order Prevention - COMPLETED
+- [x] Investigated current duplicate detection logic (no validation existed)
+- [x] Updated bulkCreateOrders() to check Service ID + WO No. combination
+- [x] Service ID alone is NOT a duplicate (same service can have multiple WOs)
+- [x] Service ID + WO No. combination IS a duplicate
+- [x] Service ID + empty WO No. checks against existing orders with same Service ID and empty WO No.
+- [x] Added database unique constraint on (serviceNumber, orderNumber) combination
+- [x] Cleaned up 20+ existing duplicate orders in database
+- [x] Backend throws clear error message when duplicate is detected
+- [x] Database constraint prevents duplicates at database level

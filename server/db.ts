@@ -1,4 +1,4 @@
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, isNull, lte, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { assignmentHistory, assignments, InsertAssignment, InsertAssignmentHistory, InsertInstaller, InsertNote, InsertOrder, InsertOrderHistory, installers, InsertTimeSlot, InsertUser, notes, orderHistory, orders, timeSlots, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -176,6 +176,48 @@ export async function bulkCreateOrders(orderList: InsertOrder[]) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   if (orderList.length === 0) return;
+  
+  // Check for duplicates based on Service ID + WO No. combination
+  // Service ID alone is NOT a duplicate (same service can have multiple WOs)
+  // Service ID + WO No. combination IS a duplicate
+  const duplicates: Array<{ serviceNumber: string; orderNumber: string | null }> = [];
+  
+  for (const order of orderList) {
+    if (!order.serviceNumber) continue;
+    
+    // Build the where condition based on whether WO No. exists
+    const whereCondition = order.orderNumber && order.orderNumber.trim() !== ''
+      ? and(
+          eq(orders.serviceNumber, order.serviceNumber),
+          eq(orders.orderNumber, order.orderNumber)
+        )
+      : and(
+          eq(orders.serviceNumber, order.serviceNumber),
+          or(
+            eq(orders.orderNumber, ''),
+            isNull(orders.orderNumber)
+          )
+        );
+    
+    const existing = await db.select().from(orders).where(whereCondition).limit(1);
+    
+    if (existing.length > 0) {
+      duplicates.push({
+        serviceNumber: order.serviceNumber,
+        orderNumber: order.orderNumber || null
+      });
+    }
+  }
+  
+  if (duplicates.length > 0) {
+    const duplicateList = duplicates.map(d => 
+      d.orderNumber 
+        ? `Service: ${d.serviceNumber}, WO: ${d.orderNumber}`
+        : `Service: ${d.serviceNumber} (no WO)`
+    ).join('; ');
+    throw new Error(`Duplicate orders found: ${duplicateList}`);
+  }
+  
   await db.insert(orders).values(orderList);
 }
 
