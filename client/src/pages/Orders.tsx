@@ -186,7 +186,7 @@ export default function Orders() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       return (
-        order.orderNumber.toLowerCase().includes(query) ||
+        (order.orderNumber || "").toLowerCase().includes(query) ||
         order.customerName.toLowerCase().includes(query) ||
         (order.serviceNumber && order.serviceNumber.toLowerCase().includes(query)) ||
         (order.ticketNumber && order.ticketNumber.toLowerCase().includes(query)) ||
@@ -206,8 +206,8 @@ export default function Orders() {
     
     switch (sortColumn) {
       case "orderNumber":
-        aValue = a.orderNumber.toLowerCase();
-        bValue = b.orderNumber.toLowerCase();
+        aValue = (a.orderNumber || "").toLowerCase();
+        bValue = (b.orderNumber || "").toLowerCase();
         break;
       case "customerName":
         aValue = a.customerName.toLowerCase();
@@ -316,7 +316,7 @@ export default function Orders() {
     if (newStatus === "docket_received" || newStatus === "docket_uploaded") {
       const order = orders?.find(o => o.id === orderId);
       if (order) {
-        setDocketUploadOrder({ id: orderId, status: newStatus, orderNumber: order.orderNumber });
+        setDocketUploadOrder({ id: orderId, status: newStatus, orderNumber: order.orderNumber || "" });
         setIsDocketUploadOpen(true);
       }
       return;
@@ -355,8 +355,8 @@ export default function Orders() {
   };
   
   const handleSaveEdit = async () => {
-    if (!editOrder.orderNumber || !editOrder.customerName) {
-      toast.error("Order number and customer name are required");
+    if (!editOrder.serviceNumber || !editOrder.customerName) {
+      toast.error("Service number and customer name are required");
       return;
     }
     
@@ -708,7 +708,7 @@ export default function Orders() {
                       return (
                         <TableRow key={order.id}>
                           <TableCell className="font-medium text-xs">
-                            <div className="truncate" title={order.orderNumber}>{order.orderNumber}</div>
+                            <div className="truncate" title={order.orderNumber || "-"}>{order.orderNumber || "-"}</div>
                           </TableCell>
                           <TableCell className="text-xs">
                             <div className="truncate" title={order.ticketNumber || "-"}>{order.ticketNumber || "-"}</div>

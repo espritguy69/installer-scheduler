@@ -34,7 +34,7 @@ import { toast } from "sonner";
 
 interface Order {
   id: number;
-  orderNumber: string;
+  orderNumber: string | null;
   customerName: string | null;
   buildingName: string | null;
   serviceNumber: string | null;
@@ -186,8 +186,8 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
           <div className="font-semibold text-xs truncate" title={order.serviceNumber || 'N/A'}>
             SN: {order.serviceNumber || 'N/A'}
           </div>
-          <div className="text-xs text-muted-foreground truncate" title={order.orderNumber}>
-            WO: {order.orderNumber}
+          <div className="text-xs text-muted-foreground truncate" title={order.orderNumber || 'N/A'}>
+            WO: {order.orderNumber || 'N/A'}
           </div>
         </div>
         {isAssigned && (
@@ -271,7 +271,7 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       {/* History Dialog */}
       <OrderHistoryDialog
         orderId={order.id}
-        orderNumber={order.serviceNumber || order.orderNumber}
+        orderNumber={order.serviceNumber || order.orderNumber || "N/A"}
         open={showHistory}
         onOpenChange={setShowHistory}
       />

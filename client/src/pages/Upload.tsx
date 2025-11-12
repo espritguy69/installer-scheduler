@@ -234,15 +234,21 @@ export default function Upload() {
       console.log('=== UPLOAD DEBUG ===');
       console.log('First mapped order:', JSON.stringify(orders[0], null, 2));
       console.log('Total mapped orders:', orders.length);
-      console.log('Sample dates from first 3 orders:');
-      orders.slice(0, 3).forEach((o: any, idx: number) => {
-        console.log(`  Order ${idx + 1}: date="${o.appointmentDate}" time="${o.appointmentTime}"`);
+      console.log('Last 3 mapped orders:');
+      orders.slice(-3).forEach((o: any, idx: number) => {
+        console.log(`  Order ${orders.length - 2 + idx}: WO="${o.orderNumber}" Service="${o.serviceNumber}" Customer="${o.customerName}"`);
       });
       
       // Filter out completely empty rows (where all key fields are empty)
-      const validOrders = orders.filter(o => 
-        o.orderNumber || o.customerName || o.serviceNumber || o.serviceType
-      );
+      const validOrders = orders.filter(o => {
+        // Check if at least one key field has actual content (not just empty string)
+        const hasOrderNumber = o.orderNumber && o.orderNumber.trim() !== "";
+        const hasCustomerName = o.customerName && o.customerName.trim() !== "";
+        const hasServiceNumber = o.serviceNumber && o.serviceNumber.trim() !== "";
+        const hasServiceType = o.serviceType && o.serviceType.trim() !== "";
+        
+        return hasOrderNumber || hasCustomerName || hasServiceNumber || hasServiceType;
+      });
       
       console.log('Valid orders after filter:', validOrders.length);
 
@@ -252,10 +258,15 @@ export default function Upload() {
         return;
       }
 
-      // Validate time formats
+      // Validate required fields and formats
       const errors = new Map<number, string>();
       validOrders.forEach((order, index) => {
-        if (order.appointmentTime && !isValidTimeFormat(order.appointmentTime)) {
+        // Service Number is required
+        if (!order.serviceNumber || order.serviceNumber.trim() === "") {
+          errors.set(index, `Service Number is required`);
+        }
+        // Validate time format if provided
+        else if (order.appointmentTime && !isValidTimeFormat(order.appointmentTime)) {
           errors.set(index, `Invalid time format: "${order.appointmentTime}". Expected format: "2:30 PM" or "02:30 PM"`);
         }
       });

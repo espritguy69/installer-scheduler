@@ -1097,3 +1097,21 @@
 - [x] Prevent import if validation errors exist (disabled Import button)
 - [x] Add "Cancel & Fix File" button for users to fix and re-upload
 - [x] Validation checks appointment time format and shows specific error messages
+
+
+## Upload Filtering Issue - Rows 20-21 Not Imported
+- [ ] Investigate why rows with Service No. but no WO No. are being filtered out
+- [ ] Fix validation logic to accept rows with Service No. as valid orders
+- [ ] Ensure orderNumber can be optional or derived from Service No.
+- [ ] Test with user's Excel file (rows 20-21: CELCOMO, DIGI001735)
+
+
+## Upload Filtering Issue - Rows 20-21 Not Importing (RESOLVED)
+- [x] Investigate why rows with Service No but no WO No were being filtered out
+- [x] Identified database schema issue - orderNumber field was marked as notNull
+- [x] Make orderNumber optional and serviceNumber required in database schema
+- [x] Update backend routers to accept optional orderNumber and require serviceNumber
+- [x] Fix all TypeScript errors from orderNumber becoming nullable (Orders.tsx, ScheduleV4.tsx, ScheduleNew.tsx, server/routers.ts)
+- [x] Update Upload.tsx validation to require serviceNumber instead of orderNumber
+- [x] Service Number is now the most important required field, WO Number is optional
+- [x] Rows 20-21 from user's Excel file will now import successfully

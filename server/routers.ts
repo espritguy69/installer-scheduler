@@ -83,9 +83,9 @@ export const appRouter = router({
       return await db.getOrderHistory(input.orderId);
     }),
     create: protectedProcedure.input(z.object({
-      orderNumber: z.string(),
+      orderNumber: z.string().optional(),
       ticketNumber: z.string().optional(),
-      serviceNumber: z.string().optional(),
+      serviceNumber: z.string(),
       customerName: z.string(),
       customerPhone: z.string().optional(),
       customerEmail: z.string().optional(),
@@ -179,7 +179,7 @@ export const appRouter = router({
               : "Unknown";
             
             await notifyOrderCompleted({
-              orderNumber: updatedOrder.orderNumber,
+              orderNumber: updatedOrder.orderNumber || updatedOrder.serviceNumber,
               installerName,
               customerName: updatedOrder.customerName,
             });
@@ -191,7 +191,7 @@ export const appRouter = router({
               : "Unknown";
             
             await notifyOrderRescheduled({
-              orderNumber: updatedOrder.orderNumber,
+              orderNumber: updatedOrder.orderNumber || updatedOrder.serviceNumber,
               installerName,
               customerName: updatedOrder.customerName,
               reason: data.rescheduleReason,
@@ -200,7 +200,7 @@ export const appRouter = router({
             });
           } else if (data.status === "withdrawn") {
             await notifyOrderWithdrawn({
-              orderNumber: updatedOrder.orderNumber,
+              orderNumber: updatedOrder.orderNumber || updatedOrder.serviceNumber,
               customerName: updatedOrder.customerName,
             });
           }
@@ -216,9 +216,9 @@ export const appRouter = router({
       return { success: true };
     }),
     bulkCreate: protectedProcedure.input(z.array(z.object({
-      orderNumber: z.string(),
+      orderNumber: z.string().optional(),
       ticketNumber: z.string().optional(),
-      serviceNumber: z.string().optional(),
+      serviceNumber: z.string(),
       customerName: z.string(),
       customerPhone: z.string().optional(),
       customerEmail: z.string().optional(),
@@ -372,7 +372,7 @@ export const appRouter = router({
           
           // Send notification
           await notifyOrderAssigned({
-            orderNumber: order.orderNumber,
+            orderNumber: order.orderNumber || order.serviceNumber,
             installerName: installer.name,
             customerName: order.customerName,
             scheduledDate: input.scheduledDate.toLocaleDateString(),
