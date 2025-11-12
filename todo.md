@@ -922,3 +922,12 @@
 - [x] Add default time slots seeding on first run
 - [x] Test time slot CRUD operations
 - [x] Test schedule view updates when time slots change
+
+## WO Type Color Differentiation in Schedule View
+- [x] Analyze current status color logic in OrderCard component
+- [x] Implement color differentiation for AWO-prefixed WO numbers when status is not pending
+- [x] Implement color differentiation for orders with no WO number when status is not pending
+- [x] Ensure pending status maintains current color regardless of WO type
+- [x] Test with AWO orders in different statuses (assigned, on_the_way, met_customer, completed)
+- [x] Test with no-WO orders in different statuses
+- [x] Test with regular WO orders to ensure they maintain original colors

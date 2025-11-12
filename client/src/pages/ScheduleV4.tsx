@@ -102,27 +102,82 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
   const [showHistory, setShowHistory] = useState(false);
   
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-gray-100 text-gray-800 border-gray-300';
-      case 'assigned':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'on_the_way':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      case 'met_customer':
-        return 'bg-green-100 text-green-800 border-green-300';
-      case 'completed':
-        return 'bg-green-100 text-green-800 border-green-300';
-      case 'docket_received':
-        return 'bg-orange-100 text-orange-800 border-orange-300';
-      case 'docket_uploaded':
-        return 'bg-orange-100 text-orange-800 border-orange-300';
-      case 'rescheduled':
-        return 'bg-purple-100 text-purple-800 border-purple-300';
-      case 'withdrawn':
-        return 'bg-red-100 text-red-800 border-red-300';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+    // Check if WO starts with AWO or is empty/null
+    const isAWO = order.orderNumber?.startsWith('AWO');
+    const hasNoWO = !order.orderNumber || order.orderNumber.trim() === '';
+    
+    // Pending status always uses gray regardless of WO type
+    if (status === 'pending') {
+      return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+    
+    // For non-pending statuses, differentiate by WO type
+    if (isAWO) {
+      // AWO orders use teal/cyan colors for non-pending statuses
+      switch (status) {
+        case 'assigned':
+          return 'bg-cyan-100 text-cyan-800 border-cyan-300';
+        case 'on_the_way':
+          return 'bg-cyan-200 text-cyan-900 border-cyan-400';
+        case 'met_customer':
+          return 'bg-teal-100 text-teal-800 border-teal-300';
+        case 'completed':
+          return 'bg-teal-200 text-teal-900 border-teal-400';
+        case 'docket_received':
+          return 'bg-cyan-100 text-cyan-800 border-cyan-300';
+        case 'docket_uploaded':
+          return 'bg-cyan-200 text-cyan-900 border-cyan-400';
+        case 'rescheduled':
+          return 'bg-purple-100 text-purple-800 border-purple-300';
+        case 'withdrawn':
+          return 'bg-red-100 text-red-800 border-red-300';
+        default:
+          return 'bg-cyan-100 text-cyan-800 border-cyan-300';
+      }
+    } else if (hasNoWO) {
+      // Orders with no WO use pink/rose colors for non-pending statuses
+      switch (status) {
+        case 'assigned':
+          return 'bg-pink-100 text-pink-800 border-pink-300';
+        case 'on_the_way':
+          return 'bg-pink-200 text-pink-900 border-pink-400';
+        case 'met_customer':
+          return 'bg-rose-100 text-rose-800 border-rose-300';
+        case 'completed':
+          return 'bg-rose-200 text-rose-900 border-rose-400';
+        case 'docket_received':
+          return 'bg-pink-100 text-pink-800 border-pink-300';
+        case 'docket_uploaded':
+          return 'bg-pink-200 text-pink-900 border-pink-400';
+        case 'rescheduled':
+          return 'bg-purple-100 text-purple-800 border-purple-300';
+        case 'withdrawn':
+          return 'bg-red-100 text-red-800 border-red-300';
+        default:
+          return 'bg-pink-100 text-pink-800 border-pink-300';
+      }
+    } else {
+      // Regular WO orders use original colors
+      switch (status) {
+        case 'assigned':
+          return 'bg-blue-100 text-blue-800 border-blue-300';
+        case 'on_the_way':
+          return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+        case 'met_customer':
+          return 'bg-green-100 text-green-800 border-green-300';
+        case 'completed':
+          return 'bg-green-100 text-green-800 border-green-300';
+        case 'docket_received':
+          return 'bg-orange-100 text-orange-800 border-orange-300';
+        case 'docket_uploaded':
+          return 'bg-orange-100 text-orange-800 border-orange-300';
+        case 'rescheduled':
+          return 'bg-purple-100 text-purple-800 border-purple-300';
+        case 'withdrawn':
+          return 'bg-red-100 text-red-800 border-red-300';
+        default:
+          return 'bg-gray-100 text-gray-800 border-gray-300';
+      }
     }
   };
   const [{ isOver }, drop] = useDrop(() => ({
