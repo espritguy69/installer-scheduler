@@ -1086,3 +1086,14 @@
 - [x] Add validation to prevent future time format inconsistencies (isValidTimeFormat utility)
 - [x] Test time format handling across all pages (Upload, Orders, Schedule, Dashboard)
 - [x] Document time format standards for future development (TIME_FORMAT_NORMALIZATION.md)
+
+
+## Excel Upload Time Validation Feature
+- [x] Design validation UI with error highlighting in preview table
+- [x] Implement time format validation logic using isValidTimeFormat utility
+- [x] Add preview table showing parsed data before import
+- [x] Highlight rows with invalid time formats in red background
+- [x] Show error messages for invalid rows inline
+- [x] Prevent import if validation errors exist (disabled Import button)
+- [x] Add "Cancel & Fix File" button for users to fix and re-upload
+- [x] Validation checks appointment time format and shows specific error messages

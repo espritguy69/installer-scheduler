@@ -36,7 +36,7 @@ function excelDateToReadable(excelDate: any): string {
 }
 
 // Import shared time utilities for consistent formatting
-import { excelTimeToReadable } from "@shared/timeUtils";
+import { excelTimeToReadable, isValidTimeFormat } from "@shared/timeUtils";
 
 export default function Upload() {
   const [ordersFile, setOrdersFile] = useState<File | null>(null);
@@ -44,6 +44,9 @@ export default function Upload() {
   const [duplicates, setDuplicates] = useState<any[]>([]);
   const [newOrders, setNewOrders] = useState<any[]>([]);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [previewData, setPreviewData] = useState<any[]>([]);
+  const [validationErrors, setValidationErrors] = useState<Map<number, string>>(new Map());
 
   const bulkCreateOrders = trpc.orders.bulkCreate.useMutation();
   const { data: existingOrders = [] } = trpc.orders.list.useQuery();
@@ -249,10 +252,40 @@ export default function Upload() {
         return;
       }
 
+      // Validate time formats
+      const errors = new Map<number, string>();
+      validOrders.forEach((order, index) => {
+        if (order.appointmentTime && !isValidTimeFormat(order.appointmentTime)) {
+          errors.set(index, `Invalid time format: "${order.appointmentTime}". Expected format: "2:30 PM" or "02:30 PM"`);
+        }
+      });
+
+      // Show preview dialog with validation results
+      setPreviewData(validOrders);
+      setValidationErrors(errors);
+      setShowPreviewDialog(true);
+      setIsProcessing(false);
+    } catch (error) {
+      console.error("=== UPLOAD ERROR ===");
+      console.error("Error uploading orders:", error);
+      console.error("Error stack:", (error as any).stack);
+      toast.error("Failed to upload orders. Please check the file format.");
+      setIsProcessing(false);
+    }
+  };
+
+  const handleConfirmImport = async () => {
+    if (validationErrors.size > 0) {
+      toast.error("Please fix all validation errors before importing");
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
       // Check for duplicates
       const existingOrderNumbers = new Set(existingOrders.map(o => o.orderNumber));
-      const duplicateOrders = validOrders.filter(o => existingOrderNumbers.has(o.orderNumber));
-      const uniqueOrders = validOrders.filter(o => !existingOrderNumbers.has(o.orderNumber));
+      const duplicateOrders = previewData.filter(o => existingOrderNumbers.has(o.orderNumber));
+      const uniqueOrders = previewData.filter(o => !existingOrderNumbers.has(o.orderNumber));
 
       if (duplicateOrders.length > 0) {
         // Show duplicate dialog
@@ -278,14 +311,17 @@ export default function Upload() {
         }
       });
       setOrdersFile(null);
+      setShowPreviewDialog(false);
+      setPreviewData([]);
+      setValidationErrors(new Map());
       // Reset file input
       const fileInput = document.getElementById("orders-file-input") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
     } catch (error) {
-      console.error("=== UPLOAD ERROR ===");
-      console.error("Error uploading orders:", error);
+      console.error("=== IMPORT ERROR ===");
+      console.error("Error importing orders:", error);
       console.error("Error stack:", (error as any).stack);
-      toast.error("Failed to upload orders. Please check the file format.");
+      toast.error("Failed to import orders. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -365,6 +401,90 @@ export default function Upload() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Preview & Validation Dialog */}
+      <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
+        <DialogContent className="max-w-6xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>
+              Preview Orders - {previewData.length} rows found
+            </DialogTitle>
+            <DialogDescription>
+              {validationErrors.size === 0 ? (
+                <span className="text-green-600 font-medium">✓ All rows validated successfully</span>
+              ) : (
+                <span className="text-red-600 font-medium">⚠ {validationErrors.size} validation error(s) found - please fix before importing</span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto border rounded-lg">
+            <table className="w-full text-sm">
+              <thead className="bg-muted sticky top-0">
+                <tr>
+                  <th className="px-2 py-2 text-left font-medium">#</th>
+                  <th className="px-2 py-2 text-left font-medium">Order No.</th>
+                  <th className="px-2 py-2 text-left font-medium">Customer</th>
+                  <th className="px-2 py-2 text-left font-medium">App Date</th>
+                  <th className="px-2 py-2 text-left font-medium">App Time</th>
+                  <th className="px-2 py-2 text-left font-medium">Building</th>
+                  <th className="px-2 py-2 text-left font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {previewData.map((order, index) => {
+                  const hasError = validationErrors.has(index);
+                  return (
+                    <tr key={index} className={hasError ? "bg-red-50" : index % 2 === 0 ? "bg-background" : "bg-muted/50"}>
+                      <td className="px-2 py-2 text-muted-foreground">{index + 1}</td>
+                      <td className="px-2 py-2 font-mono text-xs">{order.orderNumber || "-"}</td>
+                      <td className="px-2 py-2">{order.customerName || "-"}</td>
+                      <td className="px-2 py-2">{order.appointmentDate || "-"}</td>
+                      <td className={`px-2 py-2 ${hasError ? "text-red-600 font-semibold" : ""}`}>
+                        {order.appointmentTime || "-"}
+                        {hasError && (
+                          <div className="text-xs text-red-600 mt-1">
+                            {validationErrors.get(index)}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-2 py-2">{order.buildingName || "-"}</td>
+                      <td className="px-2 py-2">
+                        {hasError ? (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Error</span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Valid</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex gap-2 pt-4">
+            <Button
+              onClick={handleConfirmImport}
+              disabled={validationErrors.size > 0 || isProcessing}
+              className="flex-1"
+            >
+              {isProcessing ? "Importing..." : `Import ${previewData.length} Orders`}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowPreviewDialog(false);
+                setPreviewData([]);
+                setValidationErrors(new Map());
+                setOrdersFile(null);
+                const fileInput = document.getElementById("orders-file-input") as HTMLInputElement;
+                if (fileInput) fileInput.value = "";
+              }}
+            >
+              Cancel & Fix File
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Duplicate Warning Dialog */}
       <Dialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
