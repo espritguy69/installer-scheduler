@@ -41,8 +41,8 @@ export default function InstallerView() {
   // Get today's date
   const today = new Date().toISOString().split('T')[0];
 
-  // Find current user's installer record
-  const currentInstaller = installers.find(i => i.email === user?.email || i.name === user?.name);
+  // Find current user's installer record by userId
+  const currentInstaller = user ? installers.find(i => i.userId === user.id) : undefined;
 
   // Get today's assignments for current installer
   const todayAssignments = assignments.filter(a => {

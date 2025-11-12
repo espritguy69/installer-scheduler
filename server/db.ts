@@ -89,6 +89,12 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getAllUsers() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(users);
+}
+
 // Orders queries
 export async function getAllOrders() {
   const db = await getDb();
@@ -185,6 +191,25 @@ export async function bulkCreateInstallers(installerList: InsertInstaller[]) {
   if (!db) throw new Error("Database not available");
   if (installerList.length === 0) return;
   await db.insert(installers).values(installerList);
+}
+
+export async function linkUserToInstaller(installerId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(installers).set({ userId }).where(eq(installers.id, installerId));
+}
+
+export async function unlinkUserFromInstaller(installerId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(installers).set({ userId: null }).where(eq(installers.id, installerId));
+}
+
+export async function getInstallerByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(installers).where(eq(installers.userId, userId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
 }
 
 // Assignments queries

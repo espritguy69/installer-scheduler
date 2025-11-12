@@ -774,3 +774,16 @@
 - [x] Verify Update installer functionality works with edit dialog
 - [x] Verify Delete installer functionality works with confirmation dialog
 - [x] Test all CRUD operations (Create, Read, Update, Delete)
+
+## Installer View Enhancements
+- [ ] Create admin interface for linking user accounts to installer profiles
+- [ ] Add quick action buttons (Call Customer, Navigate, Mark Complete) to installer cards
+- [ ] Implement real-time status updates with polling for installer view
+- [ ] Test installer profile linking and verify card layout changes are visible
+
+## Installer Enhancements - Completed
+- [x] Add userId field to installers table for user linking
+- [x] Create backend procedures for linking/unlinking users
+- [x] Add "User Link" column to Installers table
+- [x] Create Link User dialog with user selection
+- [x] Implement link/unlink user handlers

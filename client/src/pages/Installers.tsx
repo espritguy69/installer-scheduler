@@ -33,12 +33,17 @@ export default function Installers() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isLinkUserDialogOpen, setIsLinkUserDialogOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: installers = [], isLoading } = trpc.installers.list.useQuery();
+  const { data: users = [] } = trpc.users.list.useQuery();
   const createInstaller = trpc.installers.create.useMutation();
   const updateInstaller = trpc.installers.update.useMutation();
   const deleteInstaller = trpc.installers.delete.useMutation();
+  const linkUser = trpc.installers.linkUser.useMutation();
+  const unlinkUser = trpc.installers.unlinkUser.useMutation();
   const utils = trpc.useUtils();
 
   const [formData, setFormData] = useState({
@@ -141,6 +146,47 @@ export default function Installers() {
     }
   };
 
+  const handleOpenLinkDialog = (installer: any) => {
+    setSelectedInstaller(installer);
+    setSelectedUserId(installer.userId || null);
+    setIsLinkUserDialogOpen(true);
+  };
+
+  const handleLinkUser = async () => {
+    if (!selectedInstaller || !selectedUserId) return;
+
+    try {
+      await linkUser.mutateAsync({
+        installerId: selectedInstaller.id,
+        userId: selectedUserId,
+      });
+      await utils.installers.list.invalidate();
+      toast.success("User linked successfully");
+      setIsLinkUserDialogOpen(false);
+      setSelectedInstaller(null);
+      setSelectedUserId(null);
+    } catch (error) {
+      console.error("Error linking user:", error);
+      toast.error("Failed to link user");
+    }
+  };
+
+  const handleUnlinkUser = async () => {
+    if (!selectedInstaller) return;
+
+    try {
+      await unlinkUser.mutateAsync({ installerId: selectedInstaller.id });
+      await utils.installers.list.invalidate();
+      toast.success("User unlinked successfully");
+      setIsLinkUserDialogOpen(false);
+      setSelectedInstaller(null);
+      setSelectedUserId(null);
+    } catch (error) {
+      console.error("Error unlinking user:", error);
+      toast.error("Failed to unlink user");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -200,13 +246,14 @@ export default function Installers() {
                     <TableHead>Phone</TableHead>
                     <TableHead>Skills</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>User Link</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredInstallers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                         {searchQuery ? "No installers found matching your search." : "No installers found. Upload installers to get started."}
                       </TableCell>
                     </TableRow>
@@ -229,6 +276,21 @@ export default function Installers() {
                           }`}>
                             {installer.isActive ? "Active" : "Inactive"}
                           </span>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenLinkDialog(installer)}
+                          >
+                            {installer.userId ? (
+                              <span className="text-xs">
+                                {users.find(u => u.id === installer.userId)?.name || "Linked"}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">Link User</span>
+                            )}
+                          </Button>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
@@ -395,6 +457,49 @@ export default function Installers() {
             </Button>
             <Button onClick={handleUpdateInstaller} disabled={!formData.name}>
               Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Link User Dialog */}
+      <Dialog open={isLinkUserDialogOpen} onOpenChange={setIsLinkUserDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Link User to Installer</DialogTitle>
+            <DialogDescription>
+              Link a user account to <strong>{selectedInstaller?.name}</strong> to allow them to access the installer dashboard.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="userId">Select User</Label>
+              <select
+                id="userId"
+                value={selectedUserId || ""}
+                onChange={(e) => setSelectedUserId(e.target.value ? Number(e.target.value) : null)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="">-- Select a user --</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name} ({user.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            {selectedInstaller?.userId && (
+              <Button variant="outline" onClick={handleUnlinkUser}>
+                Unlink Current User
+              </Button>
+            )}
+            <Button variant="outline" onClick={() => setIsLinkUserDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleLinkUser} disabled={!selectedUserId}>
+              Link User
             </Button>
           </DialogFooter>
         </DialogContent>

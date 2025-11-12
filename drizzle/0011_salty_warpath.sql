@@ -1,0 +1,1 @@
+ALTER TABLE `installers` ADD `userId` int;

@@ -63,6 +63,7 @@ export type InsertOrder = typeof orders.$inferInsert;
  */
 export const installers = mysqlTable("installers", {
   id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // Link to users table - allows installer to access installer dashboard
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 320 }),
   phone: varchar("phone", { length: 50 }),

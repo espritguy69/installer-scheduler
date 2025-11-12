@@ -20,6 +20,12 @@ export const appRouter = router({
     }),
   }),
 
+  users: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllUsers();
+    }),
+  }),
+
   orders: router({
     list: protectedProcedure.query(async () => {
       return await db.getAllOrders();
@@ -248,6 +254,19 @@ export const appRouter = router({
     }))).mutation(async ({ input }) => {
       await db.bulkCreateInstallers(input);
       return { success: true, count: input.length };
+    }),
+    linkUser: protectedProcedure.input(z.object({
+      installerId: z.number(),
+      userId: z.number(),
+    })).mutation(async ({ input }) => {
+      await db.linkUserToInstaller(input.installerId, input.userId);
+      return { success: true };
+    }),
+    unlinkUser: protectedProcedure.input(z.object({
+      installerId: z.number(),
+    })).mutation(async ({ input }) => {
+      await db.unlinkUserFromInstaller(input.installerId);
+      return { success: true };
     }),
   }),
 
