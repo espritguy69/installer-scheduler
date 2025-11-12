@@ -68,6 +68,8 @@ export default function InstallerView() {
         return "bg-purple-100 text-purple-800";
       case "completed":
         return "bg-green-100 text-green-800";
+      case "order_completed":
+        return "bg-lime-100 text-lime-800";
       case "docket_received":
         return "bg-teal-100 text-teal-800";
       case "docket_uploaded":
@@ -325,6 +327,7 @@ export default function InstallerView() {
                   <SelectItem value="on_the_way">On the Way</SelectItem>
                   <SelectItem value="met_customer">Met the Customer</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="order_completed">Order Completed</SelectItem>
                   <SelectItem value="docket_received">Docket Received</SelectItem>
                   <SelectItem value="docket_uploaded">Docket Uploaded</SelectItem>
                   <SelectItem value="rescheduled">Reschedule</SelectItem>

@@ -134,6 +134,8 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
         return 'bg-emerald-100 text-emerald-800 border-emerald-300';
       case 'completed':
         return 'bg-green-600 text-white border-green-700';
+      case 'order_completed':
+        return 'bg-lime-100 text-lime-800 border-lime-300';
       case 'docket_received':
         return 'bg-teal-100 text-teal-800 border-teal-300';
       case 'docket_uploaded':
@@ -211,6 +213,7 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
               <SelectItem value="on_the_way">On the Way</SelectItem>
               <SelectItem value="met_customer">Met Customer</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="order_completed">Order Completed</SelectItem>
               <SelectItem value="docket_received">Docket Received</SelectItem>
               <SelectItem value="docket_uploaded">Docket Uploaded</SelectItem>
               <SelectItem value="rescheduled">Rescheduled</SelectItem>
@@ -610,7 +613,7 @@ export default function ScheduleV4() {
 
       await updateOrderMutation.mutateAsync({
         id: orderId,
-        status: newStatus as "pending" | "assigned" | "on_the_way" | "met_customer" | "completed" | "docket_received" | "docket_uploaded" | "rescheduled" | "withdrawn",
+        status: newStatus as "pending" | "assigned" | "on_the_way" | "met_customer" | "completed" | "order_completed" | "docket_received" | "docket_uploaded" | "rescheduled" | "withdrawn",
       });
 
       toast.success("Status updated");
@@ -787,9 +790,17 @@ export default function ScheduleV4() {
                   variant={statusFilter === "completed" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("completed")}
-                  className="text-xs bg-green-100 hover:bg-green-200 text-green-700 border-green-300"
+                  className="text-xs bg-green-600 hover:bg-green-700 text-white border-green-700"
                 >
                   Completed
+                </Button>
+                <Button
+                  variant={statusFilter === "order_completed" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("order_completed")}
+                  className="text-xs bg-lime-100 hover:bg-lime-200 text-lime-700 border-lime-300"
+                >
+                  Order Completed
                 </Button>
                 <Button
                   variant={statusFilter === "docket_received" ? "default" : "outline"}

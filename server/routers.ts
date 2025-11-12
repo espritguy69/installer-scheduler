@@ -84,7 +84,7 @@ export const appRouter = router({
       buildingName: z.string().optional(),
       estimatedDuration: z.number().optional(),
       priority: z.enum(["low", "medium", "high"]).optional(),
-      status: z.enum(["pending", "assigned", "on_the_way", "met_customer", "completed", "docket_received", "docket_uploaded", "rescheduled", "withdrawn"]).optional(),
+      status: z.enum(["pending", "assigned", "on_the_way", "met_customer", "completed", "order_completed", "docket_received", "docket_uploaded", "rescheduled", "withdrawn"]).optional(),
       rescheduleReason: z.enum(["customer_issue", "building_issue", "network_issue"]).optional(),
       rescheduledDate: z.date().optional(),
       rescheduledTime: z.string().optional(),
