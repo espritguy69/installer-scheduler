@@ -5,6 +5,9 @@ This directory contains example React components demonstrating how to use the Se
 ## Table of Contents
 
 - [OrdersListExample.tsx](#orderslistexampletsx) - Complete orders list with filtering, sorting, and export
+- [InstallerScheduleViewExample.tsx](#installerscheduleviewexampletsx) - Drag-and-drop scheduling interface
+- [OrderDetailExample.tsx](#orderdetailexampletsx) - View and edit single order with validation
+- [TimeSlotSettingsExample.tsx](#timeslotsettingsexampletsx) - Admin interface for time slot management
 
 ## OrdersListExample.tsx
 
@@ -366,9 +369,9 @@ Enhance the empty state with a call-to-action:
 
 ### Related Examples
 
-- **OrderDetailExample.tsx** - View and edit a single order (coming soon)
-- **OrderCreateExample.tsx** - Create new orders with validation (coming soon)
-- **AssignmentScheduleExample.tsx** - Assign orders to installers (coming soon)
+- **InstallerScheduleViewExample.tsx** - Drag-and-drop scheduling interface
+- **OrderDetailExample.tsx** - View and edit single order with validation
+- **TimeSlotSettingsExample.tsx** - Admin interface for time slot management
 
 ### Additional Resources
 
@@ -376,6 +379,179 @@ Enhance the empty state with a call-to-action:
 - [TanStack Query Documentation](https://tanstack.com/query/latest)
 - [shadcn/ui Components](https://ui.shadcn.com/)
 - [XLSX Library Documentation](https://docs.sheetjs.com/)
+
+---
+
+## InstallerScheduleViewExample.tsx
+
+A comprehensive drag-and-drop scheduling interface for assigning orders to installers.
+
+### Features Demonstrated
+
+- **Multiple tRPC Queries** - Fetching orders, installers, assignments, and time slots
+- **Drag-and-Drop** - Native HTML5 drag-and-drop for installer assignment
+- **Date Navigation** - Calendar picker and prev/next day buttons
+- **Time Slot Organization** - Orders grouped by appointment time
+- **Color-Coded Cards** - Visual differentiation for AWO, no-WO, and regular orders
+- **Installer Availability** - Real-time order count per installer
+- **Assignment Management** - Assign and unassign with optimistic updates
+
+### Key Patterns
+
+**Drag-and-Drop Assignment:**
+```typescript
+const handleDragStart = (installer: Installer) => {
+  setDraggedInstaller(installer);
+};
+
+const handleDrop = (orderId: number) => {
+  if (!draggedInstaller) return;
+  assignMutation.mutate({
+    orderId,
+    installerId: draggedInstaller.id,
+  });
+};
+```
+
+**Grouping Orders by Time Slot:**
+```typescript
+const ordersByTimeSlot = useMemo(() => {
+  const grouped: Record<string, Order[]> = {};
+  activeTimeSlots.forEach((slot) => {
+    grouped[slot.time] = ordersForDate.filter((order) =>
+      order.appointmentTime?.startsWith(slot.time)
+    );
+  });
+  return grouped;
+}, [ordersForDate, activeTimeSlots]);
+```
+
+### Usage
+
+```bash
+cp docs/examples/InstallerScheduleViewExample.tsx client/src/pages/Schedule.tsx
+```
+
+---
+
+## OrderDetailExample.tsx
+
+A comprehensive form for viewing and editing individual order details with validation and history tracking.
+
+### Features Demonstrated
+
+- **Dynamic Routing** - Using wouter for parameterized routes
+- **Form State Management** - Controlled inputs with change tracking
+- **Input Validation** - Client-side validation before submission
+- **Tabbed Interface** - Separate tabs for details and history
+- **Conditional Fields** - Show reschedule fields only when status is "rescheduled"
+- **History Timeline** - Visual timeline of order changes
+- **Optimistic Updates** - Instant feedback on form submission
+
+### Key Patterns
+
+**Form Change Tracking:**
+```typescript
+const [formData, setFormData] = useState<Partial<Order>>({});
+const [hasChanges, setHasChanges] = useState(false);
+
+const handleFieldChange = (field: keyof Order, value: any) => {
+  setFormData((prev) => ({ ...prev, [field]: value }));
+  setHasChanges(true);
+};
+```
+
+**Conditional Field Rendering:**
+```typescript
+{formData.status === "rescheduled" && (
+  <>
+    <div className="space-y-2">
+      <Label htmlFor="rescheduleReason">Reschedule Reason</Label>
+      <Select
+        value={formData.rescheduleReason || undefined}
+        onValueChange={(value) =>
+          handleFieldChange("rescheduleReason", value)
+        }
+      >
+        {/* ... */}
+      </Select>
+    </div>
+  </>
+)}
+```
+
+### Usage
+
+```bash
+cp docs/examples/OrderDetailExample.tsx client/src/pages/OrderDetail.tsx
+
+# Add route in App.tsx:
+<Route path="/orders/:id" component={OrderDetail} />
+```
+
+---
+
+## TimeSlotSettingsExample.tsx
+
+An admin interface for managing appointment time slots with drag-and-drop reordering.
+
+### Features Demonstrated
+
+- **Drag-and-Drop Reordering** - Using @dnd-kit for sortable lists
+- **CRUD Operations** - Create, update, delete time slots
+- **Toggle Controls** - Enable/disable time slots without deleting
+- **Input Validation** - Time format validation and duplicate checking
+- **Confirmation Dialogs** - AlertDialog for destructive actions
+- **Seed Defaults** - Populate default time slots with one click
+
+### Key Patterns
+
+**Drag-and-Drop with @dnd-kit:**
+```typescript
+const handleDragEnd = (event: DragEndEvent) => {
+  const { active, over } = event;
+  if (!over || active.id === over.id) return;
+
+  const oldIndex = timeSlots.findIndex((slot) => slot.id === active.id);
+  const newIndex = timeSlots.findIndex((slot) => slot.id === over.id);
+  
+  const reorderedSlots = arrayMove(timeSlots, oldIndex, newIndex);
+  const timeSlotIds = reorderedSlots.map((slot) => slot.id);
+  reorderMutation.mutate({ timeSlotIds });
+};
+```
+
+**Sortable Item Component:**
+```typescript
+function SortableTimeSlotItem({ timeSlot, onToggle, onDelete }) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: timeSlot.id });
+
+  return (
+    <div ref={setNodeRef} style={{ transform, transition }}>
+      <div {...attributes} {...listeners}>
+        <GripVertical /> {/* Drag handle */}
+      </div>
+      {/* ... */}
+    </div>
+  );
+}
+```
+
+### Dependencies
+
+Requires @dnd-kit packages:
+```bash
+pnpm add @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
+```
+
+### Usage
+
+```bash
+cp docs/examples/TimeSlotSettingsExample.tsx client/src/pages/TimeSlotSettings.tsx
+```
+
+---
 
 ### Support
 
