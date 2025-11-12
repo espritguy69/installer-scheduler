@@ -101,26 +101,49 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
   const [isHovered, setIsHovered] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   
-  const getStatusColor = (status: string) => {
-    // Check if WO starts with AWO or is empty/null
+  // Card background color based on WO type (4-color scheme)
+  const getCardBackgroundColor = (status: string) => {
     const isAWO = order.orderNumber?.startsWith('AWO');
     const hasNoWO = !order.orderNumber || order.orderNumber.trim() === '';
     
     // Pending status always uses gray regardless of WO type
     if (status === 'pending') {
-      return 'bg-gray-100 text-gray-800 border-gray-300';
+      return 'bg-gray-100';
     }
     
     // For non-pending statuses: AWO = Light Steel Blue, No-WO = Light Yellow, Regular = Green
     if (isAWO) {
-      // AWO orders use Light Steel Blue (#B0C4DE) for all non-pending statuses
-      return 'bg-[#B0C4DE] text-gray-800 border-[#B0C4DE]';
+      return 'bg-[#B0C4DE]';
     } else if (hasNoWO) {
-      // Orders with no WO number use light yellow for all non-pending statuses
-      return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      return 'bg-yellow-100';
     } else {
-      // All regular WO orders use green background for all non-pending statuses
-      return 'bg-green-100 text-green-800 border-green-300';
+      return 'bg-green-50';
+    }
+  };
+  
+  // Status badge color based on actual status (original color scheme)
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+      case 'assigned':
+        return 'bg-blue-100 text-blue-800 border-blue-300';
+      case 'on_the_way':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'met_customer':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'completed':
+        return 'bg-green-200 text-green-900 border-green-400';
+      case 'docket_received':
+        return 'bg-teal-100 text-teal-800 border-teal-300';
+      case 'docket_uploaded':
+        return 'bg-cyan-100 text-cyan-800 border-cyan-300';
+      case 'rescheduled':
+        return 'bg-purple-100 text-purple-800 border-purple-300';
+      case 'withdrawn':
+        return 'bg-red-100 text-red-800 border-red-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
     }
   };
   const [{ isOver }, drop] = useDrop(() => ({
@@ -135,8 +158,8 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
 
   const isAssigned = !!assignedInstaller;
 
-  // Get the background color based on status and WO type
-  const cardBgColor = getStatusColor(order.status);
+  // Get the background color based on WO type
+  const cardBgColor = getCardBackgroundColor(order.status);
 
   return (
     <div
@@ -179,7 +202,7 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
         </div>
         <div className="mt-1">
           <Select value={order.status} onValueChange={(value) => onStatusChange(order.id, value)}>
-            <SelectTrigger className={`h-6 text-xs w-full font-medium border ${getStatusColor(order.status)}`}>
+            <SelectTrigger className={`h-6 text-xs w-full font-medium border ${getStatusBadgeColor(order.status)}`}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

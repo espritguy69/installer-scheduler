@@ -1003,3 +1003,6 @@
 - [x] Add light yellow background for no-WO orders when status is not pending
 - [x] Maintain 4-color scheme: Gray (pending), Light Steel Blue (AWO), Light Yellow (no-WO), Green (regular)
 - [x] Test with orders that have null or empty WO numbers
+
+## Status Badge Color Restoration
+- [x] Restore status badge colors (blue for Assigned, green for Completed, etc.) while keeping simplified 4-color card backgrounds
