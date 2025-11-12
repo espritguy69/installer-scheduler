@@ -1,0 +1,55 @@
+{
+  "query": "SELECT id, serviceNumber, orderNumber, customerName, appointmentDate, appointmentTime, status FROM orders WHERE serviceNumber LIKE 'DIGI%' OR serviceNumber LIKE 'CELCOM%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, serviceNumber, orderNumber, customerName, appointmentDate, appointmentTime, status FROM orders WHERE serviceNumber LIKE 'DIGI%' OR serviceNumber LIKE 'CELCOM%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "300276",
+      "serviceNumber": "CELCOM0016262",
+      "orderNumber": "",
+      "customerName": "AMIRUL ADLI BIN SHAIPUDDIN",
+      "appointmentDate": "Nov 1, 2025",
+      "appointmentTime": "10:00 AM",
+      "status": "completed"
+    },
+    {
+      "id": "300291",
+      "serviceNumber": "DIGI0016923",
+      "orderNumber": "",
+      "customerName": "SIAU CHUI SEN",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "10:00 AM",
+      "status": "completed"
+    },
+    {
+      "id": "300303",
+      "serviceNumber": "DIGI0016660",
+      "orderNumber": "",
+      "customerName": "LAM WEI KHIEN",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "10:00 AM",
+      "status": "completed"
+    },
+    {
+      "id": "300305",
+      "serviceNumber": "DIGI0016832",
+      "orderNumber": "",
+      "customerName": "AMEEN NUR-HAKIM BIN ASHHAR",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "2:30 PM",
+      "status": "completed"
+    },
+    {
+      "id": "300363",
+      "serviceNumber": "CELCOM0016114",
+      "orderNumber": "",
+      "customerName": "SEK LI YEE",
+      "appointmentDate": "Dec 30, 1899",
+      "appointmentTime": "DAMANSARA SERESTA - BLOCK A",
+      "status": "pending"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tserviceNumber\torderNumber\tcustomerName\tappointmentDate\tappointmentTime\tstatus\n300276\tCELCOM0016262\t\tAMIRUL ADLI BIN SHAIPUDDIN\tNov 1, 2025\t10:00 AM\tcompleted\n300291\tDIGI0016923\t\tSIAU CHUI SEN\tNov 3, 2025\t10:00 AM\tcompleted\n300303\tDIGI0016660\t\tLAM WEI KHIEN\tNov 3, 2025\t10:00 AM\tcompleted\n300305\tDIGI0016832\t\tAMEEN NUR-HAKIM BIN ASHHAR\tNov 3, 2025\t2:30 PM\tcompleted\n300363\tCELCOM0016114\t\tSEK LI YEE\tDec 30, 1899\tDAMANSARA SERESTA - BLOCK A\tpending\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

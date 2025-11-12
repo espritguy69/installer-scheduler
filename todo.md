@@ -1184,3 +1184,18 @@
 - [x] Cleaned up 20+ existing duplicate orders in database
 - [x] Backend throws clear error message when duplicate is detected
 - [x] Database constraint prevents duplicates at database level
+
+## Schedule Card Layout & Assignment Fix
+- [ ] Remove "SN:" and "WO:" labels from schedule cards
+- [ ] Display Service Number and WO Number side by side without labels
+- [ ] Investigate why DIGI/CELCOM orders cannot be assigned to installers
+- [ ] Fix installer assignment issue for orders without WO numbers
+- [ ] Test assignment functionality with various order types
+
+## Schedule Card Layout & Assignment Fix - COMPLETED
+- [x] Removed "SN:" and "WO:" labels from schedule cards
+- [x] Display Service Number and WO Number side by side without labels (cleaner look)
+- [x] Investigated DIGI/CELCOM assignment issue (found data inconsistency)
+- [x] Fixed orders stuck in "assigned" status without actual assignments
+- [x] Reset CELCOM0016828 and DIGI0017347 to pending status
+- [x] Orders now ready for proper installer assignment
