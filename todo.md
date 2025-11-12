@@ -824,3 +824,13 @@
 - [x] Implement status change handler with optimistic updates
 - [x] Add color-coded status options in dropdown
 - [x] Test status updates directly from Schedule cards
+
+## Add Status Color Coding to Schedule Cards
+
+- [ ] Create status color mapping function (gray=Pending, blue=Assigned, yellow=On the Way, green=Completed, orange=Docket stages, purple=Rescheduled, red=Withdrawn)
+- [ ] Apply dynamic background colors to status dropdown trigger
+- [ ] Test all status colors on Schedule cards
+
+- [x] Create status color mapping function (gray=Pending, blue=Assigned, yellow=On the Way, green=Completed, orange=Docket stages, purple=Rescheduled, red=Withdrawn)
+- [x] Apply dynamic background colors to status dropdown trigger
+- [x] Test all status colors on Schedule cards
