@@ -39,7 +39,7 @@ import { APP_TITLE } from "@/const";
 import { ArrowDown, ArrowUp, ArrowUpDown, Download, FileText, Loader2, Upload, X } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { Navigation } from "@/components/Navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
 
@@ -128,6 +128,31 @@ export default function Orders() {
     const today = new Date();
     return today.toISOString().split('T')[0]; // YYYY-MM-DD format
   });
+  
+  // Always reset to today's date when component mounts or becomes visible
+  useEffect(() => {
+    const updateToToday = () => {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      setDateFilter(todayStr);
+    };
+    
+    // Update on mount
+    updateToToday();
+    
+    // Update when page becomes visible (tab switch)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        updateToToday();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
   
   // Sorting states
   const [sortColumn, setSortColumn] = useState<string | null>(null);

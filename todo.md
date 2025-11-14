@@ -1293,3 +1293,10 @@
 - [x] Update manual order creation time picker
 - [x] Update order edit dialog time picker
 - [x] Create generateTimeSlots and formatTimeSlot utilities
+
+## Orders Page Date Filter Fix (USER REPORTED - COMPLETED)
+- [x] Investigated date filter stuck on November 14, 2025
+- [x] Added useEffect to reset date to actual today on component mount
+- [x] Added visibility change listener to update date when switching tabs
+- [x] Orders page now always shows current day's appointments by default
+- [x] Consistent with Schedule page behavior
