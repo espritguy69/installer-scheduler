@@ -151,6 +151,11 @@ export async function updateOrder(id: number, order: Partial<InsertOrder>) {
 export async function deleteOrder(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // Delete related assignments first (foreign key constraint)
+  await db.delete(assignments).where(eq(assignments.orderId, id));
+  
+  // Then delete the order
   await db.delete(orders).where(eq(orders.id, id));
 }
 

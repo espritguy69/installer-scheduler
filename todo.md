@@ -1259,3 +1259,13 @@
 - [x] Hybrid date/time format detection and conversion utilities
 - [x] Reschedule dialog with date/time picker when status changes to rescheduled
 - [x] Multi-select bulk assignment functionality in Schedule page
+
+## Duplicate Detection Bug
+- [ ] Investigate why deleted orders still show as duplicates
+- [ ] Verify delete functionality is working correctly
+- [ ] Fix delete or duplicate detection logic
+
+## Duplicate Detection Bug Fixed
+- [x] Investigated why deleted orders still show as duplicates
+- [x] Found that deleteOrder function wasn't deleting related assignments first
+- [x] Fixed deleteOrder to delete assignments before deleting order
