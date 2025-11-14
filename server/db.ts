@@ -221,6 +221,41 @@ export async function bulkCreateOrders(orderList: InsertOrder[]) {
   await db.insert(orders).values(orderList);
 }
 
+export async function bulkUpsertOrders(orderList: InsertOrder[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  if (orderList.length === 0) return;
+  
+  // For each order, check if it exists and update, otherwise insert
+  for (const order of orderList) {
+    if (!order.serviceNumber) continue;
+    
+    // Build the where condition based on whether WO No. exists
+    const whereCondition = order.orderNumber && order.orderNumber.trim() !== ''
+      ? and(
+          eq(orders.serviceNumber, order.serviceNumber),
+          eq(orders.orderNumber, order.orderNumber)
+        )
+      : and(
+          eq(orders.serviceNumber, order.serviceNumber),
+          or(
+            eq(orders.orderNumber, ''),
+            isNull(orders.orderNumber)
+          )
+        );
+    
+    const existing = await db.select().from(orders).where(whereCondition).limit(1);
+    
+    if (existing.length > 0) {
+      // Update existing order
+      await db.update(orders).set(order).where(eq(orders.id, existing[0].id));
+    } else {
+      // Insert new order
+      await db.insert(orders).values(order);
+    }
+  }
+}
+
 // Installers queries
 export async function getAllInstallers() {
   const db = await getDb();

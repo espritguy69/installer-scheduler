@@ -311,7 +311,7 @@ export default function Upload() {
       console.log('Calling bulkCreateOrders.mutateAsync with', uniqueOrders.length, 'orders');
       console.log('First order to be created:', JSON.stringify(uniqueOrders[0], null, 2));
       
-      const result = await bulkCreateOrders.mutateAsync(uniqueOrders);
+      const result = await bulkCreateOrders.mutateAsync({ orders: uniqueOrders, updateExisting: false });
       console.log('bulkCreateOrders result:', result);
       await utils.orders.list.invalidate();
       
@@ -525,7 +525,7 @@ export default function Upload() {
                 onClick={async () => {
                   // Import only new orders (skip duplicates)
                   if (newOrders.length > 0) {
-                    await bulkCreateOrders.mutateAsync(newOrders);
+                    await bulkCreateOrders.mutateAsync({ orders: newOrders, updateExisting: false });
                     await utils.orders.list.invalidate();
                     toast.success(`Imported ${newOrders.length} new orders. Skipped ${duplicates.length} duplicates.`, {
                       action: {
@@ -548,7 +548,7 @@ export default function Upload() {
                 onClick={async () => {
                   // Import all orders (including duplicates as updates)
                   const allOrders = [...newOrders, ...duplicates];
-                  await bulkCreateOrders.mutateAsync(allOrders);
+                  await bulkCreateOrders.mutateAsync({ orders: allOrders, updateExisting: true });
                   await utils.orders.list.invalidate();
                   toast.success(`Imported ${newOrders.length} new orders and updated ${duplicates.length} existing orders.`, {
                     action: {

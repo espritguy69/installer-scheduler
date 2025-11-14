@@ -414,8 +414,13 @@ export default function Orders() {
   };
   
   const handleAddOrder = async () => {
-    if (!newOrderData.orderNumber || !newOrderData.customerName) {
-      toast.error("Order number and customer name are required");
+    // Validate: Service Number OR WO Number (at least one) + Customer Name
+    if (!newOrderData.serviceNumber && !newOrderData.orderNumber) {
+      toast.error("Service Number or WO Number is required");
+      return;
+    }
+    if (!newOrderData.customerName) {
+      toast.error("Customer name is required");
       return;
     }
     

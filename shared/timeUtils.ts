@@ -85,6 +85,7 @@ export function isValidTimeFormat(time: string | null | undefined): boolean {
 /**
  * Parses appointment date string in various formats to Date object
  * Handles:
+ * - YYYY-MM-DD format (e.g., "2025-11-13") - ISO standard from HTML date inputs
  * - DD/MM/YYYY format (e.g., "13/11/2025") - International standard
  * - MM/DD/YYYY format (e.g., "11/13/2025") - American format
  * - "Nov 13, 2025" format - Text format
@@ -94,6 +95,12 @@ export function isValidTimeFormat(time: string | null | undefined): boolean {
  */
 export function parseAppointmentDate(dateStr: string | null | undefined): Date | null {
   if (!dateStr) return null;
+  
+  // Handle ISO format (YYYY-MM-DD) from HTML date inputs
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const date = new Date(dateStr + 'T00:00:00');
+    return isNaN(date.getTime()) ? null : date;
+  }
   
   // Handle slash-separated dates (DD/MM/YYYY or MM/DD/YYYY)
   if (dateStr.includes("/")) {

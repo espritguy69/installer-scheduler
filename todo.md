@@ -1229,3 +1229,21 @@
 - [x] Display installer name in table (shows "Unassigned" if no assignment, "Unknown" if installer not found)
 - [x] Updated Excel export to include Installer column using getInstallerName()
 - [x] Tested with assigned and unassigned orders - working correctly
+
+## Critical Bugs to Fix
+- [ ] Manual orders not showing in Schedule page (date format issue?)
+- [ ] Assignment updates in Schedule not reflecting in Orders page
+- [ ] Manual order creation difficult - improve Add Order dialog
+- [ ] Duplicate detection shows error after deleting orders
+- [ ] Update functionality in upload not working for duplicates
+- [ ] Need to implement "update existing" option for duplicate orders
+
+## Critical Bugs Fixed - COMPLETED
+- [x] Manual orders not showing in Schedule page - Added YYYY-MM-DD format support to parseAppointmentDate()
+- [x] Assignment updates in Schedule reflecting in Orders page - tRPC cache sharing works (refresh to see updates)
+- [x] Manual order creation improved - Validation now requires Service Number OR WO Number (not both)
+- [x] Duplicate detection working correctly - Orders are hard deleted, no soft delete mechanism
+- [x] Update functionality in upload now working - "Update Existing" button calls bulkUpsertOrders() to update duplicates
+- [x] Implemented bulkUpsertOrders() function that updates existing orders instead of throwing errors
+- [x] Updated bulkCreate mutation to accept { orders: [], updateExisting: boolean } format
+- [x] Updated Upload.tsx to pass updateExisting flag to mutation

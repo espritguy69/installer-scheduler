@@ -215,25 +215,32 @@ export const appRouter = router({
       await db.deleteOrder(input.id);
       return { success: true };
     }),
-    bulkCreate: protectedProcedure.input(z.array(z.object({
-      orderNumber: z.string().optional(),
-      ticketNumber: z.string().optional(),
-      serviceNumber: z.string(),
-      customerName: z.string(),
-      customerPhone: z.string().optional(),
-      customerEmail: z.string().optional(),
-      serviceType: z.string().optional(),
-      salesModiType: z.string().optional(),
-      address: z.string().optional(),
-      appointmentDate: z.string().optional(),
-      appointmentTime: z.string().optional(),
-      buildingName: z.string().optional(),
-      estimatedDuration: z.number().default(60),
-      priority: z.enum(["low", "medium", "high"]).default("medium"),
-      notes: z.string().optional(),
-    }))).mutation(async ({ input }) => {
-      await db.bulkCreateOrders(input);
-      return { success: true, count: input.length };
+    bulkCreate: protectedProcedure.input(z.object({
+      orders: z.array(z.object({
+        orderNumber: z.string().optional(),
+        ticketNumber: z.string().optional(),
+        serviceNumber: z.string(),
+        customerName: z.string(),
+        customerPhone: z.string().optional(),
+        customerEmail: z.string().optional(),
+        serviceType: z.string().optional(),
+        salesModiType: z.string().optional(),
+        address: z.string().optional(),
+        appointmentDate: z.string().optional(),
+        appointmentTime: z.string().optional(),
+        buildingName: z.string().optional(),
+        estimatedDuration: z.number().default(60),
+        priority: z.enum(["low", "medium", "high"]).default("medium"),
+        notes: z.string().optional(),
+      })),
+      updateExisting: z.boolean().default(false),
+    })).mutation(async ({ input }) => {
+      if (input.updateExisting) {
+        await db.bulkUpsertOrders(input.orders);
+      } else {
+        await db.bulkCreateOrders(input.orders);
+      }
+      return { success: true, count: input.orders.length };
     }),
     clearAll: protectedProcedure.mutation(async () => {
       await db.clearAllOrders();
