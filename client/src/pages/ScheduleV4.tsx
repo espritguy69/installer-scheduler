@@ -96,9 +96,12 @@ interface OrderCardProps {
   onUnassign: (orderId: number) => void;
   onTimeChange: (orderId: number) => void;
   onStatusChange: (orderId: number, newStatus: string) => void;
+  bulkMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelection?: (orderId: number) => void;
 }
 
-function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChange, onStatusChange }: OrderCardProps) {
+function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChange, onStatusChange, bulkMode, isSelected, onToggleSelection }: OrderCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   
@@ -179,8 +182,19 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       ref={drop as any}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`p-3 rounded-lg border-2 transition-all relative ${cardBgColor} ${isOver ? "ring-2 ring-primary ring-offset-2" : ""} ${isHovered ? "shadow-lg scale-105 z-10" : ""}`}
+      className={`p-3 rounded-lg border-2 transition-all relative ${cardBgColor} ${isOver ? "ring-2 ring-primary ring-offset-2" : ""} ${isHovered ? "shadow-lg scale-105 z-10" : ""} ${isSelected ? "ring-2 ring-blue-500" : ""}`}
     >
+      {bulkMode && (
+        <div className="absolute top-2 left-2 z-20">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onToggleSelection?.(order.id)}
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="font-semibold text-xs truncate" title={order.serviceNumber || 'N/A'}>
@@ -354,6 +368,26 @@ export default function ScheduleV4() {
     orderNumber: "",
     customerName: "",
   });
+  const [rescheduleDialog, setRescheduleDialog] = useState<{
+    open: boolean;
+    orderId: number | null;
+    orderNumber: string;
+    customerName: string;
+    currentDate: string;
+    currentTime: string;
+  }>({
+    open: false,
+    orderId: null,
+    orderNumber: "",
+    customerName: "",
+    currentDate: "",
+    currentTime: "",
+  });
+  const [rescheduleDate, setRescheduleDate] = useState("");
+  const [rescheduleTime, setRescheduleTime] = useState("");
+  const [rescheduleReason, setRescheduleReason] = useState<"customer_issue" | "building_issue" | "network_issue">("customer_issue");
+  const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
+  const [bulkAssignMode, setBulkAssignMode] = useState(false);
 
   const { data: orders = [], refetch: refetchOrders } = trpc.orders.list.useQuery();
   const { data: installers = [] } = trpc.installers.list.useQuery();
@@ -614,6 +648,25 @@ export default function ScheduleV4() {
       return; // Don't proceed with status change yet
     }
 
+    // If changing to rescheduled, show reschedule dialog first
+    if (newStatus === 'rescheduled') {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        setRescheduleDialog({
+          open: true,
+          orderId,
+          orderNumber: order.orderNumber || order.serviceNumber || 'N/A',
+          customerName: order.customerName || 'Unknown Customer',
+          currentDate: order.appointmentDate || '',
+          currentTime: order.appointmentTime || '',
+        });
+        // Pre-fill with current date and time
+        setRescheduleDate(order.appointmentDate || '');
+        setRescheduleTime(order.appointmentTime || '');
+      }
+      return; // Don't proceed with status change yet
+    }
+
     // For other statuses, proceed normally
     try {
       // Optimistic update
@@ -677,6 +730,144 @@ export default function ScheduleV4() {
     }
   };
 
+  const handleConfirmReschedule = async () => {
+    const { orderId } = rescheduleDialog;
+    if (!orderId || !rescheduleDate || !rescheduleTime) {
+      toast.error("Please select both date and time");
+      return;
+    }
+
+    try {
+      // Optimistic update
+      await utils.orders.list.cancel();
+      const previousOrders = utils.orders.list.getData();
+      
+      utils.orders.list.setData(undefined, (old) => 
+        old?.map((order) => 
+          order.id === orderId ? { 
+            ...order, 
+            status: 'rescheduled' as typeof order.status,
+            appointmentDate: rescheduleDate,
+            appointmentTime: rescheduleTime,
+          } : order
+        )
+      );
+
+      // Convert ISO date string (YYYY-MM-DD) to Date object
+      const rescheduleDateObj = new Date(rescheduleDate + 'T00:00:00');
+      
+      await updateOrderMutation.mutateAsync({
+        id: orderId,
+        status: "rescheduled",
+        appointmentDate: rescheduleDate,
+        appointmentTime: rescheduleTime,
+        rescheduledDate: rescheduleDateObj,
+        rescheduledTime: rescheduleTime,
+        rescheduleReason,
+      });
+
+      toast.success("Order rescheduled successfully");
+      await refetchOrders();
+      await refetchAssignments();
+    } catch (error) {
+      toast.error("Failed to reschedule order");
+      await refetchOrders();
+    } finally {
+      // Close dialog and reset
+      setRescheduleDialog({
+        open: false,
+        orderId: null,
+        orderNumber: "",
+        customerName: "",
+        currentDate: "",
+        currentTime: "",
+      });
+      setRescheduleDate("");
+      setRescheduleTime("");
+      setRescheduleReason("customer_issue");
+    }
+  };
+
+  const toggleOrderSelection = (orderId: number) => {
+    setSelectedOrders((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+      } else {
+        newSet.add(orderId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleBulkAssignMode = () => {
+    setBulkAssignMode(!bulkAssignMode);
+    if (bulkAssignMode) {
+      // Clear selections when exiting bulk mode
+      setSelectedOrders(new Set());
+    }
+  };
+
+  const handleBulkAssign = async (installerId: number) => {
+    if (selectedOrders.size === 0) {
+      toast.error("No orders selected");
+      return;
+    }
+
+    try {
+      const selectedOrdersList = Array.from(selectedOrders);
+      const installer = installers.find((i) => i.id === installerId);
+      
+      if (!installer) {
+        toast.error("Installer not found");
+        return;
+      }
+
+      // Assign each selected order
+      for (const orderId of selectedOrdersList) {
+        const order = orders.find((o) => o.id === orderId);
+        if (!order) continue;
+
+        const date = parseAppointmentDate(order.appointmentDate);
+        if (!date) continue;
+
+        // Create assignment
+        // Calculate end time (assume 2 hours duration)
+        const startTime = order.appointmentTime || "09:00";
+        const [hours, minutes] = startTime.split(":").map(Number);
+        const endHours = hours + 2;
+        const scheduledEndTime = `${endHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+        
+        await createAssignmentMutation.mutateAsync({
+          orderId,
+          installerId,
+          scheduledDate: date,
+          scheduledStartTime: startTime,
+          scheduledEndTime,
+        });
+
+        // Update order status
+        await updateOrderMutation.mutateAsync({
+          id: orderId,
+          status: "assigned",
+        });
+      }
+
+      toast.success(`Assigned ${selectedOrdersList.length} orders to ${installer.name}`);
+      
+      // Clear selections and exit bulk mode
+      setSelectedOrders(new Set());
+      setBulkAssignMode(false);
+      
+      await refetchOrders();
+      await refetchAssignments();
+    } catch (error) {
+      console.error("Failed to bulk assign:", error);
+      toast.error("Failed to assign orders");
+      await refetchOrders();
+    }
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-background">
@@ -697,6 +888,13 @@ export default function ScheduleV4() {
                     <span className="text-xs">No notifications sent</span>
                   </div>
                 )}
+                <Button
+                  size="lg"
+                  variant={bulkAssignMode ? "default" : "outline"}
+                  onClick={toggleBulkAssignMode}
+                >
+                  {bulkAssignMode ? `Selected: ${selectedOrders.size}` : "Bulk Assign"}
+                </Button>
                 <Button
                   size="lg"
                   variant={isScheduleConfirmed ? "outline" : "default"}
@@ -732,9 +930,21 @@ export default function ScheduleV4() {
             {/* Installer Panel */}
             <Card className="w-64 p-4 h-fit sticky top-4">
               <h2 className="font-semibold mb-4">Available Installers</h2>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {installers.map((installer) => (
-                  <DraggableInstaller key={installer.id} installer={installer} />
+                  <div key={installer.id} className="space-y-2">
+                    <DraggableInstaller installer={installer} />
+                    {bulkAssignMode && selectedOrders.size > 0 && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full text-xs"
+                        onClick={() => handleBulkAssign(installer.id)}
+                      >
+                        Assign {selectedOrders.size} to {installer.name}
+                      </Button>
+                    )}
+                  </div>
                 ))}
               </div>
             </Card>
@@ -909,6 +1119,9 @@ export default function ScheduleV4() {
                                 onUnassign={handleUnassign}
                                 onTimeChange={handleTimeChange}
                                 onStatusChange={handleStatusChange}
+                                bulkMode={bulkAssignMode}
+                                isSelected={selectedOrders.has(order.id)}
+                                onToggleSelection={toggleOrderSelection}
                               />
                             ))}
                           </div>
@@ -1022,6 +1235,111 @@ export default function ScheduleV4() {
               </Button>
               <Button onClick={handleConfirmCompletion}>
                 Confirm Completion
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Reschedule Dialog */}
+        <Dialog
+          open={rescheduleDialog.open}
+          onOpenChange={(open) =>
+            !open &&
+            setRescheduleDialog({
+              open: false,
+              orderId: null,
+              orderNumber: "",
+              customerName: "",
+              currentDate: "",
+              currentTime: "",
+            })
+          }
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Reschedule Order</DialogTitle>
+              <DialogDescription>
+                Select a new date and time for this order
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Order:</span>
+                  <span>{rescheduleDialog.orderNumber}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Customer:</span>
+                  <span>{rescheduleDialog.customerName}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="reschedule-reason">Reschedule Reason</Label>
+                <Select
+                  value={rescheduleReason}
+                  onValueChange={(value: "customer_issue" | "building_issue" | "network_issue") =>
+                    setRescheduleReason(value)
+                  }
+                >
+                  <SelectTrigger id="reschedule-reason">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="customer_issue">Customer Issue</SelectItem>
+                    <SelectItem value="building_issue">Building Issue</SelectItem>
+                    <SelectItem value="network_issue">Network Issue</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="reschedule-date">New Date</Label>
+                <Input
+                  id="reschedule-date"
+                  type="date"
+                  value={rescheduleDate}
+                  onChange={(e) => setRescheduleDate(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="reschedule-time">New Time</Label>
+                <Input
+                  id="reschedule-time"
+                  type="time"
+                  value={rescheduleTime}
+                  onChange={(e) => setRescheduleTime(e.target.value)}
+                />
+              </div>
+
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-800">
+                  ℹ️ The order will be rescheduled to the new date and time. The installer assignment will be updated automatically.
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setRescheduleDialog({
+                    open: false,
+                    orderId: null,
+                    orderNumber: "",
+                    customerName: "",
+                    currentDate: "",
+                    currentTime: "",
+                  });
+                  setRescheduleDate("");
+                  setRescheduleTime("");
+                  setRescheduleReason("customer_issue");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmReschedule}>
+                Confirm Reschedule
               </Button>
             </DialogFooter>
           </DialogContent>

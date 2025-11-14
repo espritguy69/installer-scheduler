@@ -1247,3 +1247,15 @@
 - [x] Implemented bulkUpsertOrders() function that updates existing orders instead of throwing errors
 - [x] Updated bulkCreate mutation to accept { orders: [], updateExisting: boolean } format
 - [x] Updated Upload.tsx to pass updateExisting flag to mutation
+
+## New Features to Implement
+- [ ] Hybrid date/time format detection - Automatically detect and normalize multiple date/time formats
+- [ ] Add format conversion utilities for backend/frontend/middleware consistency
+- [ ] Reschedule dialog - Show date/time picker when order status changes to "rescheduled"
+- [ ] Multi-select orders in Schedule - Allow selecting multiple orders for bulk assignment
+- [ ] Bulk assignment functionality - Assign multiple selected orders to an installer at once
+
+## New Features Completed
+- [x] Hybrid date/time format detection and conversion utilities
+- [x] Reschedule dialog with date/time picker when status changes to rescheduled
+- [x] Multi-select bulk assignment functionality in Schedule page

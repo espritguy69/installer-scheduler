@@ -136,3 +136,153 @@ export function parseAppointmentDate(dateStr: string | null | undefined): Date |
   const date = new Date(dateStr);
   return isNaN(date.getTime()) ? null : date;
 }
+
+/**
+ * Detects the date format of a given date string
+ * @param dateStr - Date string to analyze
+ * @returns Detected format: 'ISO' | 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'TEXT' | 'UNKNOWN'
+ */
+export function detectDateFormat(dateStr: string | null | undefined): string {
+  if (!dateStr) return 'UNKNOWN';
+  
+  // ISO format: YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return 'ISO';
+  
+  // Slash-separated: DD/MM/YYYY or MM/DD/YYYY
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
+    const parts = dateStr.split('/');
+    const first = parseInt(parts[0], 10);
+    const second = parseInt(parts[1], 10);
+    
+    if (first > 12) return 'DD/MM/YYYY';
+    if (second > 12) return 'MM/DD/YYYY';
+    // Ambiguous - default to DD/MM/YYYY (international)
+    return 'DD/MM/YYYY';
+  }
+  
+  // Text format: "Nov 13, 2025" or similar
+  if (/[a-zA-Z]/.test(dateStr)) return 'TEXT';
+  
+  return 'UNKNOWN';
+}
+
+/**
+ * Converts any date format to DD/MM/YYYY format (international standard)
+ * This is the preferred storage format for the database
+ * @param dateStr - Date string in any supported format
+ * @returns Date in DD/MM/YYYY format or null if parsing fails
+ */
+export function toStandardDateFormat(dateStr: string | null | undefined): string | null {
+  const date = parseAppointmentDate(dateStr);
+  if (!date) return null;
+  
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  
+  return `${day}/${month}/${year}`;
+}
+
+/**
+ * Converts any date format to ISO format (YYYY-MM-DD)
+ * This is the preferred format for HTML date inputs and backend processing
+ * @param dateStr - Date string in any supported format
+ * @returns Date in YYYY-MM-DD format or null if parsing fails
+ */
+export function toISODateFormat(dateStr: string | null | undefined): string | null {
+  const date = parseAppointmentDate(dateStr);
+  if (!date) return null;
+  
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Converts any date format to a human-readable display format
+ * @param dateStr - Date string in any supported format
+ * @param format - Display format: 'short' | 'medium' | 'long'
+ * @returns Formatted date string or null if parsing fails
+ */
+export function toDisplayDateFormat(
+  dateStr: string | null | undefined,
+  format: 'short' | 'medium' | 'long' = 'medium'
+): string | null {
+  const date = parseAppointmentDate(dateStr);
+  if (!date) return null;
+  
+  switch (format) {
+    case 'short':
+      // "13/11/2025"
+      return toStandardDateFormat(dateStr);
+    case 'medium':
+      // "Nov 13, 2025"
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+      });
+    case 'long':
+      // "November 13, 2025"
+      return date.toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+      });
+    default:
+      return toStandardDateFormat(dateStr);
+  }
+}
+
+/**
+ * Validates and normalizes a date string to ensure consistency
+ * Converts any valid date format to DD/MM/YYYY format
+ * @param dateStr - Date string to normalize
+ * @returns Normalized date string in DD/MM/YYYY format or null if invalid
+ */
+export function normalizeDateString(dateStr: string | null | undefined): string | null {
+  return toStandardDateFormat(dateStr);
+}
+
+/**
+ * Converts 24-hour time format to 12-hour format
+ * @param time24 - Time in 24-hour format (e.g., "14:30", "09:00")
+ * @returns Time in 12-hour format (e.g., "2:30 PM", "9:00 AM")
+ */
+export function convert24To12Hour(time24: string | null | undefined): string | null {
+  if (!time24) return null;
+  
+  const match = time24.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+  
+  const hours = parseInt(match[1], 10);
+  const minutes = match[2];
+  
+  return formatTime12Hour(hours, parseInt(minutes, 10));
+}
+
+/**
+ * Converts 12-hour time format to 24-hour format
+ * @param time12 - Time in 12-hour format (e.g., "2:30 PM", "9:00 AM")
+ * @returns Time in 24-hour format (e.g., "14:30", "09:00")
+ */
+export function convert12To24Hour(time12: string | null | undefined): string | null {
+  if (!time12) return null;
+  
+  const match = time12.match(/^(\d{1,2}):(\d{2})\s?(AM|PM)$/i);
+  if (!match) return null;
+  
+  let hours = parseInt(match[1], 10);
+  const minutes = match[2];
+  const period = match[3].toUpperCase();
+  
+  if (period === 'PM' && hours !== 12) {
+    hours += 12;
+  } else if (period === 'AM' && hours === 12) {
+    hours = 0;
+  }
+  
+  return `${hours.toString().padStart(2, '0')}:${minutes}`;
+}
