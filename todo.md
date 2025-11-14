@@ -1215,3 +1215,17 @@
 - [x] Fixed date parsing to use parseAppointmentDate() utility for DD/MM/YYYY format
 - [x] Added validation to show clear error if date format is invalid
 - [x] Assignment now atomic: if assignment fails, status won't be updated
+
+## Add Installer Column to Orders Page
+- [ ] Add Installer column to Orders table
+- [ ] Fetch assignments and installers data to map order to installer
+- [ ] Display installer name in table (or "Unassigned" if no assignment)
+- [ ] Add Installer column to Excel export
+- [ ] Test with assigned and unassigned orders
+
+## Add Installer Column to Orders Page - COMPLETED
+- [x] Added Installer column to Orders table (after Status column)
+- [x] Fetched assignments and installers data to map order to installer
+- [x] Display installer name in table (shows "Unassigned" if no assignment, "Unknown" if installer not found)
+- [x] Updated Excel export to include Installer column using getInstallerName()
+- [x] Tested with assigned and unassigned orders - working correctly

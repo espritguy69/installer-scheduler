@@ -74,7 +74,7 @@ export default function Orders() {
       "Status": order.status || "-",
       "Appointment Date": order.appointmentDate ? (parseAppointmentDate(order.appointmentDate)?.toLocaleDateString() || order.appointmentDate) : "-",
       "Appointment Time": order.appointmentTime || "-",
-      "Installer": order.installerName || "Unassigned",
+      "Installer": getInstallerName(order.id),
       "Docket Status": order.docketStatus || "-",
       "Notes": order.notes || "-",
       "Reschedule Reason": order.rescheduleReason || "-",
@@ -230,6 +230,7 @@ export default function Orders() {
     return 0;
   });
   const { data: assignments = [] } = trpc.assignments.list.useQuery();
+  const { data: installers = [] } = trpc.installers.list.useQuery();
   const updateOrder = trpc.orders.update.useMutation();
   const uploadDocketFile = trpc.orders.uploadDocketFile.useMutation();
   const clearAllOrders = trpc.orders.clearAll.useMutation();
@@ -289,6 +290,13 @@ export default function Orders() {
 
   const getAssignmentInfo = (orderId: number) => {
     return assignments.find(a => a.orderId === orderId);
+  };
+
+  const getInstallerName = (orderId: number) => {
+    const assignment = assignments.find(a => a.orderId === orderId);
+    if (!assignment) return "Unassigned";
+    const installer = installers.find(i => i.id === assignment.installerId);
+    return installer?.name || "Unknown";
   };
 
   const handleStatusChange = (order: any) => {
@@ -678,6 +686,7 @@ export default function Orders() {
                         )}
                       </button>
                     </TableHead>
+                    <TableHead className="w-[110px] text-xs">Installer</TableHead>
                     <TableHead className="w-[95px]">
                       <button
                         onClick={() => handleSort("appointmentDate")}
@@ -698,7 +707,7 @@ export default function Orders() {
                 <TableBody>
                   {orders.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
                         No orders found. Upload orders to get started.
                       </TableCell>
                     </TableRow>
@@ -805,6 +814,11 @@ export default function Orders() {
                                 </SelectItem>
                               </SelectContent>
                             </Select>
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            <div className="truncate" title={getInstallerName(order.id)}>
+                              {getInstallerName(order.id)}
+                            </div>
                           </TableCell>
                           <TableCell>
                             {assignment ? (
