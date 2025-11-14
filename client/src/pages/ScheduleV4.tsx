@@ -389,9 +389,18 @@ export default function ScheduleV4() {
   const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
   const [bulkAssignMode, setBulkAssignMode] = useState(false);
 
-  const { data: orders = [], refetch: refetchOrders } = trpc.orders.list.useQuery();
-  const { data: installers = [] } = trpc.installers.list.useQuery();
-  const { data: assignments = [], refetch: refetchAssignments } = trpc.assignments.list.useQuery();
+  const { data: orders = [], refetch: refetchOrders } = trpc.orders.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+  const { data: installers = [] } = trpc.installers.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+  const { data: assignments = [], refetch: refetchAssignments } = trpc.assignments.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
   const { data: timeSlotsData = [] } = trpc.timeSlots.listActive.useQuery();
   
   // Convert time slots data to array of time strings

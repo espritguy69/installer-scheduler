@@ -1269,3 +1269,14 @@
 - [x] Investigated why deleted orders still show as duplicates
 - [x] Found that deleteOrder function wasn't deleting related assignments first
 - [x] Fixed deleteOrder to delete assignments before deleting order
+
+## Multi-User Collaboration Features
+- [ ] Implement auto-refresh when switching tabs/pages
+- [ ] Default Orders page to show only today's orders
+- [ ] Add refetch on window focus for real-time updates
+
+## Multi-User Collaboration Features Completed
+- [x] Implemented auto-refresh when switching tabs/pages
+- [x] Default Orders page to show only today's orders
+- [x] Added refetch on window focus for real-time updates
+- [x] Added visual indicator for today's filter

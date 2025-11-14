@@ -123,7 +123,11 @@ export default function Orders() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [rescheduleReasonFilter, setRescheduleReasonFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [dateFilter, setDateFilter] = useState<string>("");
+  // Default to today's date for multi-user collaboration
+  const [dateFilter, setDateFilter] = useState<string>(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0]; // YYYY-MM-DD format
+  });
   
   // Sorting states
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -164,7 +168,10 @@ export default function Orders() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteOrderId, setDeleteOrderId] = useState<number | null>(null);
 
-  const { data: allOrders = [], isLoading } = trpc.orders.list.useQuery();
+  const { data: allOrders = [], isLoading } = trpc.orders.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
   
   // Apply filters
   const filteredOrders = allOrders.filter(order => {
@@ -229,8 +236,14 @@ export default function Orders() {
     if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
     return 0;
   });
-  const { data: assignments = [] } = trpc.assignments.list.useQuery();
-  const { data: installers = [] } = trpc.installers.list.useQuery();
+  const { data: assignments = [] } = trpc.assignments.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+  const { data: installers = [] } = trpc.installers.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
   const updateOrder = trpc.orders.update.useMutation();
   const uploadDocketFile = trpc.orders.uploadDocketFile.useMutation();
   const clearAllOrders = trpc.orders.clearAll.useMutation();
@@ -618,7 +631,12 @@ export default function Orders() {
               </div>
               
               <div>
-                <label className="text-sm font-medium mb-2 block">Appointment Date</label>
+                <label className="text-sm font-medium mb-2 block">
+                  Appointment Date
+                  {dateFilter && new Date(dateFilter).toDateString() === new Date().toDateString() && (
+                    <span className="ml-2 text-xs text-blue-600 font-normal">(Today's orders)</span>
+                  )}
+                </label>
                 <div className="flex gap-2">
                   <Input
                     type="date"
@@ -631,7 +649,7 @@ export default function Orders() {
                       variant="ghost"
                       size="icon"
                       onClick={() => setDateFilter("")}
-                      title="Clear date filter"
+                      title="Clear date filter to show all orders"
                     >
                       <X className="h-4 w-4" />
                     </Button>
