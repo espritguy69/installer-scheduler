@@ -34,7 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
-import { normalizeTimeFormat, parseAppointmentDate } from "@shared/timeUtils";
+import { normalizeTimeFormat, parseAppointmentDate, generateTimeSlots, formatTimeSlot } from "@shared/timeUtils";
 import { APP_TITLE } from "@/const";
 import { ArrowDown, ArrowUp, ArrowUpDown, Download, FileText, Loader2, Upload, X } from "lucide-react";
 import * as XLSX from 'xlsx';
@@ -1090,12 +1090,21 @@ export default function Orders() {
               </div>
               <div className="grid gap-2">
                 <label className="text-sm font-medium">Appointment Time</label>
-                <input
-                  type="time"
-                  value={editOrder.appointmentTime}
-                  onChange={(e) => setEditOrder({ ...editOrder, appointmentTime: e.target.value })}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                />
+                <Select 
+                  value={editOrder.appointmentTime} 
+                  onValueChange={(value) => setEditOrder({ ...editOrder, appointmentTime: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select time" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {generateTimeSlots(8, 18).map((time) => (
+                      <SelectItem key={time} value={time}>
+                        {formatTimeSlot(time)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
                 <label className="text-sm font-medium">Building Name</label>
@@ -1354,12 +1363,21 @@ export default function Orders() {
               </div>
               <div>
                 <Label htmlFor="appointmentTime">Appointment Time</Label>
-                <Input
-                  id="appointmentTime"
-                  type="time"
-                  value={newOrderData.appointmentTime}
-                  onChange={(e) => setNewOrderData({...newOrderData, appointmentTime: e.target.value})}
-                />
+                <Select 
+                  value={newOrderData.appointmentTime} 
+                  onValueChange={(value) => setNewOrderData({...newOrderData, appointmentTime: value})}
+                >
+                  <SelectTrigger id="appointmentTime">
+                    <SelectValue placeholder="Select time" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {generateTimeSlots(8, 18).map((time) => (
+                      <SelectItem key={time} value={time}>
+                        {formatTimeSlot(time)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">

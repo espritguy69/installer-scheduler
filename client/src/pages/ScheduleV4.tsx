@@ -22,7 +22,7 @@ import { APP_TITLE, getLoginUrl } from "@/const";
 import { Navigation } from "@/components/Navigation";
 import { OrderHistoryDialog } from "@/components/OrderHistoryDialog";
 import { trpc } from "@/lib/trpc";
-import { normalizeTimeFormat, parseAppointmentDate } from "@shared/timeUtils";
+import { normalizeTimeFormat, parseAppointmentDate, generateTimeSlots, formatTimeSlot } from "@shared/timeUtils";
 import { ChevronLeft, ChevronRight, Clock, MapPin, User, X, History } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -1314,12 +1314,18 @@ export default function ScheduleV4() {
 
               <div className="space-y-2">
                 <Label htmlFor="reschedule-time">New Time</Label>
-                <Input
-                  id="reschedule-time"
-                  type="time"
-                  value={rescheduleTime}
-                  onChange={(e) => setRescheduleTime(e.target.value)}
-                />
+                <Select value={rescheduleTime} onValueChange={setRescheduleTime}>
+                  <SelectTrigger id="reschedule-time">
+                    <SelectValue placeholder="Select time" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {generateTimeSlots(8, 18).map((time) => (
+                      <SelectItem key={time} value={time}>
+                        {formatTimeSlot(time)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">

@@ -286,3 +286,40 @@ export function convert12To24Hour(time12: string | null | undefined): string | n
   
   return `${hours.toString().padStart(2, '0')}:${minutes}`;
 }
+
+/**
+ * Generate time slots in 30-minute intervals
+ * @param startHour - Starting hour (default: 8 for 8:00 AM)
+ * @param endHour - Ending hour (default: 18 for 6:00 PM)
+ * @returns Array of time strings in HH:MM format (24-hour)
+ */
+export function generateTimeSlots(startHour: number = 8, endHour: number = 18): string[] {
+  const slots: string[] = [];
+  
+  for (let hour = startHour; hour <= endHour; hour++) {
+    // Add :00 slot
+    const hourStr = hour.toString().padStart(2, '0');
+    slots.push(`${hourStr}:00`);
+    
+    // Add :30 slot (except for the last hour)
+    if (hour < endHour) {
+      slots.push(`${hourStr}:30`);
+    }
+  }
+  
+  return slots;
+}
+
+/**
+ * Format time slot for display (e.g., "09:00" -> "9:00 AM")
+ * @param time - Time string in HH:MM format (24-hour)
+ * @returns Formatted time string in 12-hour format
+ */
+export function formatTimeSlot(time: string): string {
+  const [hourStr, minute] = time.split(':');
+  const hour = parseInt(hourStr);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+  
+  return `${displayHour}:${minute} ${period}`;
+}

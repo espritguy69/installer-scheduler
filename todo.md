@@ -1280,3 +1280,16 @@
 - [x] Default Orders page to show only today's orders
 - [x] Added refetch on window focus for real-time updates
 - [x] Added visual indicator for today's filter
+
+## Time Interval Improvements
+- [ ] Replace free-form time inputs with 30-minute interval dropdowns
+- [ ] Update reschedule dialog time picker
+- [ ] Update manual order creation time picker
+- [ ] Update order edit dialog time picker
+
+## Time Interval Improvements Completed
+- [x] Replace free-form time inputs with 30-minute interval dropdowns
+- [x] Update reschedule dialog time picker
+- [x] Update manual order creation time picker
+- [x] Update order edit dialog time picker
+- [x] Create generateTimeSlots and formatTimeSlot utilities
