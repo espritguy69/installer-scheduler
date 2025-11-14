@@ -39,7 +39,7 @@ import { APP_TITLE } from "@/const";
 import { ArrowDown, ArrowUp, ArrowUpDown, Download, FileText, Loader2, Upload, X } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { Navigation } from "@/components/Navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
 
@@ -128,31 +128,6 @@ export default function Orders() {
     const today = new Date();
     return today.toISOString().split('T')[0]; // YYYY-MM-DD format
   });
-  
-  // Reset to today's date when component mounts or page becomes visible
-  useEffect(() => {
-    const resetToToday = () => {
-      const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
-      setDateFilter(todayStr);
-    };
-    
-    // Reset on mount
-    resetToToday();
-    
-    // Reset when page becomes visible (user switches back to tab)
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        resetToToday();
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
   
   // Sorting states
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -830,12 +805,6 @@ export default function Orders() {
                                     Met customer
                                   </span>
                                 </SelectItem>
-                                <SelectItem value="order_completed">
-                                  <span className="inline-flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-lime-500"></span>
-                                    Order Completed
-                                  </span>
-                                </SelectItem>
                                 <SelectItem value="completed">
                                   <span className="inline-flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-green-500"></span>
@@ -852,36 +821,6 @@ export default function Orders() {
                                   <span className="inline-flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
                                     Docket Uploaded
-                                  </span>
-                                </SelectItem>
-                                <SelectItem value="ready_to_invoice">
-                                  <span className="inline-flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
-                                    Ready to Invoice
-                                  </span>
-                                </SelectItem>
-                                <SelectItem value="invoiced">
-                                  <span className="inline-flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-violet-500"></span>
-                                    Invoiced
-                                  </span>
-                                </SelectItem>
-                                <SelectItem value="customer_issue">
-                                  <span className="inline-flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-orange-500"></span>
-                                    Customer Issue
-                                  </span>
-                                </SelectItem>
-                                <SelectItem value="building_issue">
-                                  <span className="inline-flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
-                                    Building Issue
-                                  </span>
-                                </SelectItem>
-                                <SelectItem value="network_issue">
-                                  <span className="inline-flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-pink-500"></span>
-                                    Network Issue
                                   </span>
                                 </SelectItem>
                                 <SelectItem value="rescheduled">
