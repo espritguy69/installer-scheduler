@@ -1295,7 +1295,14 @@
 - [x] Create generateTimeSlots and formatTimeSlot utilities
 
 ## Documentation
-- [ ] Create comprehensive wire diagram showing application architecture
-- [ ] Document database schema relationships
-- [ ] Document page navigation and data flow
-- [ ] Document Schedule page component relationships
+- [x] Create comprehensive wire diagram showing application architecture
+- [x] Document database schema relationships
+- [x] Document page navigation and data flow
+- [x] Document Schedule page component relationships
+
+## Status Consistency Verification (USER REQUESTED)
+- [x] Check status options in Orders page
+- [x] Check status options in Schedule page
+- [x] Verify all 15 statuses match between pages
+- [x] Verify status colors are consistent
+- [x] Fix any discrepancies found
