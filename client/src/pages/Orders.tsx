@@ -662,6 +662,54 @@ export default function Orders() {
                     <span className="ml-2 text-xs text-blue-600 font-normal">(Today's orders)</span>
                   )}
                 </label>
+                {/* Quick date shortcuts */}
+                <div className="flex gap-2 mb-2">
+                  <Button
+                    variant={(() => {
+                      if (!dateFilter) return "outline";
+                      const yesterday = new Date();
+                      yesterday.setDate(yesterday.getDate() - 1);
+                      return new Date(dateFilter).toDateString() === yesterday.toDateString() ? "default" : "outline";
+                    })()}
+                    size="sm"
+                    onClick={() => {
+                      const yesterday = new Date();
+                      yesterday.setDate(yesterday.getDate() - 1);
+                      setDateFilter(yesterday.toISOString().split('T')[0]);
+                    }}
+                    className="text-xs"
+                  >
+                    Yesterday
+                  </Button>
+                  <Button
+                    variant={dateFilter && new Date(dateFilter).toDateString() === new Date().toDateString() ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      const today = new Date();
+                      setDateFilter(today.toISOString().split('T')[0]);
+                    }}
+                    className="text-xs"
+                  >
+                    Today
+                  </Button>
+                  <Button
+                    variant={(() => {
+                      if (!dateFilter) return "outline";
+                      const tomorrow = new Date();
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      return new Date(dateFilter).toDateString() === tomorrow.toDateString() ? "default" : "outline";
+                    })()}
+                    size="sm"
+                    onClick={() => {
+                      const tomorrow = new Date();
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      setDateFilter(tomorrow.toISOString().split('T')[0]);
+                    }}
+                    className="text-xs"
+                  >
+                    Tomorrow
+                  </Button>
+                </div>
                 <div className="flex gap-2">
                   <Input
                     type="date"

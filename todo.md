@@ -1300,3 +1300,9 @@
 - [x] Added visibility change listener to update date when switching tabs
 - [x] Orders page now always shows current day's appointments by default
 - [x] Consistent with Schedule page behavior
+
+## Quick Date Shortcuts (USER REQUESTED)
+- [x] Add Yesterday, Today, Tomorrow buttons above date picker
+- [x] Style buttons to match existing UI design
+- [x] Implement click handlers to update date filter
+- [x] Highlight active button (e.g., Today when showing today's orders)
