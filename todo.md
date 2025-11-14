@@ -1306,3 +1306,10 @@
 - [x] Verify all 15 statuses match between pages
 - [x] Verify status colors are consistent
 - [x] Fix any discrepancies found
+
+## Orders Page Date Filter Fix (USER REPORTED)
+- [x] Investigate why Orders page date filter is stuck on November 14, 2025
+- [x] Fix date filter to use actual current date (new Date())
+- [x] Ensure "Today's orders" label reflects actual today
+- [x] Test that Orders page shows current day's appointments by default
+- [x] Verify consistency with Schedule page date behavior
