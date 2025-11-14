@@ -123,11 +123,18 @@ export default function Orders() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [rescheduleReasonFilter, setRescheduleReasonFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  // Date filter mode: 'single' or 'range'
+  const [dateFilterMode, setDateFilterMode] = useState<'single' | 'range'>('single');
+  
   // Default to today's date for multi-user collaboration
   const [dateFilter, setDateFilter] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split('T')[0]; // YYYY-MM-DD format
   });
+  
+  // Date range filters
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   
   // Always reset to today's date when component mounts or becomes visible
   useEffect(() => {
@@ -206,12 +213,31 @@ export default function Orders() {
     // Reschedule reason filter
     if (rescheduleReasonFilter !== "all" && order.rescheduleReason !== rescheduleReasonFilter) return false;
     
-    // Date filter
-    if (dateFilter && order.appointmentDate) {
+    // Date filter - single date or range
+    if (order.appointmentDate) {
       const orderDate = parseAppointmentDate(order.appointmentDate);
-      const filterDate = new Date(dateFilter);
-      // Compare only the date part (ignore time)
-      if (!orderDate || orderDate.toDateString() !== filterDate.toDateString()) return false;
+      if (!orderDate) return false;
+      
+      if (dateFilterMode === 'single' && dateFilter) {
+        // Single date filter
+        const filterDate = new Date(dateFilter);
+        if (orderDate.toDateString() !== filterDate.toDateString()) return false;
+      } else if (dateFilterMode === 'range' && (startDate || endDate)) {
+        // Date range filter
+        const orderTime = orderDate.getTime();
+        
+        if (startDate) {
+          const start = new Date(startDate);
+          start.setHours(0, 0, 0, 0);
+          if (orderTime < start.getTime()) return false;
+        }
+        
+        if (endDate) {
+          const end = new Date(endDate);
+          end.setHours(23, 59, 59, 999);
+          if (orderTime > end.getTime()) return false;
+        }
+      }
     }
     
     // Search query
@@ -656,78 +682,187 @@ export default function Orders() {
               </div>
               
               <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Appointment Date
-                  {dateFilter && new Date(dateFilter).toDateString() === new Date().toDateString() && (
-                    <span className="ml-2 text-xs text-blue-600 font-normal">(Today's orders)</span>
-                  )}
-                </label>
-                {/* Quick date shortcuts */}
-                <div className="flex gap-2 mb-2">
-                  <Button
-                    variant={(() => {
-                      if (!dateFilter) return "outline";
-                      const yesterday = new Date();
-                      yesterday.setDate(yesterday.getDate() - 1);
-                      return new Date(dateFilter).toDateString() === yesterday.toDateString() ? "default" : "outline";
-                    })()}
-                    size="sm"
-                    onClick={() => {
-                      const yesterday = new Date();
-                      yesterday.setDate(yesterday.getDate() - 1);
-                      setDateFilter(yesterday.toISOString().split('T')[0]);
-                    }}
-                    className="text-xs"
-                  >
-                    Yesterday
-                  </Button>
-                  <Button
-                    variant={dateFilter && new Date(dateFilter).toDateString() === new Date().toDateString() ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      const today = new Date();
-                      setDateFilter(today.toISOString().split('T')[0]);
-                    }}
-                    className="text-xs"
-                  >
-                    Today
-                  </Button>
-                  <Button
-                    variant={(() => {
-                      if (!dateFilter) return "outline";
-                      const tomorrow = new Date();
-                      tomorrow.setDate(tomorrow.getDate() + 1);
-                      return new Date(dateFilter).toDateString() === tomorrow.toDateString() ? "default" : "outline";
-                    })()}
-                    size="sm"
-                    onClick={() => {
-                      const tomorrow = new Date();
-                      tomorrow.setDate(tomorrow.getDate() + 1);
-                      setDateFilter(tomorrow.toISOString().split('T')[0]);
-                    }}
-                    className="text-xs"
-                  >
-                    Tomorrow
-                  </Button>
-                </div>
-                <div className="flex gap-2">
-                  <Input
-                    type="date"
-                    value={dateFilter}
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    placeholder="Select date"
-                  />
-                  {dateFilter && (
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium">
+                    Appointment Date
+                    {dateFilterMode === 'single' && dateFilter && new Date(dateFilter).toDateString() === new Date().toDateString() && (
+                      <span className="ml-2 text-xs text-blue-600 font-normal">(Today's orders)</span>
+                    )}
+                  </label>
+                  <div className="flex gap-1">
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDateFilter("")}
-                      title="Clear date filter to show all orders"
+                      variant={dateFilterMode === 'single' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setDateFilterMode('single')}
+                      className="text-xs h-7"
                     >
-                      <X className="h-4 w-4" />
+                      Single Date
                     </Button>
-                  )}
+                    <Button
+                      variant={dateFilterMode === 'range' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setDateFilterMode('range')}
+                      className="text-xs h-7"
+                    >
+                      Date Range
+                    </Button>
+                  </div>
                 </div>
+                
+                {dateFilterMode === 'single' ? (
+                  <>
+                    {/* Quick date shortcuts */}
+                    <div className="flex gap-2 mb-2">
+                      <Button
+                        variant={(() => {
+                          if (!dateFilter) return "outline";
+                          const yesterday = new Date();
+                          yesterday.setDate(yesterday.getDate() - 1);
+                          return new Date(dateFilter).toDateString() === yesterday.toDateString() ? "default" : "outline";
+                        })()}
+                        size="sm"
+                        onClick={() => {
+                          const yesterday = new Date();
+                          yesterday.setDate(yesterday.getDate() - 1);
+                          setDateFilter(yesterday.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        Yesterday
+                      </Button>
+                      <Button
+                        variant={dateFilter && new Date(dateFilter).toDateString() === new Date().toDateString() ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          const today = new Date();
+                          setDateFilter(today.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        variant={(() => {
+                          if (!dateFilter) return "outline";
+                          const tomorrow = new Date();
+                          tomorrow.setDate(tomorrow.getDate() + 1);
+                          return new Date(dateFilter).toDateString() === tomorrow.toDateString() ? "default" : "outline";
+                        })()}
+                        size="sm"
+                        onClick={() => {
+                          const tomorrow = new Date();
+                          tomorrow.setDate(tomorrow.getDate() + 1);
+                          setDateFilter(tomorrow.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        Tomorrow
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        type="date"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                        placeholder="Select date"
+                      />
+                      {dateFilter && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setDateFilter("")}
+                          title="Clear date filter to show all orders"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Quick range presets */}
+                    <div className="flex gap-2 mb-2 flex-wrap">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const today = new Date();
+                          const weekStart = new Date(today);
+                          weekStart.setDate(today.getDate() - today.getDay());
+                          const weekEnd = new Date(weekStart);
+                          weekEnd.setDate(weekStart.getDate() + 6);
+                          setStartDate(weekStart.toISOString().split('T')[0]);
+                          setEndDate(weekEnd.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        This Week
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const today = new Date();
+                          const last7Days = new Date(today);
+                          last7Days.setDate(today.getDate() - 6);
+                          setStartDate(last7Days.toISOString().split('T')[0]);
+                          setEndDate(today.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        Last 7 Days
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const today = new Date();
+                          const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+                          const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                          setStartDate(monthStart.toISOString().split('T')[0]);
+                          setEndDate(monthEnd.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        This Month
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-xs text-muted-foreground mb-1 block">Start Date</label>
+                        <Input
+                          type="date"
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                          placeholder="Start date"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground mb-1 block">End Date</label>
+                        <Input
+                          type="date"
+                          value={endDate}
+                          onChange={(e) => setEndDate(e.target.value)}
+                          placeholder="End date"
+                        />
+                      </div>
+                    </div>
+                    {(startDate || endDate) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setStartDate("");
+                          setEndDate("");
+                        }}
+                        className="text-xs mt-2 w-full"
+                      >
+                        <X className="h-3 w-3 mr-1" />
+                        Clear Date Range
+                      </Button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
             

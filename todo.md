@@ -1306,3 +1306,11 @@
 - [x] Style buttons to match existing UI design
 - [x] Implement click handlers to update date filter
 - [x] Highlight active button (e.g., Today when showing today's orders)
+
+## Custom Date Range Filter (USER REQUESTED)
+- [x] Add state management for start and end dates
+- [x] Update filter logic to support date range (between start and end)
+- [x] Add UI with start date and end date inputs
+- [x] Add "Date Range" toggle/button to switch between single date and range mode
+- [x] Add quick range presets (This Week, Last 7 Days, This Month)
+- [x] Add clear button for date range
