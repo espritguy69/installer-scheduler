@@ -1357,3 +1357,11 @@
 - [x] Add "All Unassigned" view to Schedule page to show ALL unassigned orders regardless of date
 - [x] Added Daily View / All Unassigned toggle buttons
 - [ ] Test with user's order (BBNB057207G) to verify it appears and formats correctly
+
+## Add Installer Dropdown to Add Order Form (USER REQUESTED)
+- [x] Add installer dropdown to Add Order dialog
+- [x] Include "Unassigned/Pending" option as default
+- [x] Load list of installers from database
+- [x] Update order creation logic to create assignment if installer is selected
+- [x] Added createAssignment mutation
+- [x] Success message shows if order was assigned or left pending
