@@ -190,6 +190,7 @@ export default function Orders() {
     salesModiType: "",
     priority: "medium" as "low" | "medium" | "high",
     notes: "",
+    installerId: null as number | null,
   });
   
   // Edit order dialog
@@ -309,6 +310,7 @@ export default function Orders() {
   const clearAllOrders = trpc.orders.clearAll.useMutation();
   const createOrder = trpc.orders.create.useMutation();
   const deleteOrder = trpc.orders.delete.useMutation();
+  const createAssignment = trpc.assignments.create.useMutation();
   const utils = trpc.useUtils();
 
   const getStatusBadgeColor = (status: string) => {
@@ -498,9 +500,21 @@ export default function Orders() {
     }
     
     try {
-      await createOrder.mutateAsync(newOrderData);
+      // Create order without installerId (backend doesn't expect it)
+      const { installerId, ...orderDataWithoutInstaller } = newOrderData;
+      const result = await createOrder.mutateAsync(orderDataWithoutInstaller);
+      
+      // If installer was selected, create assignment
+      if (installerId && result && 'id' in result) {
+        await createAssignment.mutateAsync({
+          orderId: result.id,
+          installerId: installerId,
+        });
+        await utils.assignments.list.invalidate();
+      }
+      
       await utils.orders.list.invalidate();
-      toast.success("Order created successfully");
+      toast.success(installerId ? "Order created and assigned successfully" : "Order created successfully");
       setIsAddOrderDialogOpen(false);
       // Reset form
       setNewOrderData({
@@ -518,6 +532,7 @@ export default function Orders() {
         salesModiType: "",
         priority: "medium",
         notes: "",
+        installerId: null,
       });
     } catch (error) {
       toast.error("Failed to create order");
@@ -1113,12 +1128,12 @@ export default function Orders() {
                               <div className="text-sm">
                                 {order.appointmentDate && (
                                   <div className="text-xs font-medium">
-                                    {order.appointmentDate}
+                                    {parseAppointmentDate(order.appointmentDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) || order.appointmentDate}
                                   </div>
                                 )}
                                 {order.appointmentTime && (
                                   <div className="text-xs text-muted-foreground">
-                                    {order.appointmentTime}
+                                    {normalizeTimeFormat(order.appointmentTime) || order.appointmentTime}
                                   </div>
                                 )}
                               </div>
@@ -1127,12 +1142,12 @@ export default function Orders() {
                                 <div className="text-xs text-muted-foreground">Not assigned</div>
                                 {order.appointmentDate && (
                                   <div className="text-xs font-medium">
-                                    {order.appointmentDate}
+                                    {parseAppointmentDate(order.appointmentDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) || order.appointmentDate}
                                   </div>
                                 )}
                                 {order.appointmentTime && (
                                   <div className="text-xs">
-                                    {order.appointmentTime}
+                                    {normalizeTimeFormat(order.appointmentTime) || order.appointmentTime}
                                   </div>
                                 )}
                               </div>
@@ -1685,6 +1700,25 @@ export default function Orders() {
                   <SelectItem value="low">Low</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="installer">Assign Installer (Optional)</Label>
+              <Select 
+                value={newOrderData.installerId?.toString() || "unassigned"} 
+                onValueChange={(value) => setNewOrderData({...newOrderData, installerId: value === "unassigned" ? null : parseInt(value)})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Leave unassigned" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unassigned">Unassigned (Pending)</SelectItem>
+                  {installers.map((installer) => (
+                    <SelectItem key={installer.id} value={installer.id.toString()}>
+                      {installer.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
