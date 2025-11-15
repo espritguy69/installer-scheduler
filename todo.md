@@ -1335,4 +1335,11 @@
 - [x] Create spec.md with feature specifications
 - [x] Create wire.md with UI wireframes and design system
 - [x] Update ARCHITECTURE.md with system architecture
-- [ ] Commit and push all changes to GitHub
+- [x] Commit and push all changes to GitHub
+
+## Missing Statuses in Orders Page (USER REPORTED)
+- [x] Check status filter dropdown for missing statuses - All 15 present ✓
+- [x] Check quick status update dropdown for missing statuses - Found 6 missing
+- [x] Identify which of the 15 statuses are not showing
+- [x] Add missing 6 statuses to quick dropdown (order_completed, ready_to_invoice, invoiced, customer_issue, building_issue, network_issue)
+- [x] All 15 statuses now appear in quick dropdown with proper colors
