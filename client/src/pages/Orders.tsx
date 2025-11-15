@@ -263,21 +263,30 @@ export default function Orders() {
     let bValue: any;
     
     switch (sortColumn) {
-      case "orderNumber":
-        aValue = (a.orderNumber || "").toLowerCase();
-        bValue = (b.orderNumber || "").toLowerCase();
+      case "ticketNumber":
+        aValue = (a.ticketNumber || "").toLowerCase();
+        bValue = (b.ticketNumber || "").toLowerCase();
         break;
-      case "customerName":
-        aValue = a.customerName.toLowerCase();
-        bValue = b.customerName.toLowerCase();
-        break;
-      case "appointmentDate":
-        aValue = a.appointmentDate ? new Date(a.appointmentDate).getTime() : 0;
-        bValue = b.appointmentDate ? new Date(b.appointmentDate).getTime() : 0;
+      case "serviceNumber":
+        aValue = (a.serviceNumber || "").toLowerCase();
+        bValue = (b.serviceNumber || "").toLowerCase();
         break;
       case "status":
         aValue = a.status.toLowerCase();
         bValue = b.status.toLowerCase();
+        break;
+      case "installer":
+        // Get installer name from assignment
+        const assignmentA = assignments.find(asn => asn.orderId === a.id);
+        const assignmentB = assignments.find(asn => asn.orderId === b.id);
+        const installerA = assignmentA ? installers.find(inst => inst.id === assignmentA.installerId) : null;
+        const installerB = assignmentB ? installers.find(inst => inst.id === assignmentB.installerId) : null;
+        aValue = (installerA?.name || "Unassigned").toLowerCase();
+        bValue = (installerB?.name || "Unassigned").toLowerCase();
+        break;
+      case "appointmentDate":
+        aValue = a.appointmentDate ? new Date(a.appointmentDate).getTime() : 0;
+        bValue = b.appointmentDate ? new Date(b.appointmentDate).getTime() : 0;
         break;
       default:
         return 0;
@@ -874,34 +883,34 @@ export default function Orders() {
               <Table className="table-fixed w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[85px]">
+                    <TableHead className="w-[85px] text-xs">WO No.</TableHead>
+                    <TableHead className="w-[80px]">
                       <button
-                        onClick={() => handleSort("orderNumber")}
+                        onClick={() => handleSort("ticketNumber")}
                         className="flex items-center gap-1 hover:text-primary transition-colors text-xs"
                       >
-                        <span>WO No.</span>
-                        {sortColumn === "orderNumber" ? (
+                        <span>Ticket No.</span>
+                        {sortColumn === "ticketNumber" ? (
                           sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                         ) : (
                           <ArrowUpDown className="h-3 w-3" />
                         )}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[80px] text-xs">Ticket No.</TableHead>
-                    <TableHead className="w-[95px] text-xs">Service No.</TableHead>
-                    <TableHead className="w-[125px]">
+                    <TableHead className="w-[95px]">
                       <button
-                        onClick={() => handleSort("customerName")}
+                        onClick={() => handleSort("serviceNumber")}
                         className="flex items-center gap-1 hover:text-primary transition-colors text-xs"
                       >
-                        <span>Customer</span>
-                        {sortColumn === "customerName" ? (
+                        <span>Service No.</span>
+                        {sortColumn === "serviceNumber" ? (
                           sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                         ) : (
                           <ArrowUpDown className="h-3 w-3" />
                         )}
                       </button>
                     </TableHead>
+                    <TableHead className="w-[125px] text-xs">Customer</TableHead>
                     <TableHead className="w-[100px] text-xs">WO Type</TableHead>
                     <TableHead className="w-[70px] text-xs">Priority</TableHead>
                     <TableHead className="w-[100px]">
@@ -917,7 +926,19 @@ export default function Orders() {
                         )}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[110px] text-xs">Installer</TableHead>
+                    <TableHead className="w-[110px]">
+                      <button
+                        onClick={() => handleSort("installer")}
+                        className="flex items-center gap-1 hover:text-primary transition-colors text-xs"
+                      >
+                        <span>Installer</span>
+                        {sortColumn === "installer" ? (
+                          sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                        ) : (
+                          <ArrowUpDown className="h-3 w-3" />
+                        )}
+                      </button>
+                    </TableHead>
                     <TableHead className="w-[95px]">
                       <button
                         onClick={() => handleSort("appointmentDate")}

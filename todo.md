@@ -1314,3 +1314,10 @@
 - [x] Add "Date Range" toggle/button to switch between single date and range mode
 - [x] Add quick range presets (This Week, Last 7 Days, This Month)
 - [x] Add clear button for date range
+
+## Update Sorting Columns (USER REQUESTED)
+- [x] Remove sorting from: WO No., Customer, WO Type, Priority, Docket
+- [x] Keep sorting only on: Ticket No., Service No., Status, Installer, Assignment
+- [x] Update table headers to show sort icons only on sortable columns
+- [x] Update sorting logic to support the 5 sortable columns
+- [x] Installer sorting uses assignment data to get installer names
