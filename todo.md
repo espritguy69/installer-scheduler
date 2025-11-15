@@ -1321,3 +1321,8 @@
 - [x] Update table headers to show sort icons only on sortable columns
 - [x] Update sorting logic to support the 5 sortable columns
 - [x] Installer sorting uses assignment data to get installer names
+
+## Fix Installer Sorting Error (USER REPORTED BUG)
+- [x] Fix "Cannot access 'br' before initialization" error when clicking installer sort
+- [x] Move assignments and installers data loading before sorting logic
+- [x] Ensure installer sorting can safely access assignment and installer data

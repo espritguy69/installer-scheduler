@@ -204,6 +204,14 @@ export default function Orders() {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
+  const { data: assignments = [] } = trpc.assignments.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+  const { data: installers = [] } = trpc.installers.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
   
   // Apply filters
   const filteredOrders = allOrders.filter(order => {
@@ -295,14 +303,6 @@ export default function Orders() {
     if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
     if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
     return 0;
-  });
-  const { data: assignments = [] } = trpc.assignments.list.useQuery(undefined, {
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-  });
-  const { data: installers = [] } = trpc.installers.list.useQuery(undefined, {
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
   });
   const updateOrder = trpc.orders.update.useMutation();
   const uploadDocketFile = trpc.orders.uploadDocketFile.useMutation();
