@@ -1,0 +1,31 @@
+{
+  "query": "SELECT id, serviceNumber, orderNumber, customerName, status FROM orders WHERE customerName IN ('SYED MUHAMMAD QOTADDAH BIN SYED JAMAL ABDUL NASIR', 'SATISWARAN A/L MEROGAN', 'ONG WEE HWA') ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, serviceNumber, orderNumber, customerName, status FROM orders WHERE customerName IN ('SYED MUHAMMAD QOTADDAH BIN SYED JAMAL ABDUL NASIR', 'SATISWARAN A/L MEROGAN', 'ONG WEE HWA') ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "630001",
+      "serviceNumber": "DIGI0017056",
+      "orderNumber": "",
+      "customerName": "ONG WEE HWA",
+      "status": "pending"
+    },
+    {
+      "id": "450020",
+      "serviceNumber": "DIGI0017347",
+      "orderNumber": "",
+      "customerName": "SATISWARAN A/L MEROGAN",
+      "status": "rescheduled"
+    },
+    {
+      "id": "450019",
+      "serviceNumber": "CELCOM0016828",
+      "orderNumber": "",
+      "customerName": "SYED MUHAMMAD QOTADDAH BIN SYED JAMAL ABDUL NASIR",
+      "status": "rescheduled"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tserviceNumber\torderNumber\tcustomerName\tstatus\n630001\tDIGI0017056\t\tONG WEE HWA\tpending\n450020\tDIGI0017347\t\tSATISWARAN A/L MEROGAN\trescheduled\n450019\tCELCOM0016828\t\tSYED MUHAMMAD QOTADDAH BIN SYED JAMAL ABDUL NASIR\trescheduled\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

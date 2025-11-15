@@ -34,11 +34,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { trpc } from "@/lib/trpc";
+import { normalizeTimeFormat, parseAppointmentDate, generateTimeSlots, formatTimeSlot } from "@shared/timeUtils";
 import { APP_TITLE } from "@/const";
 import { ArrowDown, ArrowUp, ArrowUpDown, Download, FileText, Loader2, Upload, X } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { Navigation } from "@/components/Navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
 
@@ -62,7 +63,7 @@ export default function Orders() {
 
     // Prepare data for export
     const exportData = currentOrders.map((order: any) => ({
-      "WO No.": order.orderNumber || "-",
+      "WO No.": order.orderNumber || (order.serviceNumber ? `SN: ${order.serviceNumber}` : "-"),
       "Ticket No.": order.ticketNumber || "-",
       "Service No.": order.serviceNumber || "-",
       "Customer": order.customerName || "-",
@@ -71,9 +72,9 @@ export default function Orders() {
       "WO Type": order.woType || "-",
       "Priority": order.priority || "-",
       "Status": order.status || "-",
-      "Appointment Date": order.appointmentDate ? new Date(order.appointmentDate).toLocaleDateString() : "-",
+      "Appointment Date": order.appointmentDate ? (parseAppointmentDate(order.appointmentDate)?.toLocaleDateString() || order.appointmentDate) : "-",
       "Appointment Time": order.appointmentTime || "-",
-      "Installer": order.installerName || "Unassigned",
+      "Installer": getInstallerName(order.id),
       "Docket Status": order.docketStatus || "-",
       "Notes": order.notes || "-",
       "Reschedule Reason": order.rescheduleReason || "-",
@@ -122,7 +123,43 @@ export default function Orders() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [rescheduleReasonFilter, setRescheduleReasonFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [dateFilter, setDateFilter] = useState<string>("");
+  // Date filter mode: 'single' or 'range'
+  const [dateFilterMode, setDateFilterMode] = useState<'single' | 'range'>('single');
+  
+  // Default to today's date for multi-user collaboration
+  const [dateFilter, setDateFilter] = useState<string>(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0]; // YYYY-MM-DD format
+  });
+  
+  // Date range filters
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  
+  // Always reset to today's date when component mounts or becomes visible
+  useEffect(() => {
+    const updateToToday = () => {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      setDateFilter(todayStr);
+    };
+    
+    // Update on mount
+    updateToToday();
+    
+    // Update when page becomes visible (tab switch)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        updateToToday();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
   
   // Sorting states
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -163,7 +200,18 @@ export default function Orders() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteOrderId, setDeleteOrderId] = useState<number | null>(null);
 
-  const { data: allOrders = [], isLoading } = trpc.orders.list.useQuery();
+  const { data: allOrders = [], isLoading } = trpc.orders.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+  const { data: assignments = [] } = trpc.assignments.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+  const { data: installers = [] } = trpc.installers.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
   
   // Apply filters
   const filteredOrders = allOrders.filter(order => {
@@ -173,19 +221,38 @@ export default function Orders() {
     // Reschedule reason filter
     if (rescheduleReasonFilter !== "all" && order.rescheduleReason !== rescheduleReasonFilter) return false;
     
-    // Date filter
-    if (dateFilter && order.appointmentDate) {
-      const orderDate = new Date(order.appointmentDate);
-      const filterDate = new Date(dateFilter);
-      // Compare only the date part (ignore time)
-      if (orderDate.toDateString() !== filterDate.toDateString()) return false;
+    // Date filter - single date or range
+    if (order.appointmentDate) {
+      const orderDate = parseAppointmentDate(order.appointmentDate);
+      if (!orderDate) return false;
+      
+      if (dateFilterMode === 'single' && dateFilter) {
+        // Single date filter
+        const filterDate = new Date(dateFilter);
+        if (orderDate.toDateString() !== filterDate.toDateString()) return false;
+      } else if (dateFilterMode === 'range' && (startDate || endDate)) {
+        // Date range filter
+        const orderTime = orderDate.getTime();
+        
+        if (startDate) {
+          const start = new Date(startDate);
+          start.setHours(0, 0, 0, 0);
+          if (orderTime < start.getTime()) return false;
+        }
+        
+        if (endDate) {
+          const end = new Date(endDate);
+          end.setHours(23, 59, 59, 999);
+          if (orderTime > end.getTime()) return false;
+        }
+      }
     }
     
     // Search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       return (
-        order.orderNumber.toLowerCase().includes(query) ||
+        (order.orderNumber || "").toLowerCase().includes(query) ||
         order.customerName.toLowerCase().includes(query) ||
         (order.serviceNumber && order.serviceNumber.toLowerCase().includes(query)) ||
         (order.ticketNumber && order.ticketNumber.toLowerCase().includes(query)) ||
@@ -204,21 +271,30 @@ export default function Orders() {
     let bValue: any;
     
     switch (sortColumn) {
-      case "orderNumber":
-        aValue = a.orderNumber.toLowerCase();
-        bValue = b.orderNumber.toLowerCase();
+      case "ticketNumber":
+        aValue = (a.ticketNumber || "").toLowerCase();
+        bValue = (b.ticketNumber || "").toLowerCase();
         break;
-      case "customerName":
-        aValue = a.customerName.toLowerCase();
-        bValue = b.customerName.toLowerCase();
-        break;
-      case "appointmentDate":
-        aValue = a.appointmentDate ? new Date(a.appointmentDate).getTime() : 0;
-        bValue = b.appointmentDate ? new Date(b.appointmentDate).getTime() : 0;
+      case "serviceNumber":
+        aValue = (a.serviceNumber || "").toLowerCase();
+        bValue = (b.serviceNumber || "").toLowerCase();
         break;
       case "status":
         aValue = a.status.toLowerCase();
         bValue = b.status.toLowerCase();
+        break;
+      case "installer":
+        // Get installer name from assignment
+        const assignmentA = assignments.find(asn => asn.orderId === a.id);
+        const assignmentB = assignments.find(asn => asn.orderId === b.id);
+        const installerA = assignmentA ? installers.find(inst => inst.id === assignmentA.installerId) : null;
+        const installerB = assignmentB ? installers.find(inst => inst.id === assignmentB.installerId) : null;
+        aValue = (installerA?.name || "Unassigned").toLowerCase();
+        bValue = (installerB?.name || "Unassigned").toLowerCase();
+        break;
+      case "appointmentDate":
+        aValue = a.appointmentDate ? new Date(a.appointmentDate).getTime() : 0;
+        bValue = b.appointmentDate ? new Date(b.appointmentDate).getTime() : 0;
         break;
       default:
         return 0;
@@ -228,7 +304,6 @@ export default function Orders() {
     if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
     return 0;
   });
-  const { data: assignments = [] } = trpc.assignments.list.useQuery();
   const updateOrder = trpc.orders.update.useMutation();
   const uploadDocketFile = trpc.orders.uploadDocketFile.useMutation();
   const clearAllOrders = trpc.orders.clearAll.useMutation();
@@ -239,21 +314,33 @@ export default function Orders() {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
       case "assigned":
         return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
       case "on_the_way":
-        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200";
+        return "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200";
       case "met_customer":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
-      case "completed":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+        return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200";
+      case "order_completed":
+        return "bg-lime-100 text-lime-800 dark:bg-lime-900 dark:text-lime-200";
       case "docket_received":
         return "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200";
       case "docket_uploaded":
         return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200";
-      case "rescheduled":
+      case "ready_to_invoice":
+        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200";
+      case "invoiced":
+        return "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200";
+      case "completed":
+        return "bg-green-600 text-white dark:bg-green-700 dark:text-white";
+      case "customer_issue":
         return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+      case "building_issue":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+      case "network_issue":
+        return "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200";
+      case "rescheduled":
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
       case "withdrawn":
         return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
       default:
@@ -276,6 +363,13 @@ export default function Orders() {
 
   const getAssignmentInfo = (orderId: number) => {
     return assignments.find(a => a.orderId === orderId);
+  };
+
+  const getInstallerName = (orderId: number) => {
+    const assignment = assignments.find(a => a.orderId === orderId);
+    if (!assignment) return "Unassigned";
+    const installer = installers.find(i => i.id === assignment.installerId);
+    return installer?.name || "Unknown";
   };
 
   const handleStatusChange = (order: any) => {
@@ -303,7 +397,7 @@ export default function Orders() {
     if (newStatus === "docket_received" || newStatus === "docket_uploaded") {
       const order = orders?.find(o => o.id === orderId);
       if (order) {
-        setDocketUploadOrder({ id: orderId, status: newStatus, orderNumber: order.orderNumber });
+        setDocketUploadOrder({ id: orderId, status: newStatus, orderNumber: order.orderNumber || "" });
         setIsDocketUploadOpen(true);
       }
       return;
@@ -342,13 +436,18 @@ export default function Orders() {
   };
   
   const handleSaveEdit = async () => {
-    if (!editOrder.orderNumber || !editOrder.customerName) {
-      toast.error("Order number and customer name are required");
+    if (!editOrder.serviceNumber || !editOrder.customerName) {
+      toast.error("Service number and customer name are required");
       return;
     }
     
     try {
-      await updateOrder.mutateAsync(editOrder);
+      // Normalize appointment time before saving
+      const normalizedOrder = {
+        ...editOrder,
+        appointmentTime: editOrder.appointmentTime ? (normalizeTimeFormat(editOrder.appointmentTime) || editOrder.appointmentTime) : editOrder.appointmentTime
+      };
+      await updateOrder.mutateAsync(normalizedOrder);
       await utils.orders.list.invalidate();
       toast.success("Order updated successfully");
       setIsEditDialogOpen(false);
@@ -388,8 +487,13 @@ export default function Orders() {
   };
   
   const handleAddOrder = async () => {
-    if (!newOrderData.orderNumber || !newOrderData.customerName) {
-      toast.error("Order number and customer name are required");
+    // Validate: Service Number OR WO Number (at least one) + Customer Name
+    if (!newOrderData.serviceNumber && !newOrderData.orderNumber) {
+      toast.error("Service Number or WO Number is required");
+      return;
+    }
+    if (!newOrderData.customerName) {
+      toast.error("Customer name is required");
       return;
     }
     
@@ -556,9 +660,15 @@ export default function Orders() {
                     <SelectItem value="assigned">Assigned</SelectItem>
                     <SelectItem value="on_the_way">On the Way</SelectItem>
                     <SelectItem value="met_customer">Met Customer</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="order_completed">Order Completed</SelectItem>
                     <SelectItem value="docket_received">Docket Received</SelectItem>
                     <SelectItem value="docket_uploaded">Docket Uploaded</SelectItem>
+                    <SelectItem value="ready_to_invoice">Ready to Invoice</SelectItem>
+                    <SelectItem value="invoiced">Invoiced</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="customer_issue">Customer Issue</SelectItem>
+                    <SelectItem value="building_issue">Building Issue</SelectItem>
+                    <SelectItem value="network_issue">Network Issue</SelectItem>
                     <SelectItem value="rescheduled">Rescheduled</SelectItem>
                     <SelectItem value="withdrawn">Withdrawn</SelectItem>
                   </SelectContent>
@@ -581,25 +691,187 @@ export default function Orders() {
               </div>
               
               <div>
-                <label className="text-sm font-medium mb-2 block">Appointment Date</label>
-                <div className="flex gap-2">
-                  <Input
-                    type="date"
-                    value={dateFilter}
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    placeholder="Select date"
-                  />
-                  {dateFilter && (
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium">
+                    Appointment Date
+                    {dateFilterMode === 'single' && dateFilter && new Date(dateFilter).toDateString() === new Date().toDateString() && (
+                      <span className="ml-2 text-xs text-blue-600 font-normal">(Today's orders)</span>
+                    )}
+                  </label>
+                  <div className="flex gap-1">
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDateFilter("")}
-                      title="Clear date filter"
+                      variant={dateFilterMode === 'single' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setDateFilterMode('single')}
+                      className="text-xs h-7"
                     >
-                      <X className="h-4 w-4" />
+                      Single Date
                     </Button>
-                  )}
+                    <Button
+                      variant={dateFilterMode === 'range' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setDateFilterMode('range')}
+                      className="text-xs h-7"
+                    >
+                      Date Range
+                    </Button>
+                  </div>
                 </div>
+                
+                {dateFilterMode === 'single' ? (
+                  <>
+                    {/* Quick date shortcuts */}
+                    <div className="flex gap-2 mb-2">
+                      <Button
+                        variant={(() => {
+                          if (!dateFilter) return "outline";
+                          const yesterday = new Date();
+                          yesterday.setDate(yesterday.getDate() - 1);
+                          return new Date(dateFilter).toDateString() === yesterday.toDateString() ? "default" : "outline";
+                        })()}
+                        size="sm"
+                        onClick={() => {
+                          const yesterday = new Date();
+                          yesterday.setDate(yesterday.getDate() - 1);
+                          setDateFilter(yesterday.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        Yesterday
+                      </Button>
+                      <Button
+                        variant={dateFilter && new Date(dateFilter).toDateString() === new Date().toDateString() ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          const today = new Date();
+                          setDateFilter(today.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        variant={(() => {
+                          if (!dateFilter) return "outline";
+                          const tomorrow = new Date();
+                          tomorrow.setDate(tomorrow.getDate() + 1);
+                          return new Date(dateFilter).toDateString() === tomorrow.toDateString() ? "default" : "outline";
+                        })()}
+                        size="sm"
+                        onClick={() => {
+                          const tomorrow = new Date();
+                          tomorrow.setDate(tomorrow.getDate() + 1);
+                          setDateFilter(tomorrow.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        Tomorrow
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        type="date"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                        placeholder="Select date"
+                      />
+                      {dateFilter && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setDateFilter("")}
+                          title="Clear date filter to show all orders"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Quick range presets */}
+                    <div className="flex gap-2 mb-2 flex-wrap">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const today = new Date();
+                          const weekStart = new Date(today);
+                          weekStart.setDate(today.getDate() - today.getDay());
+                          const weekEnd = new Date(weekStart);
+                          weekEnd.setDate(weekStart.getDate() + 6);
+                          setStartDate(weekStart.toISOString().split('T')[0]);
+                          setEndDate(weekEnd.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        This Week
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const today = new Date();
+                          const last7Days = new Date(today);
+                          last7Days.setDate(today.getDate() - 6);
+                          setStartDate(last7Days.toISOString().split('T')[0]);
+                          setEndDate(today.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        Last 7 Days
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const today = new Date();
+                          const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+                          const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                          setStartDate(monthStart.toISOString().split('T')[0]);
+                          setEndDate(monthEnd.toISOString().split('T')[0]);
+                        }}
+                        className="text-xs"
+                      >
+                        This Month
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-xs text-muted-foreground mb-1 block">Start Date</label>
+                        <Input
+                          type="date"
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                          placeholder="Start date"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground mb-1 block">End Date</label>
+                        <Input
+                          type="date"
+                          value={endDate}
+                          onChange={(e) => setEndDate(e.target.value)}
+                          placeholder="End date"
+                        />
+                      </div>
+                    </div>
+                    {(startDate || endDate) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setStartDate("");
+                          setEndDate("");
+                        }}
+                        className="text-xs mt-2 w-full"
+                      >
+                        <X className="h-3 w-3 mr-1" />
+                        Clear Date Range
+                      </Button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
             
@@ -611,34 +883,34 @@ export default function Orders() {
               <Table className="table-fixed w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[85px]">
+                    <TableHead className="w-[85px] text-xs">WO No.</TableHead>
+                    <TableHead className="w-[80px]">
                       <button
-                        onClick={() => handleSort("orderNumber")}
+                        onClick={() => handleSort("ticketNumber")}
                         className="flex items-center gap-1 hover:text-primary transition-colors text-xs"
                       >
-                        <span>WO No.</span>
-                        {sortColumn === "orderNumber" ? (
+                        <span>Ticket No.</span>
+                        {sortColumn === "ticketNumber" ? (
                           sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                         ) : (
                           <ArrowUpDown className="h-3 w-3" />
                         )}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[80px] text-xs">Ticket No.</TableHead>
-                    <TableHead className="w-[95px] text-xs">Service No.</TableHead>
-                    <TableHead className="w-[125px]">
+                    <TableHead className="w-[95px]">
                       <button
-                        onClick={() => handleSort("customerName")}
+                        onClick={() => handleSort("serviceNumber")}
                         className="flex items-center gap-1 hover:text-primary transition-colors text-xs"
                       >
-                        <span>Customer</span>
-                        {sortColumn === "customerName" ? (
+                        <span>Service No.</span>
+                        {sortColumn === "serviceNumber" ? (
                           sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                         ) : (
                           <ArrowUpDown className="h-3 w-3" />
                         )}
                       </button>
                     </TableHead>
+                    <TableHead className="w-[125px] text-xs">Customer</TableHead>
                     <TableHead className="w-[100px] text-xs">WO Type</TableHead>
                     <TableHead className="w-[70px] text-xs">Priority</TableHead>
                     <TableHead className="w-[100px]">
@@ -648,6 +920,19 @@ export default function Orders() {
                       >
                         <span>Status</span>
                         {sortColumn === "status" ? (
+                          sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                        ) : (
+                          <ArrowUpDown className="h-3 w-3" />
+                        )}
+                      </button>
+                    </TableHead>
+                    <TableHead className="w-[110px]">
+                      <button
+                        onClick={() => handleSort("installer")}
+                        className="flex items-center gap-1 hover:text-primary transition-colors text-xs"
+                      >
+                        <span>Installer</span>
+                        {sortColumn === "installer" ? (
                           sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
                         ) : (
                           <ArrowUpDown className="h-3 w-3" />
@@ -674,7 +959,7 @@ export default function Orders() {
                 <TableBody>
                   {orders.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
                         No orders found. Upload orders to get started.
                       </TableCell>
                     </TableRow>
@@ -684,7 +969,14 @@ export default function Orders() {
                       return (
                         <TableRow key={order.id}>
                           <TableCell className="font-medium text-xs">
-                            <div className="truncate" title={order.orderNumber}>{order.orderNumber}</div>
+                            {order.orderNumber ? (
+                              <div className="truncate" title={order.orderNumber}>{order.orderNumber}</div>
+                            ) : (
+                              <div className="flex items-center gap-1">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-700">SN</span>
+                                <span className="truncate font-semibold text-blue-600" title={order.serviceNumber || "-"}>{order.serviceNumber || "-"}</span>
+                              </div>
+                            )}
                           </TableCell>
                           <TableCell className="text-xs">
                             <div className="truncate" title={order.ticketNumber || "-"}>{order.ticketNumber || "-"}</div>
@@ -775,6 +1067,11 @@ export default function Orders() {
                               </SelectContent>
                             </Select>
                           </TableCell>
+                          <TableCell className="text-xs">
+                            <div className="truncate" title={getInstallerName(order.id)}>
+                              {getInstallerName(order.id)}
+                            </div>
+                          </TableCell>
                           <TableCell>
                             {assignment ? (
                               <div className="text-sm">
@@ -861,9 +1158,15 @@ export default function Orders() {
                   <SelectItem value="assigned">Assigned</SelectItem>
                   <SelectItem value="on_the_way">On the Way</SelectItem>
                   <SelectItem value="met_customer">Met the Customer</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="order_completed">Order Completed</SelectItem>
                   <SelectItem value="docket_received">Docket Received</SelectItem>
                   <SelectItem value="docket_uploaded">Docket Uploaded</SelectItem>
+                  <SelectItem value="ready_to_invoice">Ready to Invoice</SelectItem>
+                  <SelectItem value="invoiced">Invoiced</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="customer_issue">Customer Issue</SelectItem>
+                  <SelectItem value="building_issue">Building Issue</SelectItem>
+                  <SelectItem value="network_issue">Network Issue</SelectItem>
                   <SelectItem value="rescheduled">Reschedule</SelectItem>
                   <SelectItem value="withdrawn">Withdrawn</SelectItem>
                 </SelectContent>
@@ -1016,12 +1319,21 @@ export default function Orders() {
               </div>
               <div className="grid gap-2">
                 <label className="text-sm font-medium">Appointment Time</label>
-                <input
-                  type="time"
-                  value={editOrder.appointmentTime}
-                  onChange={(e) => setEditOrder({ ...editOrder, appointmentTime: e.target.value })}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                />
+                <Select 
+                  value={editOrder.appointmentTime} 
+                  onValueChange={(value) => setEditOrder({ ...editOrder, appointmentTime: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select time" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {generateTimeSlots(8, 18).map((time) => (
+                      <SelectItem key={time} value={time}>
+                        {formatTimeSlot(time)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
                 <label className="text-sm font-medium">Building Name</label>
@@ -1280,12 +1592,21 @@ export default function Orders() {
               </div>
               <div>
                 <Label htmlFor="appointmentTime">Appointment Time</Label>
-                <Input
-                  id="appointmentTime"
-                  type="time"
-                  value={newOrderData.appointmentTime}
-                  onChange={(e) => setNewOrderData({...newOrderData, appointmentTime: e.target.value})}
-                />
+                <Select 
+                  value={newOrderData.appointmentTime} 
+                  onValueChange={(value) => setNewOrderData({...newOrderData, appointmentTime: value})}
+                >
+                  <SelectTrigger id="appointmentTime">
+                    <SelectValue placeholder="Select time" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {generateTimeSlots(8, 18).map((time) => (
+                      <SelectItem key={time} value={time}>
+                        {formatTimeSlot(time)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">

@@ -21,8 +21,54 @@ export const appRouter = router({
   }),
 
   users: router({
-    list: protectedProcedure.query(async () => {
+    list: protectedProcedure.query(async ({ ctx }) => {
+      // Only admin can list users
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
       return await db.getAllUsers();
+    }),
+    getById: protectedProcedure.input(z.object({ id: z.number() })).query(async ({ ctx, input }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
+      return await db.getUserById(input.id);
+    }),
+    create: protectedProcedure.input(z.object({
+      openId: z.string(),
+      name: z.string().optional(),
+      email: z.string().optional(),
+      loginMethod: z.string().optional(),
+      role: z.enum(['user', 'admin', 'supervisor']),
+    })).mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
+      return await db.createUser(input);
+    }),
+    update: protectedProcedure.input(z.object({
+      id: z.number(),
+      name: z.string().optional(),
+      email: z.string().optional(),
+      role: z.enum(['user', 'admin', 'supervisor']).optional(),
+    })).mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
+      const { id, ...data } = input;
+      await db.updateUser(id, data);
+      return { success: true };
+    }),
+    delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
+      // Prevent deleting yourself
+      if (ctx.user.id === input.id) {
+        throw new Error('Cannot delete your own account');
+      }
+      await db.deleteUser(input.id);
+      return { success: true };
     }),
   }),
 
@@ -37,9 +83,9 @@ export const appRouter = router({
       return await db.getOrderHistory(input.orderId);
     }),
     create: protectedProcedure.input(z.object({
-      orderNumber: z.string(),
+      orderNumber: z.string().optional(),
       ticketNumber: z.string().optional(),
-      serviceNumber: z.string().optional(),
+      serviceNumber: z.string(),
       customerName: z.string(),
       customerPhone: z.string().optional(),
       customerEmail: z.string().optional(),
@@ -84,7 +130,7 @@ export const appRouter = router({
       buildingName: z.string().optional(),
       estimatedDuration: z.number().optional(),
       priority: z.enum(["low", "medium", "high"]).optional(),
-      status: z.enum(["pending", "assigned", "on_the_way", "met_customer", "completed", "docket_received", "docket_uploaded", "rescheduled", "withdrawn"]).optional(),
+      status: z.enum(["pending", "assigned", "on_the_way", "met_customer", "order_completed", "docket_received", "docket_uploaded", "ready_to_invoice", "invoiced", "completed", "customer_issue", "building_issue", "network_issue", "rescheduled", "withdrawn"]).optional(),
       rescheduleReason: z.enum(["customer_issue", "building_issue", "network_issue"]).optional(),
       rescheduledDate: z.date().optional(),
       rescheduledTime: z.string().optional(),
@@ -133,7 +179,7 @@ export const appRouter = router({
               : "Unknown";
             
             await notifyOrderCompleted({
-              orderNumber: updatedOrder.orderNumber,
+              orderNumber: updatedOrder.orderNumber || updatedOrder.serviceNumber,
               installerName,
               customerName: updatedOrder.customerName,
             });
@@ -145,7 +191,7 @@ export const appRouter = router({
               : "Unknown";
             
             await notifyOrderRescheduled({
-              orderNumber: updatedOrder.orderNumber,
+              orderNumber: updatedOrder.orderNumber || updatedOrder.serviceNumber,
               installerName,
               customerName: updatedOrder.customerName,
               reason: data.rescheduleReason,
@@ -154,7 +200,7 @@ export const appRouter = router({
             });
           } else if (data.status === "withdrawn") {
             await notifyOrderWithdrawn({
-              orderNumber: updatedOrder.orderNumber,
+              orderNumber: updatedOrder.orderNumber || updatedOrder.serviceNumber,
               customerName: updatedOrder.customerName,
             });
           }
@@ -169,25 +215,32 @@ export const appRouter = router({
       await db.deleteOrder(input.id);
       return { success: true };
     }),
-    bulkCreate: protectedProcedure.input(z.array(z.object({
-      orderNumber: z.string(),
-      ticketNumber: z.string().optional(),
-      serviceNumber: z.string().optional(),
-      customerName: z.string(),
-      customerPhone: z.string().optional(),
-      customerEmail: z.string().optional(),
-      serviceType: z.string().optional(),
-      salesModiType: z.string().optional(),
-      address: z.string().optional(),
-      appointmentDate: z.string().optional(),
-      appointmentTime: z.string().optional(),
-      buildingName: z.string().optional(),
-      estimatedDuration: z.number().default(60),
-      priority: z.enum(["low", "medium", "high"]).default("medium"),
-      notes: z.string().optional(),
-    }))).mutation(async ({ input }) => {
-      await db.bulkCreateOrders(input);
-      return { success: true, count: input.length };
+    bulkCreate: protectedProcedure.input(z.object({
+      orders: z.array(z.object({
+        orderNumber: z.string().optional(),
+        ticketNumber: z.string().optional(),
+        serviceNumber: z.string(),
+        customerName: z.string(),
+        customerPhone: z.string().optional(),
+        customerEmail: z.string().optional(),
+        serviceType: z.string().optional(),
+        salesModiType: z.string().optional(),
+        address: z.string().optional(),
+        appointmentDate: z.string().optional(),
+        appointmentTime: z.string().optional(),
+        buildingName: z.string().optional(),
+        estimatedDuration: z.number().default(60),
+        priority: z.enum(["low", "medium", "high"]).default("medium"),
+        notes: z.string().optional(),
+      })),
+      updateExisting: z.boolean().default(false),
+    })).mutation(async ({ input }) => {
+      if (input.updateExisting) {
+        await db.bulkUpsertOrders(input.orders);
+      } else {
+        await db.bulkCreateOrders(input.orders);
+      }
+      return { success: true, count: input.orders.length };
     }),
     clearAll: protectedProcedure.mutation(async () => {
       await db.clearAllOrders();
@@ -326,7 +379,7 @@ export const appRouter = router({
           
           // Send notification
           await notifyOrderAssigned({
-            orderNumber: order.orderNumber,
+            orderNumber: order.orderNumber || order.serviceNumber,
             installerName: installer.name,
             customerName: order.customerName,
             scheduledDate: input.scheduledDate.toLocaleDateString(),

@@ -1,0 +1,1 @@
+ALTER TABLE `orders` MODIFY COLUMN `status` enum('pending','assigned','on_the_way','met_customer','order_completed','docket_received','docket_uploaded','ready_to_invoice','invoiced','completed','customer_issue','building_issue','network_issue','rescheduled','withdrawn') NOT NULL DEFAULT 'pending';

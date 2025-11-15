@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, time, sortOrder, isActive FROM timeSlots ORDER BY sortOrder;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, time, sortOrder, isActive FROM timeSlots ORDER BY sortOrder;",
+  "rows": [
+    {
+      "id": "1",
+      "time": "9:00 AM",
+      "sortOrder": "0",
+      "isActive": "1"
+    },
+    {
+      "id": "2",
+      "time": "10:00 AM",
+      "sortOrder": "1",
+      "isActive": "1"
+    },
+    {
+      "id": "3",
+      "time": "11:00 AM",
+      "sortOrder": "2",
+      "isActive": "1"
+    },
+    {
+      "id": "4",
+      "time": "11:30 AM",
+      "sortOrder": "3",
+      "isActive": "1"
+    },
+    {
+      "id": "5",
+      "time": "1:00 PM",
+      "sortOrder": "4",
+      "isActive": "1"
+    },
+    {
+      "id": "6",
+      "time": "2:30 PM",
+      "sortOrder": "5",
+      "isActive": "1"
+    },
+    {
+      "id": "7",
+      "time": "3:00 PM",
+      "sortOrder": "6",
+      "isActive": "1"
+    },
+    {
+      "id": "8",
+      "time": "4:00 PM",
+      "sortOrder": "7",
+      "isActive": "1"
+    },
+    {
+      "id": "9",
+      "time": "6:00 PM",
+      "sortOrder": "8",
+      "isActive": "1"
+    },
+    {
+      "id": "10",
+      "time": "8:00 AM",
+      "sortOrder": "9",
+      "isActive": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttime\tsortOrder\tisActive\n1\t9:00 AM\t0\t1\n2\t10:00 AM\t1\t1\n3\t11:00 AM\t2\t1\n4\t11:30 AM\t3\t1\n5\t1:00 PM\t4\t1\n6\t2:30 PM\t5\t1\n7\t3:00 PM\t6\t1\n8\t4:00 PM\t7\t1\n9\t6:00 PM\t8\t1\n10\t8:00 AM\t9\t0\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}

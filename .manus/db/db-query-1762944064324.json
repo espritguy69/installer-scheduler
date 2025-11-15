@@ -1,0 +1,40 @@
+{
+  "query": "SELECT time FROM timeSlots ORDER BY sortOrder;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT time FROM timeSlots ORDER BY sortOrder;",
+  "rows": [
+    {
+      "time": "9:00 AM"
+    },
+    {
+      "time": "10:00 AM"
+    },
+    {
+      "time": "11:00 AM"
+    },
+    {
+      "time": "11:30 AM"
+    },
+    {
+      "time": "1:00 PM"
+    },
+    {
+      "time": "2:30 PM"
+    },
+    {
+      "time": "3:00 PM"
+    },
+    {
+      "time": "4:00 PM"
+    },
+    {
+      "time": "6:00 PM"
+    },
+    {
+      "time": "8:00 AM"
+    }
+  ],
+  "messages": [],
+  "stdout": "time\n9:00 AM\n10:00 AM\n11:00 AM\n11:30 AM\n1:00 PM\n2:30 PM\n3:00 PM\n4:00 PM\n6:00 PM\n8:00 AM\n",
+  "stderr": "",
+  "execution_time_ms": 45
+}

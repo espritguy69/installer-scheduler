@@ -1,0 +1,16 @@
+{
+  "query": "SELECT DISTINCT appointmentTime FROM orders WHERE appointmentTime LIKE '%2:30%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT DISTINCT appointmentTime FROM orders WHERE appointmentTime LIKE '%2:30%';",
+  "rows": [
+    {
+      "appointmentTime": "2:30 PM"
+    },
+    {
+      "appointmentTime": "02:30 PM"
+    }
+  ],
+  "messages": [],
+  "stdout": "appointmentTime\n2:30 PM\n02:30 PM\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

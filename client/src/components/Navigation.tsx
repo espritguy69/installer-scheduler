@@ -8,17 +8,23 @@ export function Navigation() {
   const [location] = useLocation();
   const { user, logout } = useAuth();
 
-  const navItems = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
-    { href: "/performance", label: "Performance", icon: BarChart3 },
-    { href: "/orders", label: "Orders", icon: FileText },
-    { href: "/schedule", label: "Schedule", icon: Calendar },
-    { href: "/notes", label: "Notes", icon: StickyNote },
-    { href: "/history", label: "History", icon: History },
-    { href: "/upload", label: "Upload", icon: Upload },
-    { href: "/settings", label: "Settings", icon: Settings },
+  const allNavItems = [
+    { href: "/", label: "Home", icon: Home, roles: ["admin", "supervisor", "user"] },
+    { href: "/installer", label: "My Tasks", icon: Users, roles: ["user"] },
+    { href: "/dashboard", label: "Dashboard", icon: BarChart3, roles: ["admin", "supervisor"] },
+    { href: "/performance", label: "Performance", icon: BarChart3, roles: ["admin", "supervisor"] },
+    { href: "/orders", label: "Orders", icon: FileText, roles: ["admin", "supervisor"] },
+    { href: "/schedule", label: "Schedule", icon: Calendar, roles: ["admin", "supervisor"] },
+    { href: "/notes", label: "Notes", icon: StickyNote, roles: ["admin", "supervisor"] },
+    { href: "/history", label: "History", icon: History, roles: ["admin", "supervisor"] },
+    { href: "/upload", label: "Upload", icon: Upload, roles: ["admin", "supervisor"] },
+    { href: "/settings", label: "Settings", icon: Settings, roles: ["admin"] },
   ];
+
+  // Filter nav items based on user role
+  const navItems = allNavItems.filter(item => 
+    user && item.roles.includes(user.role)
+  );
 
   const isActive = (href: string) => {
     if (href === "/") return location === "/";
@@ -33,7 +39,7 @@ export function Navigation() {
             {APP_TITLE}
           </Link>
           <div className="hidden md:flex gap-1">
-            {navItems.map(({ href, label, icon: Icon }) => (
+            {navItems.map(({ href, label, icon: Icon, roles }) => (
               <Link key={href} href={href}>
                 <Button
                   variant={isActive(href) ? "default" : "ghost"}

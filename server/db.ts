@@ -1,4 +1,4 @@
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, isNull, lte, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { assignmentHistory, assignments, InsertAssignment, InsertAssignmentHistory, InsertInstaller, InsertNote, InsertOrder, InsertOrderHistory, installers, InsertTimeSlot, InsertUser, notes, orderHistory, orders, timeSlots, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -95,6 +95,32 @@ export async function getAllUsers() {
   return await db.select().from(users);
 }
 
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createUser(user: InsertUser) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(users).values(user);
+  return result;
+}
+
+export async function updateUser(id: number, user: Partial<InsertUser>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set(user).where(eq(users.id, id));
+}
+
+export async function deleteUser(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(users).where(eq(users.id, id));
+}
+
 // Orders queries
 export async function getAllOrders() {
   const db = await getDb();
@@ -125,6 +151,11 @@ export async function updateOrder(id: number, order: Partial<InsertOrder>) {
 export async function deleteOrder(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // Delete related assignments first (foreign key constraint)
+  await db.delete(assignments).where(eq(assignments.orderId, id));
+  
+  // Then delete the order
   await db.delete(orders).where(eq(orders.id, id));
 }
 
@@ -150,7 +181,84 @@ export async function bulkCreateOrders(orderList: InsertOrder[]) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   if (orderList.length === 0) return;
+  
+  // Check for duplicates based on Service ID + WO No. combination
+  // Service ID alone is NOT a duplicate (same service can have multiple WOs)
+  // Service ID + WO No. combination IS a duplicate
+  const duplicates: Array<{ serviceNumber: string; orderNumber: string | null }> = [];
+  
+  for (const order of orderList) {
+    if (!order.serviceNumber) continue;
+    
+    // Build the where condition based on whether WO No. exists
+    const whereCondition = order.orderNumber && order.orderNumber.trim() !== ''
+      ? and(
+          eq(orders.serviceNumber, order.serviceNumber),
+          eq(orders.orderNumber, order.orderNumber)
+        )
+      : and(
+          eq(orders.serviceNumber, order.serviceNumber),
+          or(
+            eq(orders.orderNumber, ''),
+            isNull(orders.orderNumber)
+          )
+        );
+    
+    const existing = await db.select().from(orders).where(whereCondition).limit(1);
+    
+    if (existing.length > 0) {
+      duplicates.push({
+        serviceNumber: order.serviceNumber,
+        orderNumber: order.orderNumber || null
+      });
+    }
+  }
+  
+  if (duplicates.length > 0) {
+    const duplicateList = duplicates.map(d => 
+      d.orderNumber 
+        ? `Service: ${d.serviceNumber}, WO: ${d.orderNumber}`
+        : `Service: ${d.serviceNumber} (no WO)`
+    ).join('; ');
+    throw new Error(`Duplicate orders found: ${duplicateList}`);
+  }
+  
   await db.insert(orders).values(orderList);
+}
+
+export async function bulkUpsertOrders(orderList: InsertOrder[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  if (orderList.length === 0) return;
+  
+  // For each order, check if it exists and update, otherwise insert
+  for (const order of orderList) {
+    if (!order.serviceNumber) continue;
+    
+    // Build the where condition based on whether WO No. exists
+    const whereCondition = order.orderNumber && order.orderNumber.trim() !== ''
+      ? and(
+          eq(orders.serviceNumber, order.serviceNumber),
+          eq(orders.orderNumber, order.orderNumber)
+        )
+      : and(
+          eq(orders.serviceNumber, order.serviceNumber),
+          or(
+            eq(orders.orderNumber, ''),
+            isNull(orders.orderNumber)
+          )
+        );
+    
+    const existing = await db.select().from(orders).where(whereCondition).limit(1);
+    
+    if (existing.length > 0) {
+      // Update existing order
+      await db.update(orders).set(order).where(eq(orders.id, existing[0].id));
+    } else {
+      // Insert new order
+      await db.insert(orders).values(order);
+    }
+  }
 }
 
 // Installers queries

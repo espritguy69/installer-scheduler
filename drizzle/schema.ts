@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -16,7 +16,7 @@ export const users = mysqlTable("users", {
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "admin", "supervisor"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -30,9 +30,9 @@ export type InsertUser = typeof users.$inferInsert;
  */
 export const orders = mysqlTable("orders", {
   id: int("id").autoincrement().primaryKey(),
-  orderNumber: varchar("orderNumber", { length: 100 }).notNull(),
+  orderNumber: varchar("orderNumber", { length: 100 }),
   ticketNumber: varchar("ticketNumber", { length: 100 }),
-  serviceNumber: varchar("serviceNumber", { length: 100 }),
+  serviceNumber: varchar("serviceNumber", { length: 100 }).notNull(),
   customerName: varchar("customerName", { length: 255 }).notNull(),
   customerPhone: varchar("customerPhone", { length: 50 }),
   customerEmail: varchar("customerEmail", { length: 320 }),
@@ -44,7 +44,7 @@ export const orders = mysqlTable("orders", {
   buildingName: varchar("buildingName", { length: 255 }),
   estimatedDuration: int("estimatedDuration").default(60).notNull(),
   priority: mysqlEnum("priority", ["low", "medium", "high"]).default("medium").notNull(),
-  status: mysqlEnum("status", ["pending", "assigned", "on_the_way", "met_customer", "completed", "docket_received", "docket_uploaded", "rescheduled", "withdrawn"]).default("pending").notNull(),
+  status: mysqlEnum("status", ["pending", "assigned", "on_the_way", "met_customer", "order_completed", "docket_received", "docket_uploaded", "ready_to_invoice", "invoiced", "completed", "customer_issue", "building_issue", "network_issue", "rescheduled", "withdrawn"]).default("pending").notNull(),
   rescheduleReason: mysqlEnum("rescheduleReason", ["customer_issue", "building_issue", "network_issue"]),
   rescheduledDate: timestamp("rescheduledDate"),
   rescheduledTime: varchar("rescheduledTime", { length: 10 }),
@@ -53,7 +53,10 @@ export const orders = mysqlTable("orders", {
   docketFileName: varchar("docketFileName", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+}, (table) => ({
+  // Unique constraint: Same service can have multiple WOs, but Service+WO combination must be unique
+  serviceOrderUnique: uniqueIndex("service_order_unique").on(table.serviceNumber, table.orderNumber),
+}));
 
 export type Order = typeof orders.$inferSelect;
 export type InsertOrder = typeof orders.$inferInsert;

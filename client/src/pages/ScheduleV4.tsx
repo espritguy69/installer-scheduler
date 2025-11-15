@@ -22,6 +22,7 @@ import { APP_TITLE, getLoginUrl } from "@/const";
 import { Navigation } from "@/components/Navigation";
 import { OrderHistoryDialog } from "@/components/OrderHistoryDialog";
 import { trpc } from "@/lib/trpc";
+import { normalizeTimeFormat, parseAppointmentDate, generateTimeSlots, formatTimeSlot } from "@shared/timeUtils";
 import { ChevronLeft, ChevronRight, Clock, MapPin, User, X, History } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -33,7 +34,7 @@ import { toast } from "sonner";
 
 interface Order {
   id: number;
-  orderNumber: string;
+  orderNumber: string | null;
   customerName: string | null;
   buildingName: string | null;
   serviceNumber: string | null;
@@ -95,89 +96,70 @@ interface OrderCardProps {
   onUnassign: (orderId: number) => void;
   onTimeChange: (orderId: number) => void;
   onStatusChange: (orderId: number, newStatus: string) => void;
+  bulkMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelection?: (orderId: number) => void;
 }
 
-function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChange, onStatusChange }: OrderCardProps) {
+function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChange, onStatusChange, bulkMode, isSelected, onToggleSelection }: OrderCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   
-  const getStatusColor = (status: string) => {
-    // Check if WO starts with AWO or is empty/null
+  // Card background color based on WO type (4-color scheme)
+  const getCardBackgroundColor = (status: string) => {
     const isAWO = order.orderNumber?.startsWith('AWO');
     const hasNoWO = !order.orderNumber || order.orderNumber.trim() === '';
     
     // Pending status always uses gray regardless of WO type
     if (status === 'pending') {
-      return 'bg-gray-100 text-gray-800 border-gray-300';
+      return 'bg-gray-100';
     }
     
-    // For non-pending statuses, differentiate by WO type
+    // For non-pending statuses: AWO = Light Lavender, No-WO = Light Yellow, Regular = Green
     if (isAWO) {
-      // AWO orders use teal/cyan colors for non-pending statuses
-      switch (status) {
-        case 'assigned':
-          return 'bg-cyan-100 text-cyan-800 border-cyan-300';
-        case 'on_the_way':
-          return 'bg-cyan-200 text-cyan-900 border-cyan-400';
-        case 'met_customer':
-          return 'bg-teal-100 text-teal-800 border-teal-300';
-        case 'completed':
-          return 'bg-teal-200 text-teal-900 border-teal-400';
-        case 'docket_received':
-          return 'bg-cyan-100 text-cyan-800 border-cyan-300';
-        case 'docket_uploaded':
-          return 'bg-cyan-200 text-cyan-900 border-cyan-400';
-        case 'rescheduled':
-          return 'bg-purple-100 text-purple-800 border-purple-300';
-        case 'withdrawn':
-          return 'bg-red-100 text-red-800 border-red-300';
-        default:
-          return 'bg-cyan-100 text-cyan-800 border-cyan-300';
-      }
+      return 'bg-purple-100';
     } else if (hasNoWO) {
-      // Orders with no WO use pink/rose colors for non-pending statuses
-      switch (status) {
-        case 'assigned':
-          return 'bg-pink-100 text-pink-800 border-pink-300';
-        case 'on_the_way':
-          return 'bg-pink-200 text-pink-900 border-pink-400';
-        case 'met_customer':
-          return 'bg-rose-100 text-rose-800 border-rose-300';
-        case 'completed':
-          return 'bg-rose-200 text-rose-900 border-rose-400';
-        case 'docket_received':
-          return 'bg-pink-100 text-pink-800 border-pink-300';
-        case 'docket_uploaded':
-          return 'bg-pink-200 text-pink-900 border-pink-400';
-        case 'rescheduled':
-          return 'bg-purple-100 text-purple-800 border-purple-300';
-        case 'withdrawn':
-          return 'bg-red-100 text-red-800 border-red-300';
-        default:
-          return 'bg-pink-100 text-pink-800 border-pink-300';
-      }
+      return 'bg-yellow-100';
     } else {
-      // Regular WO orders use original colors
-      switch (status) {
-        case 'assigned':
-          return 'bg-blue-100 text-blue-800 border-blue-300';
-        case 'on_the_way':
-          return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-        case 'met_customer':
-          return 'bg-green-100 text-green-800 border-green-300';
-        case 'completed':
-          return 'bg-green-100 text-green-800 border-green-300';
-        case 'docket_received':
-          return 'bg-orange-100 text-orange-800 border-orange-300';
-        case 'docket_uploaded':
-          return 'bg-orange-100 text-orange-800 border-orange-300';
-        case 'rescheduled':
-          return 'bg-purple-100 text-purple-800 border-purple-300';
-        case 'withdrawn':
-          return 'bg-red-100 text-red-800 border-red-300';
-        default:
-          return 'bg-gray-100 text-gray-800 border-gray-300';
-      }
+      return 'bg-green-50';
+    }
+  };
+  
+  // Status badge color based on actual status (each status has unique color)
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+      case 'assigned':
+        return 'bg-blue-100 text-blue-800 border-blue-300';
+      case 'on_the_way':
+        return 'bg-amber-100 text-amber-800 border-amber-300';
+      case 'met_customer':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+      case 'order_completed':
+        return 'bg-lime-100 text-lime-800 border-lime-300';
+      case 'docket_received':
+        return 'bg-teal-100 text-teal-800 border-teal-300';
+      case 'docket_uploaded':
+        return 'bg-cyan-100 text-cyan-800 border-cyan-300';
+      case 'ready_to_invoice':
+        return 'bg-indigo-100 text-indigo-800 border-indigo-300';
+      case 'invoiced':
+        return 'bg-violet-100 text-violet-800 border-violet-300';
+      case 'completed':
+        return 'bg-green-600 text-white border-green-700';
+      case 'customer_issue':
+        return 'bg-orange-100 text-orange-800 border-orange-300';
+      case 'building_issue':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'network_issue':
+        return 'bg-pink-100 text-pink-800 border-pink-300';
+      case 'rescheduled':
+        return 'bg-purple-100 text-purple-800 border-purple-300';
+      case 'withdrawn':
+        return 'bg-red-100 text-red-800 border-red-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
     }
   };
   const [{ isOver }, drop] = useDrop(() => ({
@@ -192,25 +174,37 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
 
   const isAssigned = !!assignedInstaller;
 
+  // Get the background color based on WO type
+  const cardBgColor = getCardBackgroundColor(order.status);
+
   return (
     <div
       ref={drop as any}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`p-3 rounded-lg border-2 transition-all relative ${
-        isAssigned
-          ? "bg-green-50 border-green-500"
-          : "bg-gray-50 border-dashed border-gray-300"
-      } ${isOver ? "ring-2 ring-primary ring-offset-2" : ""} ${isHovered ? "shadow-lg scale-105 z-10" : ""}`}
+      className={`p-3 rounded-lg border-2 transition-all relative ${cardBgColor} ${isOver ? "ring-2 ring-primary ring-offset-2" : ""} ${isHovered ? "shadow-lg scale-105 z-10" : ""} ${isSelected ? "ring-2 ring-blue-500" : ""}`}
     >
+      {bulkMode && (
+        <div className="absolute top-2 left-2 z-20">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onToggleSelection?.(order.id)}
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
       <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="font-semibold text-xs truncate" title={order.serviceNumber || 'N/A'}>
-            SN: {order.serviceNumber || 'N/A'}
+            {order.serviceNumber || 'N/A'}
           </div>
-          <div className="text-xs text-muted-foreground truncate" title={order.orderNumber}>
-            WO: {order.orderNumber}
-          </div>
+          {order.orderNumber && order.orderNumber.trim() !== '' && (
+            <div className="text-xs text-muted-foreground truncate" title={order.orderNumber}>
+              {order.orderNumber}
+            </div>
+          )}
         </div>
         {isAssigned && (
           <Button
@@ -237,7 +231,7 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
         </div>
         <div className="mt-1">
           <Select value={order.status} onValueChange={(value) => onStatusChange(order.id, value)}>
-            <SelectTrigger className={`h-6 text-xs w-full font-medium border ${getStatusColor(order.status)}`}>
+            <SelectTrigger className={`h-6 text-xs w-full font-medium border ${getStatusBadgeColor(order.status)}`}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -245,9 +239,15 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
               <SelectItem value="assigned">Assigned</SelectItem>
               <SelectItem value="on_the_way">On the Way</SelectItem>
               <SelectItem value="met_customer">Met Customer</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="order_completed">Order Completed</SelectItem>
               <SelectItem value="docket_received">Docket Received</SelectItem>
               <SelectItem value="docket_uploaded">Docket Uploaded</SelectItem>
+              <SelectItem value="ready_to_invoice">Ready to Invoice</SelectItem>
+              <SelectItem value="invoiced">Invoiced</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="customer_issue">Customer Issue</SelectItem>
+              <SelectItem value="building_issue">Building Issue</SelectItem>
+              <SelectItem value="network_issue">Network Issue</SelectItem>
               <SelectItem value="rescheduled">Rescheduled</SelectItem>
               <SelectItem value="withdrawn">Withdrawn</SelectItem>
             </SelectContent>
@@ -257,7 +257,7 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
 
       {isAssigned && (
         <div className="mt-2 pt-2 border-t">
-          <div className="flex items-center gap-1 text-xs font-medium text-green-700">
+          <div className="flex items-center gap-1 text-xs font-semibold text-gray-900 bg-white/80 px-2 py-1 rounded">
             <User className="h-3 w-3" />
             {assignedInstaller}
           </div>
@@ -287,7 +287,7 @@ function OrderCard({ order, assignedInstaller, onAssign, onUnassign, onTimeChang
       {/* History Dialog */}
       <OrderHistoryDialog
         orderId={order.id}
-        orderNumber={order.serviceNumber || order.orderNumber}
+        orderNumber={order.serviceNumber || order.orderNumber || "N/A"}
         open={showHistory}
         onOpenChange={setShowHistory}
       />
@@ -357,10 +357,50 @@ export default function ScheduleV4() {
     currentTime: "",
   });
   const [newTime, setNewTime] = useState("");
+  const [completionConfirmDialog, setCompletionConfirmDialog] = useState<{
+    open: boolean;
+    orderId: number | null;
+    orderNumber: string;
+    customerName: string;
+  }>({
+    open: false,
+    orderId: null,
+    orderNumber: "",
+    customerName: "",
+  });
+  const [rescheduleDialog, setRescheduleDialog] = useState<{
+    open: boolean;
+    orderId: number | null;
+    orderNumber: string;
+    customerName: string;
+    currentDate: string;
+    currentTime: string;
+  }>({
+    open: false,
+    orderId: null,
+    orderNumber: "",
+    customerName: "",
+    currentDate: "",
+    currentTime: "",
+  });
+  const [rescheduleDate, setRescheduleDate] = useState("");
+  const [rescheduleTime, setRescheduleTime] = useState("");
+  const [rescheduleReason, setRescheduleReason] = useState<"customer_issue" | "building_issue" | "network_issue">("customer_issue");
+  const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
+  const [bulkAssignMode, setBulkAssignMode] = useState(false);
 
-  const { data: orders = [], refetch: refetchOrders } = trpc.orders.list.useQuery();
-  const { data: installers = [] } = trpc.installers.list.useQuery();
-  const { data: assignments = [], refetch: refetchAssignments } = trpc.assignments.list.useQuery();
+  const { data: orders = [], refetch: refetchOrders } = trpc.orders.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+  const { data: installers = [] } = trpc.installers.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+  const { data: assignments = [], refetch: refetchAssignments } = trpc.assignments.list.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
   const { data: timeSlotsData = [] } = trpc.timeSlots.listActive.useQuery();
   
   // Convert time slots data to array of time strings
@@ -395,24 +435,9 @@ export default function ScheduleV4() {
   const ordersForDate = orders.filter((order) => {
     if (!order.appointmentDate || !order.appointmentTime) return false;
     
-    // Parse appointment date - handle both "Nov 11, 2025" and "MM/DD/YYYY" formats
-    let orderDate: Date;
-    
-    if (order.appointmentDate.includes("/")) {
-      // MM/DD/YYYY format
-      const dateParts = order.appointmentDate.split("/");
-      if (dateParts.length !== 3) return false;
-      
-      const orderMonth = parseInt(dateParts[0], 10);
-      const orderDay = parseInt(dateParts[1], 10);
-      const orderYear = parseInt(dateParts[2], 10);
-      
-      orderDate = new Date(orderYear, orderMonth - 1, orderDay);
-    } else {
-      // "Nov 11, 2025" format
-      orderDate = new Date(order.appointmentDate);
-      if (isNaN(orderDate.getTime())) return false;
-    }
+    // Parse appointment date using shared utility
+    const orderDate = parseAppointmentDate(order.appointmentDate);
+    if (!orderDate) return false;
     
     // Compare with selected date (compare year, month, day only)
     const dateMatches = orderDate.getFullYear() === selectedDate.getFullYear() &&
@@ -442,7 +467,15 @@ export default function ScheduleV4() {
 
   ordersForDate.forEach((order) => {
     if (order.appointmentTime) {
-      const timeSlot = TIME_SLOTS.find((slot) => order.appointmentTime?.startsWith(slot));
+      // Normalize time format by removing leading zeros for matching
+      // e.g., "02:30 PM" becomes "2:30 PM"
+      const normalizedOrderTime = order.appointmentTime.replace(/^0(\d)/, '$1');
+      
+      const timeSlot = TIME_SLOTS.find((slot) => {
+        const normalizedSlot = slot.replace(/^0(\d)/, '$1');
+        return normalizedOrderTime.startsWith(normalizedSlot);
+      });
+      
       if (timeSlot) {
         ordersByTimeSlot[timeSlot].push(order);
       }
@@ -484,15 +517,13 @@ export default function ScheduleV4() {
         return;
       }
 
-      // Update order status
-      await updateOrderMutation.mutateAsync({
-        id: orderId,
-        status: "assigned",
-      });
-
-      // Create assignment
-      // Parse appointment date from "Nov 1, 2025" format
-      const scheduledDate = new Date(order.appointmentDate);
+      // Create assignment FIRST (before updating status)
+      // Parse appointment date using shared utility (handles DD/MM/YYYY and other formats)
+      const scheduledDate = parseAppointmentDate(order.appointmentDate);
+      if (!scheduledDate) {
+        toast.error("Invalid appointment date format");
+        return;
+      }
       
       // Parse appointment time and calculate end time
       // Support both 12-hour format ("10:00 AM", "02:30 PM") and 24-hour format ("10:00", "14:30")
@@ -541,6 +572,12 @@ export default function ScheduleV4() {
         scheduledDate,
         scheduledStartTime,
         scheduledEndTime,
+      });
+
+      // Update order status ONLY after assignment is successfully created
+      await updateOrderMutation.mutateAsync({
+        id: orderId,
+        status: "assigned",
       });
 
       toast.success(`Assigned to ${installerName}`);
@@ -592,7 +629,7 @@ export default function ScheduleV4() {
     try {
       await updateOrderMutation.mutateAsync({
         id: timeChangeDialog.orderId,
-        appointmentTime: newTime,
+        appointmentTime: normalizeTimeFormat(newTime) || newTime,
       });
 
       toast.success("Appointment time updated");
@@ -606,6 +643,40 @@ export default function ScheduleV4() {
   };
 
   const handleStatusChange = async (orderId: number, newStatus: string) => {
+    // If changing to completed, show confirmation dialog first
+    if (newStatus === 'completed') {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        setCompletionConfirmDialog({
+          open: true,
+          orderId,
+          orderNumber: order.orderNumber || 'N/A',
+          customerName: order.customerName || 'Unknown Customer',
+        });
+      }
+      return; // Don't proceed with status change yet
+    }
+
+    // If changing to rescheduled, show reschedule dialog first
+    if (newStatus === 'rescheduled') {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        setRescheduleDialog({
+          open: true,
+          orderId,
+          orderNumber: order.orderNumber || order.serviceNumber || 'N/A',
+          customerName: order.customerName || 'Unknown Customer',
+          currentDate: order.appointmentDate || '',
+          currentTime: order.appointmentTime || '',
+        });
+        // Pre-fill with current date and time
+        setRescheduleDate(order.appointmentDate || '');
+        setRescheduleTime(order.appointmentTime || '');
+      }
+      return; // Don't proceed with status change yet
+    }
+
+    // For other statuses, proceed normally
     try {
       // Optimistic update
       await utils.orders.list.cancel();
@@ -619,7 +690,7 @@ export default function ScheduleV4() {
 
       await updateOrderMutation.mutateAsync({
         id: orderId,
-        status: newStatus as "pending" | "assigned" | "on_the_way" | "met_customer" | "completed" | "docket_received" | "docket_uploaded" | "rescheduled" | "withdrawn",
+        status: newStatus as "pending" | "assigned" | "on_the_way" | "met_customer" | "order_completed" | "docket_received" | "docket_uploaded" | "ready_to_invoice" | "invoiced" | "completed" | "customer_issue" | "building_issue" | "network_issue" | "rescheduled" | "withdrawn",
       });
 
       toast.success("Status updated");
@@ -628,6 +699,180 @@ export default function ScheduleV4() {
       console.error("Failed to update status:", error);
       toast.error("Failed to update status");
       // Rollback on error
+      await refetchOrders();
+    }
+  };
+
+  const handleConfirmCompletion = async () => {
+    const { orderId } = completionConfirmDialog;
+    if (!orderId) return;
+
+    try {
+      // Optimistic update
+      await utils.orders.list.cancel();
+      const previousOrders = utils.orders.list.getData();
+      
+      utils.orders.list.setData(undefined, (old) => 
+        old?.map((order) => 
+          order.id === orderId ? { ...order, status: 'completed' as typeof order.status } : order
+        )
+      );
+
+      await updateOrderMutation.mutateAsync({
+        id: orderId,
+        status: "completed",
+      });
+
+      toast.success("Order marked as completed");
+      await refetchOrders();
+    } catch (error) {
+      toast.error("Failed to mark order as completed");
+      await refetchOrders();
+    } finally {
+      // Close dialog
+      setCompletionConfirmDialog({
+        open: false,
+        orderId: null,
+        orderNumber: "",
+        customerName: "",
+      });
+    }
+  };
+
+  const handleConfirmReschedule = async () => {
+    const { orderId } = rescheduleDialog;
+    if (!orderId || !rescheduleDate || !rescheduleTime) {
+      toast.error("Please select both date and time");
+      return;
+    }
+
+    try {
+      // Optimistic update
+      await utils.orders.list.cancel();
+      const previousOrders = utils.orders.list.getData();
+      
+      utils.orders.list.setData(undefined, (old) => 
+        old?.map((order) => 
+          order.id === orderId ? { 
+            ...order, 
+            status: 'rescheduled' as typeof order.status,
+            appointmentDate: rescheduleDate,
+            appointmentTime: rescheduleTime,
+          } : order
+        )
+      );
+
+      // Convert ISO date string (YYYY-MM-DD) to Date object
+      const rescheduleDateObj = new Date(rescheduleDate + 'T00:00:00');
+      
+      await updateOrderMutation.mutateAsync({
+        id: orderId,
+        status: "rescheduled",
+        appointmentDate: rescheduleDate,
+        appointmentTime: rescheduleTime,
+        rescheduledDate: rescheduleDateObj,
+        rescheduledTime: rescheduleTime,
+        rescheduleReason,
+      });
+
+      toast.success("Order rescheduled successfully");
+      await refetchOrders();
+      await refetchAssignments();
+    } catch (error) {
+      toast.error("Failed to reschedule order");
+      await refetchOrders();
+    } finally {
+      // Close dialog and reset
+      setRescheduleDialog({
+        open: false,
+        orderId: null,
+        orderNumber: "",
+        customerName: "",
+        currentDate: "",
+        currentTime: "",
+      });
+      setRescheduleDate("");
+      setRescheduleTime("");
+      setRescheduleReason("customer_issue");
+    }
+  };
+
+  const toggleOrderSelection = (orderId: number) => {
+    setSelectedOrders((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+      } else {
+        newSet.add(orderId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleBulkAssignMode = () => {
+    setBulkAssignMode(!bulkAssignMode);
+    if (bulkAssignMode) {
+      // Clear selections when exiting bulk mode
+      setSelectedOrders(new Set());
+    }
+  };
+
+  const handleBulkAssign = async (installerId: number) => {
+    if (selectedOrders.size === 0) {
+      toast.error("No orders selected");
+      return;
+    }
+
+    try {
+      const selectedOrdersList = Array.from(selectedOrders);
+      const installer = installers.find((i) => i.id === installerId);
+      
+      if (!installer) {
+        toast.error("Installer not found");
+        return;
+      }
+
+      // Assign each selected order
+      for (const orderId of selectedOrdersList) {
+        const order = orders.find((o) => o.id === orderId);
+        if (!order) continue;
+
+        const date = parseAppointmentDate(order.appointmentDate);
+        if (!date) continue;
+
+        // Create assignment
+        // Calculate end time (assume 2 hours duration)
+        const startTime = order.appointmentTime || "09:00";
+        const [hours, minutes] = startTime.split(":").map(Number);
+        const endHours = hours + 2;
+        const scheduledEndTime = `${endHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+        
+        await createAssignmentMutation.mutateAsync({
+          orderId,
+          installerId,
+          scheduledDate: date,
+          scheduledStartTime: startTime,
+          scheduledEndTime,
+        });
+
+        // Update order status
+        await updateOrderMutation.mutateAsync({
+          id: orderId,
+          status: "assigned",
+        });
+      }
+
+      toast.success(`Assigned ${selectedOrdersList.length} orders to ${installer.name}`);
+      
+      // Clear selections and exit bulk mode
+      setSelectedOrders(new Set());
+      setBulkAssignMode(false);
+      
+      await refetchOrders();
+      await refetchAssignments();
+    } catch (error) {
+      console.error("Failed to bulk assign:", error);
+      toast.error("Failed to assign orders");
       await refetchOrders();
     }
   };
@@ -652,6 +897,13 @@ export default function ScheduleV4() {
                     <span className="text-xs">No notifications sent</span>
                   </div>
                 )}
+                <Button
+                  size="lg"
+                  variant={bulkAssignMode ? "default" : "outline"}
+                  onClick={toggleBulkAssignMode}
+                >
+                  {bulkAssignMode ? `Selected: ${selectedOrders.size}` : "Bulk Assign"}
+                </Button>
                 <Button
                   size="lg"
                   variant={isScheduleConfirmed ? "outline" : "default"}
@@ -687,9 +939,21 @@ export default function ScheduleV4() {
             {/* Installer Panel */}
             <Card className="w-64 p-4 h-fit sticky top-4">
               <h2 className="font-semibold mb-4">Available Installers</h2>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {installers.map((installer) => (
-                  <DraggableInstaller key={installer.id} installer={installer} />
+                  <div key={installer.id} className="space-y-2">
+                    <DraggableInstaller installer={installer} />
+                    {bulkAssignMode && selectedOrders.size > 0 && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full text-xs"
+                        onClick={() => handleBulkAssign(installer.id)}
+                      >
+                        Assign {selectedOrders.size} to {installer.name}
+                      </Button>
+                    )}
+                  </div>
                 ))}
               </div>
             </Card>
@@ -757,18 +1021,18 @@ export default function ScheduleV4() {
                   Met Customer
                 </Button>
                 <Button
-                  variant={statusFilter === "completed" ? "default" : "outline"}
+                  variant={statusFilter === "order_completed" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setStatusFilter("completed")}
-                  className="text-xs bg-green-100 hover:bg-green-200 text-green-700 border-green-300"
+                  onClick={() => setStatusFilter("order_completed")}
+                  className="text-xs bg-lime-100 hover:bg-lime-200 text-lime-700 border-lime-300"
                 >
-                  Completed
+                  Order Completed
                 </Button>
                 <Button
                   variant={statusFilter === "docket_received" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("docket_received")}
-                  className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-300"
+                  className="text-xs bg-teal-100 hover:bg-teal-200 text-teal-700 border-teal-300"
                 >
                   Docket Received
                 </Button>
@@ -776,9 +1040,57 @@ export default function ScheduleV4() {
                   variant={statusFilter === "docket_uploaded" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter("docket_uploaded")}
-                  className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-300"
+                  className="text-xs bg-cyan-100 hover:bg-cyan-200 text-cyan-700 border-cyan-300"
                 >
                   Docket Uploaded
+                </Button>
+                <Button
+                  variant={statusFilter === "ready_to_invoice" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("ready_to_invoice")}
+                  className="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 border-indigo-300"
+                >
+                  Ready to Invoice
+                </Button>
+                <Button
+                  variant={statusFilter === "invoiced" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("invoiced")}
+                  className="text-xs bg-violet-100 hover:bg-violet-200 text-violet-700 border-violet-300"
+                >
+                  Invoiced
+                </Button>
+                <Button
+                  variant={statusFilter === "completed" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("completed")}
+                  className="text-xs bg-green-600 hover:bg-green-700 text-white border-green-700"
+                >
+                  Completed
+                </Button>
+                <Button
+                  variant={statusFilter === "customer_issue" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("customer_issue")}
+                  className="text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-300"
+                >
+                  Customer Issue
+                </Button>
+                <Button
+                  variant={statusFilter === "building_issue" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("building_issue")}
+                  className="text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-yellow-300"
+                >
+                  Building Issue
+                </Button>
+                <Button
+                  variant={statusFilter === "network_issue" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter("network_issue")}
+                  className="text-xs bg-pink-100 hover:bg-pink-200 text-pink-700 border-pink-300"
+                >
+                  Network Issue
                 </Button>
                 <Button
                   variant={statusFilter === "rescheduled" ? "default" : "outline"}
@@ -816,6 +1128,9 @@ export default function ScheduleV4() {
                                 onUnassign={handleUnassign}
                                 onTimeChange={handleTimeChange}
                                 onStatusChange={handleStatusChange}
+                                bulkMode={bulkAssignMode}
+                                isSelected={selectedOrders.has(order.id)}
+                                onToggleSelection={toggleOrderSelection}
                               />
                             ))}
                           </div>
@@ -874,6 +1189,173 @@ export default function ScheduleV4() {
                 Cancel
               </Button>
               <Button onClick={handleTimeChangeSubmit}>Update Time</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Completion Confirmation Dialog */}
+        <Dialog
+          open={completionConfirmDialog.open}
+          onOpenChange={(open) =>
+            !open &&
+            setCompletionConfirmDialog({
+              open: false,
+              orderId: null,
+              orderNumber: "",
+              customerName: "",
+            })
+          }
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Order Completion</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to mark this order as completed?
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2 py-4">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">Order Number:</span>
+                <span>{completionConfirmDialog.orderNumber}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">Customer:</span>
+                <span>{completionConfirmDialog.customerName}</span>
+              </div>
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ This action will mark the order as completed. Make sure all work has been finished and documented.
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setCompletionConfirmDialog({
+                    open: false,
+                    orderId: null,
+                    orderNumber: "",
+                    customerName: "",
+                  })
+                }
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmCompletion}>
+                Confirm Completion
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Reschedule Dialog */}
+        <Dialog
+          open={rescheduleDialog.open}
+          onOpenChange={(open) =>
+            !open &&
+            setRescheduleDialog({
+              open: false,
+              orderId: null,
+              orderNumber: "",
+              customerName: "",
+              currentDate: "",
+              currentTime: "",
+            })
+          }
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Reschedule Order</DialogTitle>
+              <DialogDescription>
+                Select a new date and time for this order
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Order:</span>
+                  <span>{rescheduleDialog.orderNumber}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Customer:</span>
+                  <span>{rescheduleDialog.customerName}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="reschedule-reason">Reschedule Reason</Label>
+                <Select
+                  value={rescheduleReason}
+                  onValueChange={(value: "customer_issue" | "building_issue" | "network_issue") =>
+                    setRescheduleReason(value)
+                  }
+                >
+                  <SelectTrigger id="reschedule-reason">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="customer_issue">Customer Issue</SelectItem>
+                    <SelectItem value="building_issue">Building Issue</SelectItem>
+                    <SelectItem value="network_issue">Network Issue</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="reschedule-date">New Date</Label>
+                <Input
+                  id="reschedule-date"
+                  type="date"
+                  value={rescheduleDate}
+                  onChange={(e) => setRescheduleDate(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="reschedule-time">New Time</Label>
+                <Select value={rescheduleTime} onValueChange={setRescheduleTime}>
+                  <SelectTrigger id="reschedule-time">
+                    <SelectValue placeholder="Select time" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {generateTimeSlots(8, 18).map((time) => (
+                      <SelectItem key={time} value={time}>
+                        {formatTimeSlot(time)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-800">
+                  ℹ️ The order will be rescheduled to the new date and time. The installer assignment will be updated automatically.
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setRescheduleDialog({
+                    open: false,
+                    orderId: null,
+                    orderNumber: "",
+                    customerName: "",
+                    currentDate: "",
+                    currentTime: "",
+                  });
+                  setRescheduleDate("");
+                  setRescheduleTime("");
+                  setRescheduleReason("customer_issue");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmReschedule}>
+                Confirm Reschedule
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

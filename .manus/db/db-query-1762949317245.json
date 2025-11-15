@@ -1,0 +1,9 @@
+{
+  "query": "SELECT a.*, i.name as installerName FROM assignments a LEFT JOIN installers i ON a.installerId = i.id WHERE a.orderId IN (450019, 450020);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT a.*, i.name as installerName FROM assignments a LEFT JOIN installers i ON a.installerId = i.id WHERE a.orderId IN (450019, 450020);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 50
+}

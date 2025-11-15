@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, time, sortOrder, isActive FROM timeSlots WHERE time LIKE '%2:30%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, time, sortOrder, isActive FROM timeSlots WHERE time LIKE '%2:30%';",
+  "rows": [
+    {
+      "id": "6",
+      "time": "2:30 PM",
+      "sortOrder": "5",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttime\tsortOrder\tisActive\n6\t2:30 PM\t5\t1\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}

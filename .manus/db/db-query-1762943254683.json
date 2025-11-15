@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, orderNumber, appointmentDate, appointmentTime FROM orders WHERE appointmentTime LIKE '%2:30%' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, orderNumber, appointmentDate, appointmentTime FROM orders WHERE appointmentTime LIKE '%2:30%' LIMIT 10;",
+  "rows": [
+    {
+      "id": "300278",
+      "orderNumber": "A1789574",
+      "appointmentDate": "Nov 1, 2025",
+      "appointmentTime": "02:30 PM"
+    },
+    {
+      "id": "300292",
+      "orderNumber": "A1776469",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM"
+    },
+    {
+      "id": "300294",
+      "orderNumber": "A1789738",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM"
+    },
+    {
+      "id": "300296",
+      "orderNumber": "",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM"
+    },
+    {
+      "id": "300298",
+      "orderNumber": "A1788325",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM"
+    },
+    {
+      "id": "300300",
+      "orderNumber": "M1790088",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM"
+    },
+    {
+      "id": "300302",
+      "orderNumber": "M1786290",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM"
+    },
+    {
+      "id": "300304",
+      "orderNumber": "A1789761",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM"
+    },
+    {
+      "id": "300305",
+      "orderNumber": "",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM"
+    },
+    {
+      "id": "300310",
+      "orderNumber": "A1787996",
+      "appointmentDate": "Nov 3, 2025",
+      "appointmentTime": "02:30 PM"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\tappointmentDate\tappointmentTime\n300278\tA1789574\tNov 1, 2025\t02:30 PM\n300292\tA1776469\tNov 3, 2025\t02:30 PM\n300294\tA1789738\tNov 3, 2025\t02:30 PM\n300296\t\tNov 3, 2025\t02:30 PM\n300298\tA1788325\tNov 3, 2025\t02:30 PM\n300300\tM1790088\tNov 3, 2025\t02:30 PM\n300302\tM1786290\tNov 3, 2025\t02:30 PM\n300304\tA1789761\tNov 3, 2025\t02:30 PM\n300305\t\tNov 3, 2025\t02:30 PM\n300310\tA1787996\tNov 3, 2025\t02:30 PM\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

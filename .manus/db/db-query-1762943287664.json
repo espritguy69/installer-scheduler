@@ -1,0 +1,14 @@
+{
+  "query": "SELECT appointmentTime, LENGTH(appointmentTime) as time_length FROM orders WHERE appointmentTime LIKE '%2:30%' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT appointmentTime, LENGTH(appointmentTime) as time_length FROM orders WHERE appointmentTime LIKE '%2:30%' LIMIT 1;",
+  "rows": [
+    {
+      "appointmentTime": "02:30 PM",
+      "time_length": "8"
+    }
+  ],
+  "messages": [],
+  "stdout": "appointmentTime\ttime_length\n02:30 PM\t8\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

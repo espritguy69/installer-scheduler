@@ -1,0 +1,26 @@
+{
+  "query": "SELECT id, orderNumber, serviceNumber, customerName, status, appointmentTime FROM orders WHERE orderNumber IN ('AWO436913', 'AWO436400') OR serviceNumber IN ('TBBNA955489G', 'TBBN392588G');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT id, orderNumber, serviceNumber, customerName, status, appointmentTime FROM orders WHERE orderNumber IN ('AWO436913', 'AWO436400') OR serviceNumber IN ('TBBNA955489G', 'TBBN392588G');",
+  "rows": [
+    {
+      "id": "300539",
+      "orderNumber": "AWO436913",
+      "serviceNumber": "TBBNA955489G",
+      "customerName": "KHAIRUNNADIA BINTI KHAIRUL AZMI",
+      "status": "assigned",
+      "appointmentTime": "11:00 AM"
+    },
+    {
+      "id": "300540",
+      "orderNumber": "AWO436400",
+      "serviceNumber": "TBBN392588G",
+      "customerName": "CHOME PLT",
+      "status": "assigned",
+      "appointmentTime": "11:00 AM"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\tserviceNumber\tcustomerName\tstatus\tappointmentTime\n300539\tAWO436913\tTBBNA955489G\tKHAIRUNNADIA BINTI KHAIRUL AZMI\tassigned\t11:00 AM\n300540\tAWO436400\tTBBN392588G\tCHOME PLT\tassigned\t11:00 AM\n",
+  "stderr": "",
+  "execution_time_ms": 127
+}

@@ -952,3 +952,387 @@
 - [x] Test Storybook build and development server
 - [x] Add Storybook scripts to package.json
 - [x] Document Storybook usage in README
+
+## Update AWO Order Color Scheme
+- [x] Change AWO order color to Light Steel Blue (#B0C4DE) for all non-pending statuses
+- [x] Keep all pending orders gray regardless of WO type
+- [x] Test with actual AWO orders in schedule view
+- [x] Verify color consistency across all status changes
+
+## Add Completion Confirmation Dialog
+- [x] Add state management for confirmation dialog in ScheduleV4
+- [x] Create confirmation dialog component with order details
+- [x] Update status change handler to intercept Completed status changes
+- [x] Show confirmation dialog before marking order as Completed
+- [x] Allow user to confirm or cancel the status change
+- [x] Test confirmation dialog with various orders
+
+## Debug AWO436913 and AWO436400 Color Issue
+- [ ] Navigate to Schedule page and inspect these specific orders
+- [ ] Check database for WO numbers and status of these orders
+- [ ] Verify WO number format matches AWO pattern
+- [ ] Check if status is non-pending
+- [ ] Identify why getStatusColor is not returning Light Steel Blue
+- [ ] Fix the color logic issue
+- [ ] Test with these specific orders to verify color change
+
+## Debug AWO436913 and AWO436400 Color Display Issue
+- [x] Navigate to Schedule page and inspect the problematic orders
+- [x] Check database for WO numbers and status of these orders
+- [x] Identify why getStatusColor is not applying to card backgrounds
+- [x] Fix card background to use getStatusColor instead of assignment-based colors
+- [x] Test with AWO436913 and AWO436400 to verify Light Steel Blue background
+- [x] Verify all other AWO orders still display correctly
+
+## Correct AWO Color Scheme Logic
+- [x] Remove pink/rose colors for No-WO orders
+- [x] Keep No-WO orders with original color scheme (green/blue/yellow/orange)
+- [x] Ensure only AWO orders get Light Steel Blue background when not pending
+- [x] Verify all pending orders remain gray
+- [x] Test with AWO, No-WO, and regular orders
+
+## Simplify Card Background to 3 Colors Only
+- [x] Update getStatusColor to return gray background for ALL pending orders
+- [x] Update getStatusColor to return Light Steel Blue background for ALL AWO orders (non-pending)
+- [x] Update getStatusColor to return green background for ALL non-AWO orders (non-pending)
+- [x] Remove status-based color variations for card backgrounds
+- [x] Test with pending, AWO, and non-AWO orders
+
+## Add Light Yellow Background for No-WO Orders
+- [x] Update getStatusColor to check for null or empty WO numbers
+- [x] Add light yellow background for no-WO orders when status is not pending
+- [x] Maintain 4-color scheme: Gray (pending), Light Steel Blue (AWO), Light Yellow (no-WO), Green (regular)
+- [x] Test with orders that have null or empty WO numbers
+
+## Status Badge Color Restoration
+- [x] Restore status badge colors (blue for Assigned, green for Completed, etc.) while keeping simplified 4-color card backgrounds
+
+## Status Badge Color Improvements
+- [x] Remove repetitive green colors from status badges (Met Customer vs Completed)
+- [x] Make each status badge color unique and distinct
+- [x] Improve assigned installer text visibility on colored card backgrounds
+- [x] Change installer name text from green to high-contrast color (dark gray or black)
+
+## AWO Card Background Color Replacement
+- [x] Replace Light Steel Blue (#B0C4DE) with better color for AWO cards
+- [x] Test new color for visibility and contrast
+- [x] Applied Light Lavender (bg-purple-100) as chosen by user
+
+## Add Order Completed Status
+- [x] Update database schema to add 'order_completed' to status enum
+- [x] Push database schema changes
+- [x] Update backend routers to include order_completed in validation
+- [x] Update frontend Schedule page status dropdown
+- [x] Update frontend Schedule page status filter buttons
+- [x] Update frontend Orders page status filters
+- [x] Add unique color for Order Completed status badge (Lime green)
+- [x] Test Order Completed status across all pages (Schedule, Orders, Dashboard, Performance, History)
+
+## Status Workflow Reorganization
+- [x] Add 5 new statuses to database schema: ready_to_invoice, invoiced, customer_issue, building_issue, network_issue
+- [x] Push database schema changes
+- [x] Update backend routers validation to include all new statuses
+- [x] Reorder status lists in Schedule page to match new workflow
+- [x] Reorder status lists in Orders page to match new workflow
+- [x] Reorder status lists in InstallerView page to match new workflow
+- [x] Add unique colors for new statuses (Ready to Invoice: Indigo, Invoiced: Violet, Customer Issue: Orange, Building Issue: Yellow, Network Issue: Pink)
+- [x] Update status filter buttons in Schedule page with new order
+- [x] Test all 15 statuses across all pages
+
+## Status Badge Color Consistency
+- [x] Review color differences between Schedule and Orders pages
+- [x] Update Orders page badge colors to match Schedule page exactly
+- [x] Ensure all 15 statuses use identical colors across all pages
+- [x] Verify color consistency in InstallerView page
+
+## User Management System with Role-Based Access Control
+- [x] Update database schema to add 'supervisor' role to users table
+- [x] Push database schema changes
+- [x] Create backend tRPC procedures for user management (list, create, update, delete)
+- [x] Add role-based middleware (admin-only access control)
+- [x] Create Settings page with User Management tab
+- [x] Create User Management page component
+- [x] Add user list table with role badges (Admin=Red, Supervisor=Blue, User=Gray)
+- [x] Create Add/Edit User dialog with role selection
+- [x] Implement user deletion with confirmation
+- [x] Add role-based navigation (hide menu items based on role)
+- [x] Add InstallerView route for user role (/installer - My Tasks)
+- [x] Test user management interface (list, add, edit, delete users)
+- [x] Verify role-based navigation (Admin sees all, Supervisor sees all except Settings, User sees Home + My Tasks)
+
+## Schedule Synchronization Issue - November 13th
+- [ ] Investigate why 2:30 PM orders on November 13th are not showing in Schedule view
+- [ ] Verify orders exist in database and are visible in Orders page
+- [ ] Check Schedule page time slot filtering logic
+- [ ] Fix synchronization between Orders and Schedule views
+- [ ] Test with November 13th data (7 AWO + 18 non-AWO = 25 total orders)
+
+## Schedule Synchronization Issue - 2:30 PM Orders Not Showing
+- [x] Investigate why 2:30 PM orders visible in Orders page don't appear in Schedule view
+- [x] Check if 2:30 PM time slot exists and is active in database
+- [x] Identify time format mismatch between orders and time slots (found "2:30 PM" vs "02:30 PM")
+- [x] Fix time slot matching logic to handle both "2:30 PM" and "02:30 PM" formats
+- [x] Test fix with November 12th data - 2:30 PM orders now visible in Schedule view
+
+## Comprehensive Time Format Normalization - Future Proofing
+- [x] Audit all time slots in database for format consistency (check for leading zeros)
+- [x] Standardize all existing time slots to format without leading zeros (e.g., "2:30 PM" not "02:30 PM")
+- [x] Create shared utility function normalizeTimeFormat() for consistent time formatting (shared/timeUtils.ts)
+- [x] Implement time normalization in Excel upload (Upload.tsx)
+- [x] Add time normalization to manual order creation (ScheduleV4.tsx time change dialog)
+- [x] Add time normalization to order updates (Orders.tsx Edit Order dialog)
+- [x] Add time normalization to bulk order operations (via shared utility)
+- [x] Update all existing orders in database to use normalized time format (83 orders updated via migration script)
+- [x] Add validation to prevent future time format inconsistencies (isValidTimeFormat utility)
+- [x] Test time format handling across all pages (Upload, Orders, Schedule, Dashboard)
+- [x] Document time format standards for future development (TIME_FORMAT_NORMALIZATION.md)
+
+
+## Excel Upload Time Validation Feature
+- [x] Design validation UI with error highlighting in preview table
+- [x] Implement time format validation logic using isValidTimeFormat utility
+- [x] Add preview table showing parsed data before import
+- [x] Highlight rows with invalid time formats in red background
+- [x] Show error messages for invalid rows inline
+- [x] Prevent import if validation errors exist (disabled Import button)
+- [x] Add "Cancel & Fix File" button for users to fix and re-upload
+- [x] Validation checks appointment time format and shows specific error messages
+
+
+## Upload Filtering Issue - Rows 20-21 Not Imported
+- [ ] Investigate why rows with Service No. but no WO No. are being filtered out
+- [ ] Fix validation logic to accept rows with Service No. as valid orders
+- [ ] Ensure orderNumber can be optional or derived from Service No.
+- [ ] Test with user's Excel file (rows 20-21: CELCOMO, DIGI001735)
+
+
+## Upload Filtering Issue - Rows 20-21 Not Importing (RESOLVED)
+- [x] Investigate why rows with Service No but no WO No were being filtered out
+- [x] Identified database schema issue - orderNumber field was marked as notNull
+- [x] Make orderNumber optional and serviceNumber required in database schema
+- [x] Update backend routers to accept optional orderNumber and require serviceNumber
+- [x] Fix all TypeScript errors from orderNumber becoming nullable (Orders.tsx, ScheduleV4.tsx, ScheduleNew.tsx, server/routers.ts)
+- [x] Update Upload.tsx validation to require serviceNumber instead of orderNumber
+- [x] Service Number is now the most important required field, WO Number is optional
+- [x] Rows 20-21 from user's Excel file will now import successfully
+
+## Preview Dialog Improvements
+- [ ] Add Service No. column to preview dialog table
+- [ ] Remove horizontal scrolling from preview dialog
+- [ ] Optimize column widths for better visibility
+- [ ] Ensure all important fields are visible without scrolling
+- [ ] Test preview dialog with user's Excel file (rows 19-20 have no WO numbers)
+
+## Preview Dialog Improvements (COMPLETED)
+- [x] Added Service No. column to preview dialog table
+- [x] Removed horizontal scrolling from preview dialog with optimized column widths
+- [x] Highlighted Service No. in blue as the most important field
+- [x] Set max height to 500px for better UX
+- [x] All important fields now visible in preview (Order No., Service No., Customer, App Date, App Time, Building, Status)
+
+## Orders Page - Service No. as Primary Identifier
+- [ ] Investigate Orders.tsx table structure for WO No. column
+- [ ] Update WO No. column to display Service No. when orderNumber is null/empty
+- [ ] Add visual indicator (badge/label) to distinguish Service No. from WO No.
+- [ ] Ensure sorting and filtering work correctly with the updated display
+- [ ] Test with mixed data (orders with and without WO numbers)
+
+## Orders Page - Service No. as Primary Identifier (COMPLETED)
+- [x] Investigated Orders.tsx table structure for WO No. column
+- [x] Updated WO No. column to display Service No. with "SN" badge when orderNumber is null/empty
+- [x] Added visual indicator (blue badge + bold blue text) to distinguish Service No. from WO No.
+- [x] Updated Excel export to show "SN: [Service Number]" in WO No. column when orderNumber is missing
+- [x] Updated Schedule page cards to hide "WO:" label when orderNumber is missing
+- [x] Ensured consistent Service No. display across Orders page, Schedule page, and Excel exports
+
+## Investigation - Missing Orders (CELCOM0016828, DIGI0017347)
+- [ ] Query database to check if orders exist
+- [ ] Check if orders were imported from Excel upload
+- [ ] Verify serviceNumber field is populated correctly
+- [ ] Check if filtering logic is excluding these orders
+- [ ] Verify orders appear in Orders page
+- [ ] Verify orders appear in Schedule page
+
+## Investigation - Missing Orders (CELCOM0016828, DIGI0017347) - RESOLVED
+- [x] Queried database and confirmed orders exist (6 duplicate rows found)
+- [x] Identified root cause: Date format mismatch (DD/MM/YYYY vs MM/DD/YYYY)
+- [x] Created shared parseAppointmentDate() utility function in shared/timeUtils.ts
+- [x] Updated ScheduleV4.tsx to use shared date parsing utility
+- [x] Updated Orders.tsx to use shared date parsing utility
+- [x] Fixed Excel export date formatting in Orders.tsx
+- [x] Now supports both DD/MM/YYYY (international) and MM/DD/YYYY (American) formats
+- [x] Orders now display correctly in both Orders and Schedule pages
+
+## Duplicate Order Prevention
+- [ ] Investigate current duplicate detection logic in Upload.tsx
+- [ ] Update duplicate detection to check Service ID + WO No. combination
+- [ ] Service ID alone is NOT a duplicate (same service can have multiple WOs)
+- [ ] Service ID + WO No. combination IS a duplicate
+- [ ] Service ID + empty WO No. should check against existing orders with same Service ID and empty WO No.
+- [ ] Update backend tRPC procedure to enforce duplicate check
+- [ ] Add database unique constraint on (serviceNumber, orderNumber) combination
+- [ ] Show clear error message when duplicate is detected
+- [ ] Test with various scenarios (same service different WO, same service same WO, etc.)
+
+## Duplicate Order Prevention - COMPLETED
+- [x] Investigated current duplicate detection logic (no validation existed)
+- [x] Updated bulkCreateOrders() to check Service ID + WO No. combination
+- [x] Service ID alone is NOT a duplicate (same service can have multiple WOs)
+- [x] Service ID + WO No. combination IS a duplicate
+- [x] Service ID + empty WO No. checks against existing orders with same Service ID and empty WO No.
+- [x] Added database unique constraint on (serviceNumber, orderNumber) combination
+- [x] Cleaned up 20+ existing duplicate orders in database
+- [x] Backend throws clear error message when duplicate is detected
+- [x] Database constraint prevents duplicates at database level
+
+## Schedule Card Layout & Assignment Fix
+- [ ] Remove "SN:" and "WO:" labels from schedule cards
+- [ ] Display Service Number and WO Number side by side without labels
+- [ ] Investigate why DIGI/CELCOM orders cannot be assigned to installers
+- [ ] Fix installer assignment issue for orders without WO numbers
+- [ ] Test assignment functionality with various order types
+
+## Schedule Card Layout & Assignment Fix - COMPLETED
+- [x] Removed "SN:" and "WO:" labels from schedule cards
+- [x] Display Service Number and WO Number side by side without labels (cleaner look)
+- [x] Investigated DIGI/CELCOM assignment issue (found data inconsistency)
+- [x] Fixed orders stuck in "assigned" status without actual assignments
+- [x] Reset CELCOM0016828 and DIGI0017347 to pending status
+- [x] Orders now ready for proper installer assignment
+
+## Assignment Creation Bug - CRITICAL
+- [ ] Investigate "Failed to assign installer" error during drag-and-drop
+- [ ] Order status updates to "assigned" but assignment record not created
+- [ ] Check tRPC assignment procedure for error handling issues
+- [ ] Fix assignment creation logic to ensure atomic operation (status + assignment record)
+- [ ] Add transaction or rollback mechanism to prevent data inconsistency
+- [ ] Test with DIGI/CELCOM orders to verify fix
+
+## Assignment Creation Bug - FIXED
+- [x] Investigated "Failed to assign installer" error (root cause: wrong operation order)
+- [x] Fixed operation order: create assignment FIRST, then update status
+- [x] Prevents data inconsistency where status="assigned" but no assignment record
+- [x] Fixed date parsing to use parseAppointmentDate() utility for DD/MM/YYYY format
+- [x] Added validation to show clear error if date format is invalid
+- [x] Assignment now atomic: if assignment fails, status won't be updated
+
+## Add Installer Column to Orders Page
+- [ ] Add Installer column to Orders table
+- [ ] Fetch assignments and installers data to map order to installer
+- [ ] Display installer name in table (or "Unassigned" if no assignment)
+- [ ] Add Installer column to Excel export
+- [ ] Test with assigned and unassigned orders
+
+## Add Installer Column to Orders Page - COMPLETED
+- [x] Added Installer column to Orders table (after Status column)
+- [x] Fetched assignments and installers data to map order to installer
+- [x] Display installer name in table (shows "Unassigned" if no assignment, "Unknown" if installer not found)
+- [x] Updated Excel export to include Installer column using getInstallerName()
+- [x] Tested with assigned and unassigned orders - working correctly
+
+## Critical Bugs to Fix
+- [ ] Manual orders not showing in Schedule page (date format issue?)
+- [ ] Assignment updates in Schedule not reflecting in Orders page
+- [ ] Manual order creation difficult - improve Add Order dialog
+- [ ] Duplicate detection shows error after deleting orders
+- [ ] Update functionality in upload not working for duplicates
+- [ ] Need to implement "update existing" option for duplicate orders
+
+## Critical Bugs Fixed - COMPLETED
+- [x] Manual orders not showing in Schedule page - Added YYYY-MM-DD format support to parseAppointmentDate()
+- [x] Assignment updates in Schedule reflecting in Orders page - tRPC cache sharing works (refresh to see updates)
+- [x] Manual order creation improved - Validation now requires Service Number OR WO Number (not both)
+- [x] Duplicate detection working correctly - Orders are hard deleted, no soft delete mechanism
+- [x] Update functionality in upload now working - "Update Existing" button calls bulkUpsertOrders() to update duplicates
+- [x] Implemented bulkUpsertOrders() function that updates existing orders instead of throwing errors
+- [x] Updated bulkCreate mutation to accept { orders: [], updateExisting: boolean } format
+- [x] Updated Upload.tsx to pass updateExisting flag to mutation
+
+## New Features to Implement
+- [ ] Hybrid date/time format detection - Automatically detect and normalize multiple date/time formats
+- [ ] Add format conversion utilities for backend/frontend/middleware consistency
+- [ ] Reschedule dialog - Show date/time picker when order status changes to "rescheduled"
+- [ ] Multi-select orders in Schedule - Allow selecting multiple orders for bulk assignment
+- [ ] Bulk assignment functionality - Assign multiple selected orders to an installer at once
+
+## New Features Completed
+- [x] Hybrid date/time format detection and conversion utilities
+- [x] Reschedule dialog with date/time picker when status changes to rescheduled
+- [x] Multi-select bulk assignment functionality in Schedule page
+
+## Duplicate Detection Bug
+- [ ] Investigate why deleted orders still show as duplicates
+- [ ] Verify delete functionality is working correctly
+- [ ] Fix delete or duplicate detection logic
+
+## Duplicate Detection Bug Fixed
+- [x] Investigated why deleted orders still show as duplicates
+- [x] Found that deleteOrder function wasn't deleting related assignments first
+- [x] Fixed deleteOrder to delete assignments before deleting order
+
+## Multi-User Collaboration Features
+- [ ] Implement auto-refresh when switching tabs/pages
+- [ ] Default Orders page to show only today's orders
+- [ ] Add refetch on window focus for real-time updates
+
+## Multi-User Collaboration Features Completed
+- [x] Implemented auto-refresh when switching tabs/pages
+- [x] Default Orders page to show only today's orders
+- [x] Added refetch on window focus for real-time updates
+- [x] Added visual indicator for today's filter
+
+## Time Interval Improvements
+- [ ] Replace free-form time inputs with 30-minute interval dropdowns
+- [ ] Update reschedule dialog time picker
+- [ ] Update manual order creation time picker
+- [ ] Update order edit dialog time picker
+
+## Time Interval Improvements Completed
+- [x] Replace free-form time inputs with 30-minute interval dropdowns
+- [x] Update reschedule dialog time picker
+- [x] Update manual order creation time picker
+- [x] Update order edit dialog time picker
+- [x] Create generateTimeSlots and formatTimeSlot utilities
+
+## Orders Page Date Filter Fix (USER REPORTED - COMPLETED)
+- [x] Investigated date filter stuck on November 14, 2025
+- [x] Added useEffect to reset date to actual today on component mount
+- [x] Added visibility change listener to update date when switching tabs
+- [x] Orders page now always shows current day's appointments by default
+- [x] Consistent with Schedule page behavior
+
+## Quick Date Shortcuts (USER REQUESTED)
+- [x] Add Yesterday, Today, Tomorrow buttons above date picker
+- [x] Style buttons to match existing UI design
+- [x] Implement click handlers to update date filter
+- [x] Highlight active button (e.g., Today when showing today's orders)
+
+## Custom Date Range Filter (USER REQUESTED)
+- [x] Add state management for start and end dates
+- [x] Update filter logic to support date range (between start and end)
+- [x] Add UI with start date and end date inputs
+- [x] Add "Date Range" toggle/button to switch between single date and range mode
+- [x] Add quick range presets (This Week, Last 7 Days, This Month)
+- [x] Add clear button for date range
+
+## Update Sorting Columns (USER REQUESTED)
+- [x] Remove sorting from: WO No., Customer, WO Type, Priority, Docket
+- [x] Keep sorting only on: Ticket No., Service No., Status, Installer, Assignment
+- [x] Update table headers to show sort icons only on sortable columns
+- [x] Update sorting logic to support the 5 sortable columns
+- [x] Installer sorting uses assignment data to get installer names
+
+## Fix Installer Sorting Error (USER REPORTED BUG)
+- [x] Fix "Cannot access 'br' before initialization" error when clicking installer sort
+- [x] Move assignments and installers data loading before sorting logic
+- [x] Ensure installer sorting can safely access assignment and installer data
+
+## Update All Documentation (USER REQUESTED)
+- [x] Create prd.md (Product Requirements Document)
+- [x] Create setup.md with installation and deployment guide
+- [x] Create howto.md with comprehensive user guide
+- [x] Create technical.md with implementation details
+- [x] Create spec.md with feature specifications
+- [x] Create wire.md with UI wireframes and design system
+- [x] Update ARCHITECTURE.md with system architecture
+- [ ] Commit and push all changes to GitHub

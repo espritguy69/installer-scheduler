@@ -68,6 +68,7 @@ export default function ScheduleNew() {
   const [showAddOrderDialog, setShowAddOrderDialog] = useState(false);
   const [newOrder, setNewOrder] = useState({
     orderNumber: "",
+    serviceNumber: "",
     customerName: "",
     customerPhone: "",
     serviceType: "",
@@ -120,8 +121,8 @@ export default function ScheduleNew() {
   };
 
   const handleAddOrder = async () => {
-    if (!newOrder.orderNumber || !newOrder.customerName) {
-      toast.error("Order number and customer name are required");
+    if (!newOrder.serviceNumber || !newOrder.customerName) {
+      toast.error("Service number and customer name are required");
       return;
     }
 
@@ -134,6 +135,7 @@ export default function ScheduleNew() {
       setShowAddOrderDialog(false);
       setNewOrder({
         orderNumber: "",
+        serviceNumber: "",
         customerName: "",
         customerPhone: "",
         serviceType: "",

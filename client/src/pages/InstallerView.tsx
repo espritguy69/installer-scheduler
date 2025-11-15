@@ -59,21 +59,33 @@ export default function InstallerView() {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-gray-100 text-gray-800";
       case "assigned":
         return "bg-blue-100 text-blue-800";
       case "on_the_way":
-        return "bg-indigo-100 text-indigo-800";
+        return "bg-amber-100 text-amber-800";
       case "met_customer":
-        return "bg-purple-100 text-purple-800";
-      case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-100 text-emerald-800";
+      case "order_completed":
+        return "bg-lime-100 text-lime-800";
       case "docket_received":
         return "bg-teal-100 text-teal-800";
       case "docket_uploaded":
         return "bg-cyan-100 text-cyan-800";
-      case "rescheduled":
+      case "ready_to_invoice":
+        return "bg-indigo-100 text-indigo-800";
+      case "invoiced":
+        return "bg-violet-100 text-violet-800";
+      case "completed":
+        return "bg-green-600 text-white";
+      case "customer_issue":
         return "bg-orange-100 text-orange-800";
+      case "building_issue":
+        return "bg-yellow-100 text-yellow-800";
+      case "network_issue":
+        return "bg-pink-100 text-pink-800";
+      case "rescheduled":
+        return "bg-purple-100 text-purple-800";
       case "withdrawn":
         return "bg-red-100 text-red-800";
       default:
@@ -321,12 +333,19 @@ export default function InstallerView() {
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="assigned">Assigned</SelectItem>
                   <SelectItem value="on_the_way">On the Way</SelectItem>
                   <SelectItem value="met_customer">Met the Customer</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="order_completed">Order Completed</SelectItem>
                   <SelectItem value="docket_received">Docket Received</SelectItem>
                   <SelectItem value="docket_uploaded">Docket Uploaded</SelectItem>
+                  <SelectItem value="ready_to_invoice">Ready to Invoice</SelectItem>
+                  <SelectItem value="invoiced">Invoiced</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="customer_issue">Customer Issue</SelectItem>
+                  <SelectItem value="building_issue">Building Issue</SelectItem>
+                  <SelectItem value="network_issue">Network Issue</SelectItem>
                   <SelectItem value="rescheduled">Reschedule</SelectItem>
                   <SelectItem value="withdrawn">Withdrawn</SelectItem>
                 </SelectContent>

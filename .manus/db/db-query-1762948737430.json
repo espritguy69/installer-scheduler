@@ -1,0 +1,110 @@
+{
+  "query": "SELECT serviceNumber, orderNumber, COUNT(*) as count FROM orders GROUP BY serviceNumber, orderNumber HAVING count > 1 ORDER BY count DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4KjEyGefdGKEBan.root --database c3KvsoBMNwGAdMjNMfT44s --execute SELECT serviceNumber, orderNumber, COUNT(*) as count FROM orders GROUP BY serviceNumber, orderNumber HAVING count > 1 ORDER BY count DESC LIMIT 20;",
+  "rows": [
+    {
+      "serviceNumber": "DIGI0016832",
+      "orderNumber": "",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB060925G",
+      "orderNumber": "A1795798",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB063118G",
+      "orderNumber": "A1797227",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB061100G",
+      "orderNumber": "A1795924",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB061798G",
+      "orderNumber": "A1796328",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB061646G",
+      "orderNumber": "A1796516",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB048191G",
+      "orderNumber": "A1794511",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNA097172G",
+      "orderNumber": "M1786067",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB063652G",
+      "orderNumber": "A1797542",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB060737G",
+      "orderNumber": "A1795671",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB063115G",
+      "orderNumber": "A1797224",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB063103G",
+      "orderNumber": "A1797217",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNA895630G",
+      "orderNumber": "M1794306",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBN145614G",
+      "orderNumber": "M1795173",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB063661G",
+      "orderNumber": "A1797556",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBN354524G",
+      "orderNumber": "M1795016",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB060225G",
+      "orderNumber": "A1795297",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB063121G",
+      "orderNumber": "A1797222",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "",
+      "orderNumber": "ACTIVATION",
+      "count": "2"
+    },
+    {
+      "serviceNumber": "TBBNB063619G",
+      "orderNumber": "A1797532",
+      "count": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "serviceNumber\torderNumber\tcount\nDIGI0016832\t\t2\nTBBNB060925G\tA1795798\t2\nTBBNB063118G\tA1797227\t2\nTBBNB061100G\tA1795924\t2\nTBBNB061798G\tA1796328\t2\nTBBNB061646G\tA1796516\t2\nTBBNB048191G\tA1794511\t2\nTBBNA097172G\tM1786067\t2\nTBBNB063652G\tA1797542\t2\nTBBNB060737G\tA1795671\t2\nTBBNB063115G\tA1797224\t2\nTBBNB063103G\tA1797217\t2\nTBBNA895630G\tM1794306\t2\nTBBN145614G\tM1795173\t2\nTBBNB063661G\tA1797556\t2\nTBBN354524G\tM1795016\t2\nTBBNB060225G\tA1795297\t2\nTBBNB063121G\tA1797222\t2\n\tACTIVATION\t2\nTBBNB063619G\tA1797532\t2\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}
