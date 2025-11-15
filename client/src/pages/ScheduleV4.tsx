@@ -346,6 +346,7 @@ export default function ScheduleV4() {
   const [, navigate] = useLocation();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [showAllUnassigned, setShowAllUnassigned] = useState(false);
   const [isScheduleConfirmed, setIsScheduleConfirmed] = useState(false);
   const [timeChangeDialog, setTimeChangeDialog] = useState<{
     open: boolean;
@@ -431,9 +432,16 @@ export default function ScheduleV4() {
     return null;
   }
 
-  // Filter orders for selected date
+  // Filter orders for selected date or all unassigned
   const ordersForDate = orders.filter((order) => {
     if (!order.appointmentDate || !order.appointmentTime) return false;
+    
+    // If showing all unassigned, only show orders without assignments
+    if (showAllUnassigned) {
+      const isAssigned = assignments.some(a => a.orderId === order.id);
+      const statusMatches = !statusFilter || order.status === statusFilter;
+      return !isAssigned && statusMatches;
+    }
     
     // Parse appointment date using shared utility
     const orderDate = parseAppointmentDate(order.appointmentDate);
@@ -962,19 +970,39 @@ export default function ScheduleV4() {
             <div className="flex-1">
               {/* Date Navigation */}
               <div className="flex items-center justify-between mb-4">
-                <Button variant="outline" size="sm" onClick={handlePreviousDay}>
+                <Button variant="outline" size="sm" onClick={handlePreviousDay} disabled={showAllUnassigned}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <div className="text-lg font-semibold">
-                  {selectedDate.toLocaleDateString("en-US", {
+                  {showAllUnassigned ? "All Unassigned Orders" : selectedDate.toLocaleDateString("en-US", {
                     weekday: "long",
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                   })}
                 </div>
-                <Button variant="outline" size="sm" onClick={handleNextDay}>
+                <Button variant="outline" size="sm" onClick={handleNextDay} disabled={showAllUnassigned}>
                   <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {/* View Toggle */}
+              <div className="flex gap-2 mb-4">
+                <Button
+                  variant={!showAllUnassigned ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowAllUnassigned(false)}
+                  className="text-xs"
+                >
+                  Daily View
+                </Button>
+                <Button
+                  variant={showAllUnassigned ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowAllUnassigned(true)}
+                  className="text-xs"
+                >
+                  All Unassigned
                 </Button>
               </div>
 

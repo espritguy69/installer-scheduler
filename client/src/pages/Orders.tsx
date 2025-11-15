@@ -1113,12 +1113,12 @@ export default function Orders() {
                               <div className="text-sm">
                                 {order.appointmentDate && (
                                   <div className="text-xs font-medium">
-                                    {order.appointmentDate}
+                                    {parseAppointmentDate(order.appointmentDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) || order.appointmentDate}
                                   </div>
                                 )}
                                 {order.appointmentTime && (
                                   <div className="text-xs text-muted-foreground">
-                                    {order.appointmentTime}
+                                    {normalizeTimeFormat(order.appointmentTime) || order.appointmentTime}
                                   </div>
                                 )}
                               </div>
@@ -1127,12 +1127,12 @@ export default function Orders() {
                                 <div className="text-xs text-muted-foreground">Not assigned</div>
                                 {order.appointmentDate && (
                                   <div className="text-xs font-medium">
-                                    {order.appointmentDate}
+                                    {parseAppointmentDate(order.appointmentDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) || order.appointmentDate}
                                   </div>
                                 )}
                                 {order.appointmentTime && (
                                   <div className="text-xs">
-                                    {order.appointmentTime}
+                                    {normalizeTimeFormat(order.appointmentTime) || order.appointmentTime}
                                   </div>
                                 )}
                               </div>

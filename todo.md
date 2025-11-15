@@ -1348,4 +1348,12 @@
 - [x] Create CHANGELOG.md with all historical changes
 - [x] Document all features, fixes, and bugs chronologically
 - [x] Use standard changelog format (Added, Changed, Fixed, Removed)
-- [ ] Commit and push to GitHub
+- [x] Commit and push to GitHub
+
+## Date Format Inconsistency & Schedule Display (USER REPORTED - CRITICAL)
+- [x] Fix date format showing "2025-11-15" instead of "Nov 15, 2025" - Now shows "Nov 15, 2025"
+- [x] Fix time format showing "11:30" instead of "11:30 AM" - Now uses normalizeTimeFormat()
+- [x] Ensure consistent date/time formatting across ALL pages (Orders table updated)
+- [x] Add "All Unassigned" view to Schedule page to show ALL unassigned orders regardless of date
+- [x] Added Daily View / All Unassigned toggle buttons
+- [ ] Test with user's order (BBNB057207G) to verify it appears and formats correctly
