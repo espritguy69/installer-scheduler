@@ -1034,6 +1034,12 @@ export default function Orders() {
                                     Met customer
                                   </span>
                                 </SelectItem>
+                                <SelectItem value="order_completed">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-lime-500"></span>
+                                    Order Completed
+                                  </span>
+                                </SelectItem>
                                 <SelectItem value="completed">
                                   <span className="inline-flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-green-500"></span>
@@ -1050,6 +1056,36 @@ export default function Orders() {
                                   <span className="inline-flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
                                     Docket Uploaded
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="ready_to_invoice">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
+                                    Ready to Invoice
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="invoiced">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-violet-500"></span>
+                                    Invoiced
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="customer_issue">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-orange-600"></span>
+                                    Customer Issue
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="building_issue">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-yellow-600"></span>
+                                    Building Issue
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="network_issue">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-pink-500"></span>
+                                    Network Issue
                                   </span>
                                 </SelectItem>
                                 <SelectItem value="rescheduled">
